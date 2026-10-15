@@ -26,8 +26,10 @@ const WORLD_PRESETS := {
 	"guardrail": { "lit_value": 0.95 },
 	"post": { "lit_value": 0.12 },
 	"leaves": { "lit_value": 0.36, "near_detail": 25.0, "far_detail": 300.0, "far_value": 0.7 },
+	"bush": { "lit_value": 0.42 },
+	"grass": { "lit_value": 0.5 },
 	"trunk": { "lit_value": 0.12 },
-	"backdrop": { "lit_value": 0.7, "near_detail": 600.0, "far_detail": 1800.0, "far_value": 0.8 },
+	"backdrop": { "lit_value": 0.7, "flat_light": true, "near_detail": 600.0, "far_detail": 1800.0, "far_value": 0.8 },
 	"sign": { "lit_value": 0.95, "pattern_mode": 1 },
 	"delineator": { "lit_value": 0.95, "pattern_mode": 2 },
 	"pole": { "lit_value": 0.3 },
@@ -156,7 +158,8 @@ static func environment() -> Environment:
 static func sun() -> DirectionalLight3D:
 	var light := DirectionalLight3D.new()
 	light.name = "Sun"
-	light.rotation_degrees = Vector3(-38, 140, 0)
+	# Low afternoon sun: long raking shadows across the road.
+	light.rotation_degrees = Vector3(-24, 125, 0)
 	light.shadow_enabled = true
 	# Hard shadows (manga) over a short distance: far away everything is tone and silhouette.
 	light.directional_shadow_max_distance = 80.0
@@ -175,7 +178,8 @@ static func apply_night(value: float) -> void:
 	night = value
 	RenderingServer.global_shader_parameter_set("manga_night", value)
 	# Night ambient keeps unlit faces in tone rather than flat ink; ink is for real shadows.
-	RenderingServer.global_shader_parameter_set("manga_ambient", lerpf(0.32, 0.07, value))
+	RenderingServer.global_shader_parameter_set("manga_ambient", lerpf(0.3, 0.07, value))
 	if is_instance_valid(_sun):
 		# Moonlight is just enough to separate lit slopes (dense tone) from shadow (ink).
-		_sun.light_energy = lerpf(1.0, 0.18, value)
+		# Day sun kept moderate: lit surfaces sit in the gray bands so their detail survives.
+		_sun.light_energy = lerpf(0.62, 0.18, value)

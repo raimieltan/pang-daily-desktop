@@ -543,7 +543,8 @@ func build_guardrails(parent: Node3D, owner: Node) -> void:
 func build_trees(parent: Node3D, owner: Node, bounds: Rect2, grid: Dictionary) -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = seed_ * 31 + 5
-	var transforms: Array[Transform3D] = []
+	# Three cedar variants so the forest doesn't repeat one silhouette.
+	var variants: Array = [[], [], []]
 	var attempts := int(bounds.get_area() / 90.0)
 	for n in attempts:
 		var x := rng.randf_range(bounds.position.x, bounds.end.x)
@@ -556,16 +557,59 @@ func build_trees(parent: Node3D, owner: Node, bounds: Rect2, grid: Dictionary) -
 		if d > 70.0 and rng.randf() > 0.35:
 			continue
 		var h := _grid_height(bounds, grid, x, z)
-		var scale := rng.randf_range(0.8, 1.35)
+		var scale := rng.randf_range(0.8, 1.3)
 		var basis := Basis(Vector3.UP, rng.randf() * TAU).scaled(Vector3(scale, scale * rng.randf_range(0.9, 1.2), scale))
-		transforms.append(Transform3D(basis, Vector3(x, h - 0.2, z)))
-	print("trees: %d" % transforms.size())
-	var trees := Scatter.make_chunked("Trees", TrackMaterials.cedar_mesh(), transforms)
+		(variants[n % 3] as Array).append(Transform3D(basis, Vector3(x, h - 0.2, z)))
+	var trees := Node3D.new()
+	trees.name = "Trees"
 	parent.add_child(trees)
 	trees.owner = owner
-	for part in trees.get_children():
-		(part as GeometryInstance3D).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-		part.owner = owner
+	var total := 0
+	for v in 3:
+		var xforms: Array[Transform3D] = []
+		xforms.assign(variants[v])
+		total += xforms.size()
+		var chunked := Scatter.make_chunked("Cedar%d" % v, TrackMaterials.cedar_mesh(v), xforms)
+		trees.add_child(chunked)
+		chunked.owner = owner
+		for part in chunked.get_children():
+			(part as GeometryInstance3D).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			part.owner = owner
+	print("trees: %d" % total)
+	_build_undergrowth(parent, owner, bounds, grid, rng)
+
+
+## Bushes and grass along the verges and the forest edge, close to the road where it is seen.
+func _build_undergrowth(parent: Node3D, owner: Node, bounds: Rect2, grid: Dictionary, rng: RandomNumberGenerator) -> void:
+	var bushes: Array[Transform3D] = []
+	var grass: Array[Transform3D] = []
+	for i in range(0, pts.size(), 1):
+		for side in 2:
+			var s := 1.0 if side == 1 else -1.0
+			# Grass: a few tufts per metre on each side, just beyond the road's own geometry.
+			for k in 3:
+				var lateral := s * (skirt[i][side] + rng.randf_range(0.2, 9.0))
+				var p := pts[i] + rgt[i] * lateral + fwd[i] * rng.randf_range(-0.5, 0.5)
+				if nearest_sample(p.x, p.z) >= 0 and Vector2(p.x - pts[nearest_sample(p.x, p.z)].x, p.z - pts[nearest_sample(p.x, p.z)].z).length() < 4.5:
+					continue
+				var h := _grid_height(bounds, grid, p.x, p.z)
+				var sc := rng.randf_range(0.8, 1.5)
+				grass.append(Transform3D(Basis(Vector3.UP, rng.randf() * TAU).scaled(Vector3(sc, sc, sc)), Vector3(p.x, h - 0.05, p.z)))
+			if i % 6 == 0 and rng.randf() < 0.6:
+				var lateral := s * (skirt[i][side] + rng.randf_range(1.0, 12.0))
+				var p := pts[i] + rgt[i] * lateral
+				var h := _grid_height(bounds, grid, p.x, p.z)
+				var sc := rng.randf_range(0.7, 1.4)
+				bushes.append(Transform3D(Basis(Vector3.UP, rng.randf() * TAU).scaled(Vector3(sc, sc, sc)), Vector3(p.x, h - 0.1, p.z)))
+	var g := Scatter.make_chunked("Grass", TrackMaterials.grass_mesh(), grass, 60.0, 110.0)
+	var b := Scatter.make_chunked("Bushes", TrackMaterials.bush_mesh(), bushes, 100.0, 260.0)
+	for node in [g, b]:
+		parent.add_child(node)
+		node.owner = owner
+		for part in node.get_children():
+			(part as GeometryInstance3D).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			part.owner = owner
+	print("grass tufts: %d, bushes: %d" % [grass.size(), bushes.size()])
 
 
 static func _grid_height(bounds: Rect2, grid: Dictionary, x: float, z: float) -> float:
