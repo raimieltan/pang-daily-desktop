@@ -42,7 +42,7 @@ func _ready() -> void:
 
 
 func _car_id() -> String:
-	return "banwa_dalagan_1996_" + session.car.preset
+	return "dalagan_gsr_" + session.car.preset
 
 
 func restart() -> void:

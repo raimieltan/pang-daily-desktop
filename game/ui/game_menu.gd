@@ -93,7 +93,7 @@ func _build_pause() -> void:
 	_value_button(left, _camera_text, _cycle_camera)
 	_value_button(left, _time_text, _toggle_time)
 	_value_button(left, func(): return "TUNE: " + ("DRIFT" if session.car.preset.ends_with("drift") else "STOCK"),
-		func(): session.car.set_preset("fwd_worn_sedan_drift" if session.car.preset == "fwd_worn_sedan" else "fwd_worn_sedan"))
+		func(): session.car.toggle_tune())
 	_value_button(left, func(): return "TIRES: " + session.car.tire_product.to_upper(),
 		func(): session.car.set_tire_product("street" if session.car.tire_product == "stock" else "stock"))
 	_button(left, "MAIN MENU", open_title)

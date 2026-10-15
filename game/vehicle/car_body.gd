@@ -25,9 +25,9 @@ var collision_config := {
 	"angularDamping": 0.5,
 }
 
-@export_enum("fwd_worn_sedan", "fwd_worn_sedan_drift") var preset := "fwd_worn_sedan"
-## Tire product on all four corners. The Babylon starter car leaves the factory on stock eco rubber.
-@export_enum("stock", "street") var tire_product := "stock"
+@export_enum("awd_gsr", "awd_gsr_drift", "fwd_worn_sedan", "fwd_worn_sedan_drift") var preset := "awd_gsr"
+## Tire product on all four corners. The GSR leaves the factory on street rubber; the worn sedan on eco.
+@export_enum("stock", "street") var tire_product := "street"
 
 ## A body contact this step: { point, normal, dv (m/s of impulse), slide (m/s along the surface) }.
 ## Read by effects after the physics step; side hits (walls, rails) only.
@@ -100,6 +100,11 @@ func _update_mass() -> void:
 	center_of_mass = Vector3(0.0, _cg_height, -collision_config["centerOfMass"]["z"])
 	inertia = Vector3(m * (h2 + l2) / 12.0, m * (w2 + l2) / 12.0, m * (w2 + h2) / 12.0)
 	solver.baseline["mass"] = m
+
+
+## Swap between a car's stock and drift tune.
+func toggle_tune() -> void:
+	set_preset(preset.trim_suffix("_drift") if preset.ends_with("_drift") else preset + "_drift")
 
 
 func set_preset(id: String) -> void:

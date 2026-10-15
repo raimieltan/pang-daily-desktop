@@ -1,7 +1,7 @@
 class_name HandlingPresets
 ## Handling configs as plain Dictionaries with the same shape and units as the TS
 ## `HandlingConfig` (`src/game/vehicles/handling/HandlingConfig.ts`), so they round-trip to JSON/saves.
-## Only the Dalagan's tunes are ported so far.
+## The Dalagan 1996 tunes are TS ports (parity-tested); the GSR (Evo V) tunes are Godot-only.
 
 const STOCK_MECHANICAL := {
 	"engine": { "torqueNm": 215.0, "idleRpm": 850.0, "redlineRpm": 6500.0, "peakTorqueRpm": 3800.0, "inertia": 0.24,
@@ -34,7 +34,39 @@ const FWD_WORN_SEDAN := {
 	"pedals": { "throttleRise": 6.0, "throttleFall": 8.0, "brakeRise": 7.0, "brakeFall": 10.0 },
 }
 
+## Banwa Dalagan GSR, the Evo V: turbo four, AWD with a 40/60 split and limited-slip diffs,
+## street rubber. `mechanicalOverrides` replace the migrated drivetrain values with real ones.
+const AWD_GSR := {
+	"chassis": { "massKg": 1260.0, "wheelbaseM": 2.5, "frontWeight": 0.6, "cgHeightM": 0.5, "trackWidthM": 1.5, "yawInertiaScale": 1.05 },
+	"steering": { "maxAngleDeg": 32.0, "minAngleDeg": 2.0, "fullLockLateralG": 1.3, "turnInSeconds": 0.18, "unwindSeconds": 0.1 },
+	"drive": { "drivetrain": "AWD", "accelerationMps2": 5.4, "topSpeedKmh": 240.0, "reverseAccelerationMps2": 2.5, "reverseTopSpeedKmh": 25.0,
+		"engineBrakingMps2": 1.4, "rollingResistanceMps2": 0.15, "aeroDrag": 0.0003 },
+	"brakes": { "decelerationMps2": 9.5, "frontBias": 0.64 },
+	"tires": { "frontGrip": 1.0, "rearGrip": 1.0, "frontPeakSlipDeg": 7.0, "rearPeakSlipDeg": 6.5, "frontLoadSensitivity": 0.28, "rearLoadSensitivity": 0.25 },
+	"balance": { "understeer": 0.35, "rearSlideFalloff": 0.12, "weightTransfer": 0.6, "weightTransferRate": 5.0, "liftOffRotation": 0.12,
+		"liftOffMinSpeedKmh": 35.0, "liftOffBuildRate": 3.0, "liftOffReleaseRate": 6.0 },
+	"assists": { "traction": 0.3, "stability": 0.4, "stabilityThresholdDeg": 6.0 },
+	"handbrake": { "enabled": true, "minEffectiveSpeedKmh": 18.0, "fullEffectSpeedKmh": 45.0, "rearGripMultiplier": 0.5,
+		"frontGripMultiplier": 0.95, "rearBrakeMps2": 5.5, "engageSmoothing": 12.0, "releaseSmoothing": 8.0 },
+	"lowSpeed": { "kinematicBelowKmh": 5.0, "dynamicAboveKmh": 12.0, "holdBelowKmh": 1.5, "reverseEngageBelowKmh": 3.0, "reverseDelaySeconds": 0.35 },
+	"pedals": { "throttleRise": 7.0, "throttleFall": 9.0, "brakeRise": 8.0, "brakeFall": 11.0 },
+	"mechanicalOverrides": {
+		"engine": { "torqueNm": 373.0, "clutchTorqueNm": 560.0, "idleRpm": 900.0, "redlineRpm": 7500.0, "peakTorqueRpm": 3000.0,
+			"gearRatios": [2.785, 1.95, 1.407, 1.031, 0.761], "finalDrive": 4.529, "shiftSeconds": 0.15 },
+		"differential": { "type": "lsd", "lock": 0.35, "preloadNm": 60.0 },
+		"suspension": { "frontSpring": 34000.0, "rearSpring": 30000.0, "frontAntiRoll": 12000.0, "rearAntiRoll": 9000.0 },
+	},
+}
+
 const PRESETS := {
+	"awd_gsr": { "config": AWD_GSR },
+	"awd_gsr_drift": { "extends": "awd_gsr", "overrides": {
+		"tires": { "rearGrip": 0.95 },
+		"balance": { "understeer": 0.28, "rearSlideFalloff": 0.2, "liftOffRotation": 0.22 },
+		"assists": { "stability": 0.15 },
+		"handbrake": { "rearGripMultiplier": 0.38, "rearBrakeMps2": 6.5 },
+		"mechanicalOverrides": { "differential": { "lock": 0.55 } },
+	} },
 	"fwd_worn_sedan": { "config": FWD_WORN_SEDAN },
 	"fwd_worn_sedan_drift": { "extends": "fwd_worn_sedan", "overrides": {
 		"tires": { "rearGrip": 0.94 },
@@ -71,6 +103,8 @@ static func physical_config(config: Dictionary) -> Dictionary:
 	p["suspension"]["rearAntiRoll"] = 4500.0
 	# The preset's stability assist becomes ESC on the mechanical car (see the TS comment).
 	p["esc"] = config["assists"]["stability"] > 0.0
+	if config.has("mechanicalOverrides"):
+		p = SimMath.deep_merge(p, config["mechanicalOverrides"])
 	var out := config.duplicate(true)
 	out["mechanical"] = p
 	return out

@@ -82,7 +82,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("reset_car"):
 		reset_car()
 	elif event.is_action_pressed("toggle_tune"):
-		car.set_preset("fwd_worn_sedan_drift" if car.preset == "fwd_worn_sedan" else "fwd_worn_sedan")
+		car.toggle_tune()
 	elif event.is_action_pressed("toggle_tires"):
 		car.set_tire_product("street" if car.tire_product == "stock" else "stock")
 	elif event.is_action_pressed("toggle_night"):
