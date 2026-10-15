@@ -1,0 +1,59 @@
+// Temporary: writes TS reference traces for the Godot port's parity tests. Not committed.
+import { writeFileSync } from 'node:fs';
+import { test } from 'vitest';
+import { ArcadeHandlingModel, type DriverInput } from './handling/ArcadeHandlingModel';
+import { resolveHandlingPreset } from './handling/HandlingConfig';
+import { HANDLING_PRESETS } from './handling/presets';
+import { physicalConfig, suspensionBaseline } from './suspensionConfig';
+import { SuspensionSolver } from '@/game-core/suspension/solver';
+import { createSuspension } from '@/game-core/suspension/schema';
+
+const DT = 1 / 120;
+type Phase = { seconds: number; input: DriverInput };
+
+function run(preset: string, vx: number, phases: Phase[]) {
+  const model = new ArcadeHandlingModel(physicalConfig(resolveHandlingPreset(HANDLING_PRESETS, preset)));
+  model.syncMotion(vx, 0, 0);
+  const contact = { front: 1, rear: 1 };
+  const samples: Record<string, number>[] = [];
+  let t = 0, frame = 0;
+  for (const phase of phases) {
+    const frames = Math.round(phase.seconds / DT);
+    for (let i = 0; i < frames; i++) {
+      model.step(DT, phase.input, contact);
+      t += DT; frame++;
+      if (frame % 30 === 0) {
+        const s = model.state, m = model.mechanics, d = model.diagnostics;
+        samples.push({ t, vx: s.vx, vy: s.vy, yawRate: s.yawRate, steer: s.steerAngle, gear: m.powertrain.gear,
+          rpm: m.powertrain.engineRpm, w0: m.wheels[0].angularVelocity, w2: m.wheels[2].angularVelocity,
+          frontGripUse: d.frontGripUse, rearGripUse: d.rearGripUse, drifting: Number(m.detector.drifting) });
+      }
+    }
+  }
+  return { preset, vx, phases, samples };
+}
+
+function suspension() {
+  const config = resolveHandlingPreset(HANDLING_PRESETS, 'fwd_worn_sedan');
+  const baseline = suspensionBaseline(config); baseline.radius = .3;
+  const solver = new SuspensionSolver(baseline, createSuspension(baseline));
+  const samples: Record<string, number>[] = [];
+  const snap = (t: number) => samples.push({ t, heave: solver.pose.heave, pitch: solver.pose.pitch, roll: solver.pose.roll,
+    ...Object.fromEntries(solver.corners.flatMap((c, i) => [[`q${i}`, c.compression], [`load${i}`, c.wheelLoad], [`camber${i}`, c.camber], [`steer${i}`, c.steeringAngle]])) });
+  for (let i = 1; i <= 120; i++) { solver.preview(1 / 60); if (i % 30 === 0) snap(i / 60); }
+  for (let i = 1; i <= 60; i++) { solver.preview(1 / 60, 3, 6, .3); if (i % 15 === 0) snap(2 + i / 60); }
+  return { baseline, samples };
+}
+
+test('write Godot parity fixtures', () => {
+  const ai = (throttle: number, brake: number, steer: number, handbrake = 0, device: DriverInput['device'] = 'ai'): DriverInput =>
+    ({ throttle, brake, steer, handbrake, device });
+  const fixtures = {
+    launch: run('fwd_worn_sedan', 0, [{ seconds: 8, input: ai(1, 0, 0) }]),
+    brake: run('fwd_worn_sedan', 27.78, [{ seconds: 4, input: ai(0, 1, 0) }]),
+    stepSteer: run('fwd_worn_sedan', 16.67, [{ seconds: 3, input: ai(.3, 0, .5, 0, 'keyboard') }]),
+    handbrake: run('fwd_worn_sedan_drift', 13.9, [{ seconds: 1, input: ai(0, 0, .6, 1, 'keyboard') }, { seconds: 2, input: ai(.5, 0, .2, 0, 'keyboard') }]),
+    suspension: suspension(),
+  };
+  writeFileSync('/Users/sean/pang-daily/tests/fixtures/ts_reference.json', JSON.stringify(fixtures, null, 1));
+});
