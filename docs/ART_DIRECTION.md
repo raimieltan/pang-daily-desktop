@@ -106,6 +106,10 @@ Lettering is part of the scene, so it gets occluded and rotated with the camera.
   T2 mass with an ink skyline stroke.
 - **Sky:** paper. Dusk adds a T1 tone band near the horizon. Night inverts to a T3/ink sky with
   paper stars and a paper moon.
+- **Setting: Philippine provincial mountain roads, not Japan.** Signage is DPWH-style: white
+  boards with red lettering (SLOW DOWN, MENOR, ACCIDENT PRONE AREA, BAWAL MAG-OVERTAKE), white
+  kilometre posts, convex mirrors at hairpins. Street lamps are sodium orange (heads and a tinted
+  pool core), never white. No kanji, torii or vending machines.
 - **Iloilo flavor** carries over from the old doc: utility poles, tangled wires (great ink
   linework), sari-sari stores, roadside shrines, jeepney signage. All of it is drawn, not textured.
 
@@ -158,6 +162,8 @@ driven by state). Outline width is per part: 2.2 cm on the body, 0.6–1.8 cm on
 |---|---|---|
 | Taillights + red road pool | brake pedal; dim tail lamps at night | `CarVisual._update_lamps` |
 | Warm headlight cones | night | spot lights, banded in the world shader |
+| Sodium lamp heads + orange pool cores | always (street lamps) | `MangaArt.lamp`, `lamp_tint` in the world shader |
+| Red sign lettering | always (warning boards) | `TrackBuilder._build_board` |
 | Yellow-orange sparks | sliding along a wall/rail > 4 m/s | `CarFx` (contact slide speed) |
 | Impact frame + shake | contact impulse > 3 m/s Δv | page pass `impact`, `ChaseCamera.add_impact` |
 | Pale blue-white streaks | top ~20% of speed-line intensity | page pass |

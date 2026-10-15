@@ -16,6 +16,8 @@ const SCENARIOS := {
 	# Flips the on-screen day/night switch after the first shot.
 	"switch": [[2.5, 0, 0, 0, 0, "switch_day"], [2.8, 0, 0, 0, 0, "switch_mid"], [3.6, 0, 0, 0, 0, "switch_night"]],
 	"overview": [[2.0, 0, 0, 0, 0, ""], [9.0, 0.85, 0, 0, 0, "overview"]],
+	# Standing shot (pair with PANG_DIST) to check roadside props by day.
+	"props": [[1.5, 0, 0, 0, 0, "props_day"]],
 }
 
 var _scene

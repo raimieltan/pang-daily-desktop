@@ -2,8 +2,9 @@ shader_type spatial;
 // World surfaces output plain lit GRAYSCALE; the manga compositor (manga_post.glsl) turns it into
 // ink / screentone / paper bands. Monochrome by design, the car is the only color on the page.
 //  - Moon/sun: albedo gray × (ambient + N·L × shadow).
-//  - Lamps (spot/omni): a hard-edged paper-white core, plus a smooth falloff outside it that the
-//    tone ramp bands into screentone. No soft colored glow.
+//  - Lamps (spot/omni): a hard-edged core, plus a smooth falloff outside it that the tone ramp
+//    bands into screentone. White lamps (headlights) give a paper core; colored lamps (sodium
+//    street lamps) tint the core enough to stay a color accent on the page. No soft glow.
 render_mode diffuse_lambert, specular_disabled, ambient_light_disabled;
 
 global uniform float manga_night;
@@ -28,6 +29,8 @@ group_uniforms lamps;
 uniform float lamp_core = 0.6;
 /// How much light outside the core still reaches the tone ramp.
 uniform float lamp_falloff = 0.8;
+/// How much of a colored lamp's hue the hard core keeps (0 = always paper).
+uniform float lamp_tint : hint_range(0.0, 1.0) = 0.6;
 group_uniforms;
 
 group_uniforms road;
@@ -133,7 +136,9 @@ void light() {
 		float peak = max(LIGHT_COLOR.r, max(LIGHT_COLOR.g, LIGHT_COLOR.b));
 		float i = ATTENUATION * peak * (0.45 + 0.55 * ndotl);
 		float core = step(lamp_core, i);
-		// Paper inside the cone whatever the albedo; outside, a falloff for the ramp to band.
-		DIFFUSE_LIGHT += vec3(core * 1.1 + (1.0 - core) * i * v_albedo * lamp_falloff * 2.0);
+		vec3 hue = mix(vec3(1.0), LIGHT_COLOR / max(peak, 1e-4), lamp_tint);
+		// Paper (or the lamp's hue) inside the cone whatever the albedo; outside, a falloff for the
+		// ramp to band.
+		DIFFUSE_LIGHT += core * 1.1 * hue + vec3((1.0 - core) * i * v_albedo * lamp_falloff * 2.0);
 	}
 }

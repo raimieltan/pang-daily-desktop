@@ -11,6 +11,9 @@ const SKY_SHADER := preload("res://game/art/manga_sky.gdshader")
 
 const PAPER := Color("#F3EDE1")
 const INK := Color("#111111")
+## Spot colors allowed in the world (sparingly): sodium street lamps and red sign lettering.
+const SODIUM := Color(1.0, 0.6, 0.2)
+const SIGN_RED := Color(0.8, 0.07, 0.05)
 
 enum Kind { PAINT, GLASS, LAMP, RUBBER, METAL }
 
@@ -34,6 +37,7 @@ const WORLD_PRESETS := {
 	"delineator": { "lit_value": 0.95, "pattern_mode": 2 },
 	"pole": { "lit_value": 0.3 },
 	"lamp_head": { "lit_value": 0.9 },
+	"board": { "lit_value": 0.95 },
 }
 
 ## Day/night state (0 day .. 1 night), mirrored from the `manga_night` global.
@@ -63,6 +67,14 @@ static func accent(color: Color) -> ShaderMaterial:
 	m.set_shader_parameter("albedo", color)
 	m.set_shader_parameter("glint", false)
 	m.set_shader_parameter("streak_width", 0.0)
+	return m
+
+
+## A lit lamp face in the world (street lamp heads): toon color plus a steady glow.
+static func lamp(color: Color, glow := 0.8) -> ShaderMaterial:
+	var m := accent(color)
+	m.set_shader_parameter("kind", int(Kind.LAMP))
+	m.set_shader_parameter("glow", glow)
 	return m
 
 

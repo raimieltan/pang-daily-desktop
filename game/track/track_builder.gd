@@ -734,10 +734,11 @@ func build_backdrop(parent: Node3D, owner: Node, bounds: Rect2) -> void:
 
 # --- Roadside furniture ----------------------------------------------------------------------------
 
-## Touge roadside props, all black-and-white graphics for the manga page:
-## chevron boards on the outside of tight corners, delineator posts, utility poles with sagging
-## wires along one stretch, convex traffic mirrors at hairpin apexes, and street lamps at the start
-## and goal (hard white pools at night).
+## Philippine provincial mountain-road props, black-and-white graphics for the manga page with
+## sparse spot color: chevron boards on the outside of tight corners, delineator posts, utility
+## poles with sagging wires along one stretch, convex traffic mirrors at hairpin apexes, DPWH-style
+## white boards with red lettering before tight corners, kilometre posts, and sodium street lamps
+## (orange heads and pools) at the start and goal and through the barangay stretch after the start.
 func build_props(parent: Node3D, owner: Node, start_distance: float, finish_distance: float) -> void:
 	var props := Node3D.new()
 	props.name = "Props"
@@ -747,8 +748,13 @@ func build_props(parent: Node3D, owner: Node, start_distance: float, finish_dist
 	_build_delineators(props, owner)
 	_build_poles(props, owner, 180.0, 720.0)
 	_build_mirrors(props, owner)
-	for d in [start_distance - 6.0, start_distance + 40.0, finish_distance - 20.0, finish_distance + 12.0]:
+	var lamps := [start_distance - 6.0, finish_distance - 20.0, finish_distance + 12.0]
+	for k in 6:
+		lamps.append(start_distance + 40.0 + k * 55.0)
+	for d in lamps:
 		_build_street_lamp(props, owner, d)
+	_build_warning_signs(props, owner, start_distance, finish_distance)
+	_build_km_posts(props, owner, start_distance, finish_distance)
 
 
 ## Ground point beside the road at `lateral` metres (signed, right +) at sample `i`.
@@ -947,7 +953,7 @@ func _build_street_lamp(parent: Node3D, owner: Node, distance: float) -> void:
 	var head := MeshInstance3D.new()
 	var hm := BoxMesh.new()
 	hm.size = Vector3(0.5, 0.14, 0.28)
-	hm.material = MangaArt.world_preset("lamp_head")
+	hm.material = MangaArt.lamp(MangaArt.SODIUM)
 	head.mesh = hm
 	head.position = base + Vector3.UP * 6.95 + reach
 	root.add_child(head)
@@ -960,6 +966,95 @@ func _build_street_lamp(parent: Node3D, owner: Node, distance: float) -> void:
 	light.spot_angle_attenuation = 0.05
 	light.spot_attenuation = 0.5
 	light.light_energy = 2.4
+	light.light_color = MangaArt.SODIUM
 	light.shadow_enabled = false
 	root.add_child(light)
 	light.owner = owner
+
+
+const WARNINGS := [
+	["SLOW DOWN", "SHARP CURVE AHEAD"],
+	["MENOR", "DELIKADONG KURBADA"],
+	["ACCIDENT", "PRONE AREA"],
+	["DANGER", "SHARP CURVE"],
+	["BAWAL", "MAG-OVERTAKE"],
+	["DRIVE SAFELY", "KEEP RIGHT"],
+]
+
+
+## White boards with red lettering on the driver's side, ~45 m before every other tight corner.
+func _build_warning_signs(parent: Node3D, owner: Node, start_distance: float, finish_distance: float) -> void:
+	var lead := roundi(45.0 / SPACING)
+	var last := -1000
+	var n := 0
+	for i in range(lead, pts.size(), 2):
+		if absf(curvature[i]) < 1.0 / 35.0 or i - last < roundi(160.0 / SPACING):
+			continue
+		last = i
+		var at := i - lead
+		if at * SPACING < start_distance + 20.0 or at * SPACING > finish_distance - 20.0:
+			continue
+		var lines: Array = WARNINGS[n % WARNINGS.size()]
+		_build_board(parent, owner, at, 4.3, Vector2(2.2, 1.1), 1.4, lines[0], lines[1], MangaArt.SIGN_RED)
+		n += 1
+
+
+## White concrete kilometre posts every kilometre on the driver's side.
+func _build_km_posts(parent: Node3D, owner: Node, start_distance: float, finish_distance: float) -> void:
+	var km := 247
+	var d := start_distance + 150.0
+	while d < finish_distance:
+		var i := clampi(roundi(d / SPACING), 0, pts.size() - 1)
+		_build_board(parent, owner, i, 4.3, Vector2(0.42, 0.75), 0.0, "KM", str(km), MangaArt.INK)
+		km += 1
+		d += 1000.0
+
+
+## A board facing traffic at sample `i`, `lateral` m to the right, with two lines of lettering.
+## `height` 0 = a squat post standing on the ground (km post); otherwise a board on two posts.
+func _build_board(parent: Node3D, owner: Node, i: int, lateral: float, size: Vector2, height: float,
+		line1: String, line2: String, ink: Color) -> void:
+	var base := _roadside(i, lateral)
+	var root := Node3D.new()
+	root.name = "Sign%d" % i
+	root.transform = Transform3D(_facing_traffic(i), base)
+	parent.add_child(root)
+	root.owner = owner
+	var center_y := height + size.y * 0.5
+	var board := MeshInstance3D.new()
+	var bm := BoxMesh.new()
+	bm.size = Vector3(size.x, size.y, 0.18 if height == 0.0 else 0.05)
+	bm.material = MangaArt.world_preset("board")
+	board.mesh = bm
+	board.position = Vector3(0, center_y, 0)
+	root.add_child(board)
+	board.owner = owner
+	if height > 0.0:
+		var pm := CylinderMesh.new()
+		pm.top_radius = 0.04
+		pm.bottom_radius = 0.04
+		pm.height = height + size.y * 0.8
+		pm.radial_segments = 6
+		pm.material = MangaArt.world_preset("post")
+		for x in [-size.x * 0.35, size.x * 0.35]:
+			var post := MeshInstance3D.new()
+			post.mesh = pm
+			post.position = Vector3(x, pm.height * 0.5, -0.04)
+			root.add_child(post)
+			post.owner = owner
+	var font_px := 64
+	var big := minf(size.y * 0.36, size.x * 0.9 / maxf(line1.length(), 1) * 1.6)
+	var small := minf(size.y * 0.26, size.x * 0.9 / maxf(line2.length(), 1) * 1.6)
+	for spec in [[line1, big, center_y + size.y * 0.2], [line2, small, center_y - size.y * 0.2]]:
+		var text := Label3D.new()
+		text.text = spec[0]
+		text.font_size = font_px
+		text.pixel_size = float(spec[1]) / font_px
+		text.modulate = ink
+		text.outline_size = 0
+		# Unshaded: retroreflective paint stays a flat spot color (shaded, it fell into ink).
+		text.shaded = false
+		text.double_sided = false
+		text.position = Vector3(0, spec[2], bm.size.z * 0.5 + 0.01)
+		root.add_child(text)
+		text.owner = owner
