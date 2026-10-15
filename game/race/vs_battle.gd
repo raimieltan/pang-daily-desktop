@@ -10,7 +10,7 @@ const GRID_ROW := 7.5
 const GRID_LANE := 1.7
 ## Each rival: who, which body, what tune, and how hard they push.
 const RIVALS := [
-	{ "name": "JUNJUN", "car": "EK HATCH", "model": "res://assets/vehicles/civic/ek_hatch_1997_modular.glb",
+	{ "name": "JUNJUN", "car": "EG HATCH", "model": "res://assets/vehicles/civic_eg/civic_eg_modular.glb",
 		"preset": "fwd_sport_hatch", "paint": Color(0.93, 0.93, 0.9), "skill": 1.0 },
 	{ "name": "ATE LIZA", "car": "CIVIC FD", "model": "res://assets/vehicles/civic-fd/civic_fd_2007_modular.glb",
 		"preset": "fwd_sport_hatch", "paint": Color(0.85, 0.1, 0.12), "skill": 0.97 },

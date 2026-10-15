@@ -1,0 +1,11 @@
+Model Information:
+* title:	1991 Honda Civic EG6
+* source:	https://sketchfab.com/3d-models/1991-honda-civic-eg6-f81da34570b145deb463fa091604d251
+* author:	rifdanzz (https://sketchfab.com/rifdanzz)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "1991 Honda Civic EG6" (https://sketchfab.com/3d-models/1991-honda-civic-eg6-f81da34570b145deb463fa091604d251) by rifdanzz (https://sketchfab.com/rifdanzz) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

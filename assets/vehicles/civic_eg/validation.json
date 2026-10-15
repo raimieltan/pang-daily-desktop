@@ -1,0 +1,214 @@
+{
+ "generator": "Blender 5.2.2 LTS",
+ "source": "civic_eg_modular",
+ "triangles": 22470,
+ "nodes": [
+  "airbox",
+  "attach_bumper_front",
+  "attach_bumper_rear",
+  "attach_chin_front",
+  "attach_engine",
+  "attach_fender_fl",
+  "attach_fender_fr",
+  "attach_hood",
+  "attach_lip_front",
+  "attach_sideskirt_l",
+  "attach_sideskirt_r",
+  "attach_spoiler_rear",
+  "attach_trunk",
+  "battery",
+  "bumper_front_stock",
+  "bumper_rear_stock",
+  "chin_front_stock",
+  "engine_stock",
+  "fender_fl_stock",
+  "fender_fr_stock",
+  "headlight_l",
+  "headlight_r",
+  "hood_stock",
+  "indicator_-1",
+  "indicator_1",
+  "intake",
+  "lip_front_stock",
+  "mirror_l",
+  "mirror_r",
+  "radiator_fins",
+  "rear_glass",
+  "shell_base",
+  "sideskirt_l_stock",
+  "sideskirt_r_stock",
+  "spoiler_rear_stock",
+  "strut_caps",
+  "strut_towers",
+  "taillight_l",
+  "taillight_r",
+  "trunk_stock",
+  "vehicle_root",
+  "wheel_fl",
+  "wheel_fr",
+  "wheel_rl",
+  "wheel_rr",
+  "window_front_-1",
+  "window_front_1",
+  "window_rear_-1",
+  "window_rear_1",
+  "windshield"
+ ],
+ "materials": [
+  "amber",
+  "chrome",
+  "engine_dark",
+  "engine_metal",
+  "glass",
+  "headlight",
+  "paint",
+  "plate",
+  "reverse",
+  "rim",
+  "taillight",
+  "tire",
+  "trim"
+ ],
+ "bounds_min": [
+  -0.8774,
+  -0.0,
+  -1.9183
+ ],
+ "bounds_max": [
+  0.8838,
+  1.2872,
+  2.051
+ ],
+ "slots": {
+  "hood": {
+   "translation": [
+    0.0,
+    0.8279,
+    0.8772
+   ],
+   "part": "hood_stock"
+  },
+  "trunk": {
+   "translation": [
+    0.0,
+    0.8652,
+    -1.7154
+   ],
+   "part": "trunk_stock"
+  },
+  "fender_fl": {
+   "translation": [
+    0.4091,
+    0.5075,
+    1.2787
+   ],
+   "part": "fender_fl_stock"
+  },
+  "fender_fr": {
+   "translation": [
+    -0.4091,
+    0.5075,
+    1.2787
+   ],
+   "part": "fender_fr_stock"
+  },
+  "sideskirt_l": {
+   "translation": [
+    0.7281,
+    0.2014,
+    0.0266
+   ],
+   "part": "sideskirt_l_stock"
+  },
+  "sideskirt_r": {
+   "translation": [
+    -0.7281,
+    0.2014,
+    0.0266
+   ],
+   "part": "sideskirt_r_stock"
+  },
+  "bumper_front": {
+   "translation": [
+    0.0,
+    0.3756,
+    1.7712
+   ],
+   "part": "bumper_front_stock"
+  },
+  "bumper_rear": {
+   "translation": [
+    0.0,
+    0.3875,
+    -1.6355
+   ],
+   "part": "bumper_rear_stock"
+  },
+  "chin_front": {
+   "translation": [
+    0.0,
+    0.2735,
+    1.9902
+   ],
+   "part": "chin_front_stock"
+  },
+  "lip_front": {
+   "translation": [
+    0.0,
+    0.3369,
+    1.9257
+   ],
+   "part": "lip_front_stock"
+  },
+  "spoiler_rear": {
+   "translation": [
+    0.0,
+    1.1038,
+    -1.4667
+   ],
+   "part": "spoiler_rear_stock"
+  },
+  "engine": {
+   "translation": [
+    0.0,
+    0.2234,
+    1.2
+   ],
+   "part": "engine_stock"
+  }
+ },
+ "wheels": {
+  "wheel_fl": {
+   "origin": [
+    0.7203,
+    0.2798,
+    1.28
+   ],
+   "radius": 0.2798
+  },
+  "wheel_fr": {
+   "origin": [
+    -0.7067,
+    0.2798,
+    1.28
+   ],
+   "radius": 0.2798
+  },
+  "wheel_rl": {
+   "origin": [
+    0.7203,
+    0.2798,
+    -1.22
+   ],
+   "radius": 0.2798
+  },
+  "wheel_rr": {
+   "origin": [
+    -0.7067,
+    0.2798,
+    -1.22
+   ],
+   "radius": 0.2798
+  }
+ }
+}
