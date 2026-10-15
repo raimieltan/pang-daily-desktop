@@ -64,6 +64,7 @@ var differential_lock := 0.0
 var _model  # HandlingModel (untyped to avoid a cyclic class reference)
 var _initialized := false
 var _reverse_timer := 0.0
+var _brake_was_released := false
 var _shift_timer := 0.0
 var _upshifting := false
 var _front_transfer := 0.0
@@ -86,8 +87,12 @@ func reset() -> void:
 	detector.drifting = false
 	engine_rpm = 850.0; gear = 1; clutch = 0.0; axle_torque = 0.0; differential_lock = 0.0
 	_initialized = false
-	_reverse_timer = 0.0; _shift_timer = 0.0; _front_transfer = 0.0; _rear_transfer = 0.0
+	_reverse_timer = 0.0; _brake_was_released = false; _shift_timer = 0.0; _front_transfer = 0.0; _rear_transfer = 0.0
 	_roll_velocity = 0.0; _pitch_velocity = 0.0; _previous_handbrake = 0.0
+
+
+static func low_speed_engage(c: Dictionary) -> float:
+	return (c["lowSpeed"] as Dictionary)["reverseEngageBelowKmh"] / 3.6
 
 
 ## Opposite wheel torques conserve total axle torque and dissipate relative rotation.
@@ -186,14 +191,24 @@ func _integrate(dt: float, input: VehicleTypes.DriverInput, contact: VehicleType
 		while gear < gear_ratios.size() and absf(s.vx) / wheel_radius * gear_ratios[gear - 1] * e["finalDrive"] * 60.0 / TAU > e["redlineRpm"] * 0.75:
 			gear += 1
 		engine_rpm = maxf(e["idleRpm"], absf(s.vx) / wheel_radius * gear_ratios[gear - 1] * e["finalDrive"] * 60.0 / TAU)
+		# Only a standing start sits in neutral; a moving spawn is already in gear.
+		if speed >= low_speed_engage(c):
+			s.neutral = false
 	var raw_throttle := SimMath.clamp_(input.throttle, 0.0, 1.0)
 	var raw_brake := SimMath.clamp_(input.brake, 0.0, 1.0)
 	var low_speed: Dictionary = c["lowSpeed"]
 	var engage_below: float = low_speed["reverseEngageBelowKmh"] / 3.6
-	var wants_reverse := not s.reversing and raw_brake > 0.5 and raw_throttle < 0.1 and speed < engage_below
+	if raw_brake < 0.1:
+		_brake_was_released = true
+	# Neutral → drive on throttle; → reverse only from a fresh brake press (not one held since spawn).
+	if s.neutral and raw_throttle > 0.1:
+		s.neutral = false
+	var wants_reverse := not s.reversing and raw_brake > 0.5 and raw_throttle < 0.1 and speed < engage_below \
+		and (_brake_was_released or not s.neutral)
 	_reverse_timer = _reverse_timer + dt if wants_reverse else 0.0
 	if wants_reverse and _reverse_timer >= low_speed["reverseDelaySeconds"]:
 		s.reversing = true
+		s.neutral = false
 		_reverse_timer = 0.0
 	if s.reversing and raw_throttle > 0.5 and raw_brake < 0.1 and speed < engage_below:
 		s.reversing = false
@@ -290,6 +305,8 @@ func _integrate(dt: float, input: VehicleTypes.DriverInput, contact: VehicleType
 	var engine_omega := engine_rpm * TAU / 60.0
 	var auto_clutch := SimMath.clamp_(speed / 4.0 + throttle, 0.0, 1.0) * (0.0 if _shift_timer > 0.0 else 1.0)
 	# The automatic clutch opens with the driven-axle handbrake to avoid stalling the engine.
+	if s.neutral:
+		auto_clutch = 0.0
 	clutch = auto_clutch * (1.0 - maxf(SimMath.clamp_(input.clutch, 0.0, 1.0), s.handbrake * (1.0 - front_drive)))
 	var clutch_torque: float = e["clutchTorqueNm"]
 	var coupling := SimMath.clamp_((engine_omega - driven_speed * ratio) * 6.0, -clutch_torque, clutch_torque) * clutch

@@ -57,7 +57,7 @@ func _process(_delta: float) -> void:
 	var d := m.diagnostics
 	var s := m.state
 	var a := mech.assistance
-	var gear := "R" if s.reversing else str(mech.gear)
+	var gear := "R" if s.reversing else ("N" if s.neutral else str(mech.gear))
 	_speedo.text = "%d km/h  %s\n%d rpm" % [absf(car.speed_kmh()), gear, mech.engine_rpm]
 	if not debug_visible:
 		return

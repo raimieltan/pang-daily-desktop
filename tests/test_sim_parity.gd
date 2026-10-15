@@ -101,3 +101,28 @@ func _snap(solver: SuspensionSolver, t: float) -> Dictionary:
 		out["camber%d" % i] = c.camber
 		out["steer%d" % i] = c.steering_angle
 	return out
+
+
+## A standing start sits in neutral: a brake held from spawn (the race countdown) must not select
+## reverse; a fresh brake press does, and throttle selects drive.
+func test_neutral_at_standing_start() -> void:
+	var model := HandlingModel.new(HandlingPresets.resolve("fwd_worn_sedan"))
+	var contact := VehicleTypes.AxleContact.grounded()
+	var held := VehicleTypes.DriverInput.make(0.0, 1.0, 0.0, 0.0, "ai")
+	var idle := VehicleTypes.DriverInput.make(0.0, 0.0, 0.0, 0.0, "ai")
+	var gas := VehicleTypes.DriverInput.make(1.0, 0.0, 0.0, 0.0, "ai")
+	if not model.state.neutral:
+		errors.append("spawn should be in neutral")
+	for n in 240:
+		model.step(DT, held, contact)
+	if model.state.reversing or not model.state.neutral:
+		errors.append("brake held since spawn selected reverse")
+	model.step(DT, idle, contact)
+	for n in 120:
+		model.step(DT, held, contact)
+	if not model.state.reversing:
+		errors.append("fresh brake press at a standstill should select reverse")
+	model.reset()
+	model.step(DT, gas, contact)
+	if model.state.neutral or model.state.reversing:
+		errors.append("throttle should select drive")

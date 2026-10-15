@@ -81,6 +81,9 @@ class HandlingState:
 	var throttle := 0.0
 	var brake := 0.0
 	var reversing := false
+	## Neutral until the first throttle (spawn/reset): no drive, and a brake held from the start
+	## (race countdown) must be released and pressed again before it selects reverse.
+	var neutral := true
 	var load_shift := 0.0
 	var lateral_load_shift := 0.0
 	var lift_off := 0.0
