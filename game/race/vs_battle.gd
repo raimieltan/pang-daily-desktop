@@ -67,7 +67,7 @@ func start() -> void:
 	if session.minimap:
 		session.minimap.rivals.assign(rivals)
 	if intro:
-		var cast: Array = [{ "node": session.car, "name": "YOU", "car": "DALAGAN GSR" }]
+		var cast: Array = [{ "node": session.car, "name": "YOU", "car": session.car_spec["name"] }]
 		for k in rivals.size():
 			cast.append({ "node": rivals[k], "name": RIVALS[k]["name"], "car": RIVALS[k]["car"] })
 		hud.visible = false

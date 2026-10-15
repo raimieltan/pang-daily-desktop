@@ -4,8 +4,12 @@ extends Node
 ## Maps own the world; they hand the session a spawn and, optionally, a reset rule.
 
 signal car_reset
+signal car_changed
 
 var car: CarBody
+## The roster entry being driven (CarRoster.CARS).
+var car_spec: Dictionary = CarRoster.CARS[0]
+var visual: CarVisual
 var camera: ChaseCamera
 var hud: TelemetryHud
 var fx: CarFx
@@ -33,12 +37,11 @@ func _ready() -> void:
 	car = CarBody.new()
 	car.name = "PlayerCar"
 	car.input_source = _read_input
+	car.preset = car_spec["preset"]
 	add_child(car)
 	car.global_position = _spawn["position"]
 	car.rotation.y = _spawn["heading"]
-	var visual := CarVisual.new()
-	visual.car = car
-	car.add_child(visual)
+	_add_visual()
 	car.place(_spawn["position"], _spawn["heading"])
 
 	camera = ChaseCamera.new()
@@ -84,6 +87,28 @@ func _ready() -> void:
 	minimap.player = car
 	minimap.position = Vector2(24, 24)
 	gauges.add_child(minimap)
+
+
+func _add_visual() -> void:
+	visual = CarVisual.new()
+	visual.model_scene = load(car_spec["model"])
+	visual.car = car
+	car.add_child(visual)
+
+
+## Swap to another roster car: its tune on the sim, its body on screen. Tires carry over.
+func set_car(id: String) -> void:
+	var spec := CarRoster.get_car(id)
+	if spec == car_spec:
+		return
+	car_spec = spec
+	car.set_preset(spec["preset"])
+	car.set_tire_product(car.tire_product)
+	if visual:
+		car.remove_child(visual)
+		visual.queue_free()
+	_add_visual()
+	car_changed.emit()
 
 
 func _read_input() -> VehicleTypes.DriverInput:

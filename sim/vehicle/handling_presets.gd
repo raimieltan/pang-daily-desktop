@@ -90,6 +90,19 @@ const PRESETS := {
 			"suspension": { "frontSpring": 30000.0, "rearSpring": 28000.0, "frontAntiRoll": 11000.0, "rearAntiRoll": 7000.0 },
 		},
 	} },
+	"rwd_box_turbo_drift": { "extends": "rwd_box_turbo", "overrides": {
+		"tires": { "rearGrip": 0.93 },
+		"balance": { "understeer": 0.24, "rearSlideFalloff": 0.24, "liftOffRotation": 0.26 },
+		"assists": { "stability": 0.1 },
+		"handbrake": { "rearGripMultiplier": 0.35, "rearBrakeMps2": 6.5 },
+		"mechanicalOverrides": { "differential": { "lock": 0.65 } },
+	} },
+	"fwd_sport_hatch_drift": { "extends": "fwd_sport_hatch", "overrides": {
+		"tires": { "rearGrip": 0.94 },
+		"balance": { "understeer": 0.3, "rearSlideFalloff": 0.2, "liftOffRotation": 0.2 },
+		"assists": { "stability": 0.15 },
+		"handbrake": { "rearGripMultiplier": 0.38, "rearBrakeMps2": 6.5 },
+	} },
 	"fwd_worn_sedan_drift": { "extends": "fwd_worn_sedan", "overrides": {
 		"tires": { "rearGrip": 0.94 },
 		"balance": { "understeer": 0.36, "rearSlideFalloff": 0.2, "liftOffRotation": 0.2 },

@@ -20,8 +20,18 @@ var music: MusicPlayer
 var _wash := ColorRect.new()
 var _title := Control.new()
 var _pause := Control.new()
+var _garage := Control.new()
 var _title_first: Button
 var _pause_first: Button
+## Garage page: the mode it leads into, its buttons per car id, and the spec card.
+var _garage_mode: Label
+var _garage_next: Callable
+var _car_buttons := {}
+var _card_drive: Label
+var _card_name: Label
+var _card_spec: Label
+var _card_blurb: Label
+var _preview: CarPreview
 var _restart_button: Button
 var _value_buttons: Array = [] # [Button, Callable -> String]
 
@@ -46,6 +56,7 @@ func _ready() -> void:
 	add_child(_wash)
 	_build_title()
 	_build_pause()
+	_build_garage()
 	if skip_title:
 		_close()
 	else:
@@ -63,9 +74,9 @@ func _build_title() -> void:
 	menu.add_theme_constant_override("separation", 6)
 	menu.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	column.add_child(menu)
-	_title_first = _button(menu, "VS BATTLE", _start_vs)
+	_title_first = _button(menu, "VS BATTLE", func(): _open_garage("VS BATTLE", _start_vs))
 	_button(menu, "TIME ATTACK", _start_time_attack)
-	_button(menu, "FREE DRIVE", _start_free_drive)
+	_button(menu, "FREE DRIVE", func(): _open_garage("FREE DRIVE", _start_free_drive))
 	_value_button(menu, _camera_text, _cycle_camera)
 	_value_button(menu, _time_text, _toggle_time)
 	_button(menu, "QUIT", get_tree().quit)
@@ -103,17 +114,7 @@ func _build_pause() -> void:
 	_button(left, "QUIT", get_tree().quit)
 
 	# Controls card: a paper panel with an ink border, captions in Bangers.
-	var card := PanelContainer.new()
-	var box := StyleBoxFlat.new()
-	box.bg_color = MangaType.PAPER
-	box.border_color = MangaType.INK
-	box.set_border_width_all(4)
-	box.set_content_margin_all(22)
-	box.shadow_color = MangaType.INK
-	box.shadow_size = 1
-	box.shadow_offset = Vector2(8, 8)
-	card.add_theme_stylebox_override("panel", box)
-	card.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	var card := _ink_card()
 	row.add_child(card)
 	var grid := GridContainer.new()
 	grid.columns = 2
@@ -134,6 +135,124 @@ func _build_pause() -> void:
 		what.text = pair[1]
 		MangaType.ink(what, 24, MangaType.caption())
 		grid.add_child(what)
+
+
+## The garage: pick the car, then the chosen mode starts with it.
+func _build_garage() -> void:
+	_garage.set_anchors_preset(Control.PRESET_FULL_RECT)
+	add_child(_garage)
+	var row := HBoxContainer.new()
+	row.set_anchors_preset(Control.PRESET_CENTER)
+	row.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	row.grow_vertical = Control.GROW_DIRECTION_BOTH
+	row.add_theme_constant_override("separation", 56)
+	_garage.add_child(row)
+
+	var left := VBoxContainer.new()
+	left.add_theme_constant_override("separation", 6)
+	left.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	row.add_child(left)
+	left.add_child(MangaType.label("GARAGE", 84))
+	_garage_mode = _slab("", MangaType.RED)
+	left.add_child(_garage_mode)
+	var gap := Control.new()
+	gap.custom_minimum_size.y = 10
+	left.add_child(gap)
+	for spec in CarRoster.CARS:
+		var b := _button(left, spec["name"], _pick_car.bind(spec["id"]))
+		b.focus_entered.connect(_show_card.bind(spec))
+		_car_buttons[spec["id"]] = b
+	_button(left, "BACK", open_title)
+
+	# Spec card: turntable in the car shader, a drivetrain stamp, name and blurb in Bangers.
+	var card := _ink_card()
+	row.add_child(card)
+	var body := VBoxContainer.new()
+	body.add_theme_constant_override("separation", 4)
+	card.add_child(body)
+	_preview = CarPreview.new()
+	_preview.custom_minimum_size = Vector2(520, 290)
+	body.add_child(_preview)
+	var head := HBoxContainer.new()
+	head.add_theme_constant_override("separation", 14)
+	body.add_child(head)
+	_card_drive = _slab("", MangaType.INK)
+	_card_drive.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	head.add_child(_card_drive)
+	_card_name = Label.new()
+	MangaType.ink(_card_name, 44)
+	head.add_child(_card_name)
+	_card_spec = Label.new()
+	MangaType.ink(_card_spec, 30, MangaType.caption())
+	body.add_child(_card_spec)
+	_card_blurb = Label.new()
+	MangaType.ink(_card_blurb, 24, MangaType.caption())
+	_card_blurb.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_card_blurb.custom_minimum_size.x = 520
+	body.add_child(_card_blurb)
+	var hint := MangaType.label("↑ ↓  SELECT     ENTER  DRIVE     ESC  BACK", 20, MangaType.caption())
+	hint.add_theme_color_override("font_color", MangaType.INK)
+	hint.remove_theme_constant_override("outline_size")
+	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	hint.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
+	hint.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	hint.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	hint.offset_top = -64
+	hint.offset_bottom = -30
+	_garage.add_child(hint)
+
+
+## Paper panel, ink border, hard ink drop shadow: a manga info box.
+func _ink_card() -> PanelContainer:
+	var card := PanelContainer.new()
+	var box := StyleBoxFlat.new()
+	box.bg_color = MangaType.PAPER
+	box.border_color = MangaType.INK
+	box.set_border_width_all(4)
+	box.set_content_margin_all(22)
+	box.shadow_color = MangaType.INK
+	box.shadow_size = 1
+	box.shadow_offset = Vector2(8, 8)
+	card.add_theme_stylebox_override("panel", box)
+	card.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	return card
+
+
+## Paper Bangers lettering on a solid slab, like a caption stamp.
+func _slab(text: String, color: Color) -> Label:
+	var l := Label.new()
+	l.text = text
+	MangaType.ink(l, 30, MangaType.caption())
+	l.add_theme_color_override("font_color", MangaType.PAPER)
+	var box := StyleBoxFlat.new()
+	box.bg_color = color
+	box.content_margin_left = 14
+	box.content_margin_right = 14
+	box.content_margin_top = 2
+	box.content_margin_bottom = 2
+	l.add_theme_stylebox_override("normal", box)
+	l.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	return l
+
+
+func _open_garage(mode: String, next: Callable) -> void:
+	_garage_mode.text = mode
+	_garage_next = next
+	_show(_garage, _car_buttons[session.car_spec["id"]])
+	_show_card(session.car_spec)
+
+
+func _show_card(spec: Dictionary) -> void:
+	_card_drive.text = spec["drive"]
+	_card_name.text = spec["name"]
+	_card_spec.text = spec["spec"]
+	_card_blurb.text = spec["blurb"]
+	_preview.show_car(spec["model"])
+
+
+func _pick_car(id: String) -> void:
+	session.set_car(id)
+	_garage_next.call()
 
 
 func _column(parent: Control) -> VBoxContainer:
@@ -221,6 +340,7 @@ func open_pause() -> void:
 func _show(screen: Control, first: Button) -> void:
 	_title.visible = screen == _title
 	_pause.visible = screen == _pause
+	_garage.visible = screen == _garage
 	_wash.visible = true
 	_refresh()
 	get_tree().paused = true
@@ -231,6 +351,7 @@ func _show(screen: Control, first: Button) -> void:
 func _close() -> void:
 	_title.visible = false
 	_pause.visible = false
+	_garage.visible = false
 	_wash.visible = false
 	get_viewport().gui_release_focus()
 	_set_play_hud(true)
@@ -290,6 +411,8 @@ func _unhandled_input(event: InputEvent) -> void:
 	get_viewport().set_input_as_handled()
 	if _pause.visible:
 		_close()
+	elif _garage.visible:
+		open_title()
 	elif not _title.visible:
 		open_pause()
 
@@ -328,3 +451,48 @@ class TitleArt extends Control:
 			var d := r if i % 2 == 0 else r * 0.22
 			points.append(at + Vector2(sin(a), -cos(a)) * d)
 		draw_colored_polygon(points, MangaType.INK)
+
+
+## The garage turntable: the car in its own little world, shaded by MangaArt like on the road,
+## turning slowly on the paper card. Keeps spinning while the tree is paused.
+class CarPreview extends SubViewportContainer:
+	var _viewport := SubViewport.new()
+	var _pivot := Node3D.new()
+	var _path := ""
+
+	func _ready() -> void:
+		stretch = true
+		process_mode = Node.PROCESS_MODE_ALWAYS
+		_viewport.own_world_3d = true
+		_viewport.transparent_bg = true
+		_viewport.msaa_3d = Viewport.MSAA_4X
+		add_child(_viewport)
+		_viewport.add_child(_pivot)
+		var cam := Camera3D.new()
+		cam.fov = 26.0
+		cam.transform = Transform3D(Basis(), Vector3(4.7, 1.9, 5.8)).looking_at(Vector3(0, 0.5, 0))
+		_viewport.add_child(cam)
+		var sun := DirectionalLight3D.new()
+		sun.rotation_degrees = Vector3(-55, 35, 0)
+		_viewport.add_child(sun)
+		var env := WorldEnvironment.new()
+		env.environment = Environment.new()
+		env.environment.background_mode = Environment.BG_CLEAR_COLOR
+		env.environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
+		env.environment.ambient_light_color = MangaType.PAPER
+		env.environment.ambient_light_energy = 0.6
+		_viewport.add_child(env)
+		_pivot.rotation.y = -0.6
+
+	func show_car(path: String) -> void:
+		if path == _path:
+			return
+		_path = path
+		for c in _pivot.get_children():
+			c.queue_free()
+		var model: Node3D = (load(path) as PackedScene).instantiate()
+		MangaArt.apply_car(model, CarVisual.PLAYER_PAINT)
+		_pivot.add_child(model)
+
+	func _process(delta: float) -> void:
+		_pivot.rotate_y(delta * 0.5)

@@ -19,6 +19,7 @@ var intro: RaceIntro
 var _in_intro := false
 var _ghost_data := PackedFloat32Array()
 var _ghost_visual: Node3D
+var _ghost_model := ""
 var _record := PackedFloat32Array()
 var _sample_clock := 0.0
 var _index_hint := 0
@@ -44,7 +45,7 @@ func _ready() -> void:
 
 
 func _car_id() -> String:
-	return "dalagan_gsr_" + session.car.preset
+	return session.car_spec["id"] + "_" + session.car.preset
 
 
 ## With an intro, the car waits on the line (brakes on) while it plays; the countdown follows.
@@ -61,13 +62,17 @@ func restart(with_intro := false) -> void:
 	var pose := track.pose_at(track.start_distance - 8.0)
 	session.car.place(pose["position"], pose["heading"])
 	session.camera.snap.call_deferred()
+	if _ghost_model != session.car_spec["model"]:
+		_ghost_visual.queue_free()
+		_ghost_visual = _make_ghost()
+		add_child(_ghost_visual)
 	_ghost_visual.visible = false
 	if with_intro and intro:
 		hud.visible = false
 		_in_intro = true
 		await get_tree().physics_frame
 		await get_tree().physics_frame
-		intro.play(track, [{ "node": session.car, "name": "YOU", "car": "DALAGAN GSR" }], "TIME ATTACK", "PASS 1  ·  DOWNHILL")
+		intro.play(track, [{ "node": session.car, "name": "YOU", "car": session.car_spec["name"] }], "TIME ATTACK", "PASS 1  ·  DOWNHILL")
 		await intro.finished
 		_in_intro = false
 		if not active:
@@ -147,11 +152,12 @@ func _process(_delta: float) -> void:
 		_ghost_visual.global_transform = Transform3D(Basis(pose["rotation"]), pose["position"])
 
 
-## The best run's car: a translucent paper sketch with ink edges, no collisions.
+## The best run's car (the player's current body): a translucent paper sketch with ink edges, no collisions.
 func _make_ghost() -> Node3D:
 	var root := Node3D.new()
 	root.name = "Ghost"
-	var model: Node3D = preload("res://assets/vehicles/dalagan_evo/dalagan_evo_modular.glb").instantiate()
+	_ghost_model = session.car_spec["model"]
+	var model: Node3D = (load(_ghost_model) as PackedScene).instantiate()
 	model.rotation.y = PI
 	root.add_child(model)
 	var m := ShaderMaterial.new()
