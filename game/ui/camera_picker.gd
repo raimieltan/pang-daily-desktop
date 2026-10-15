@@ -21,7 +21,7 @@ func _ready() -> void:
 	_root.add_theme_constant_override("separation", 6)
 	_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_root)
-	var title := MangaType.label("CAMERA  [V]", 22, false, MangaType.caption())
+	var title := MangaType.label("CAMERA  [V]", 22, MangaType.caption())
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_root.add_child(title)
 	var row := HBoxContainer.new()

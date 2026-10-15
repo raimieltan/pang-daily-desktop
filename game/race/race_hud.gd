@@ -19,7 +19,7 @@ var _count_value := -1
 func _ready() -> void:
 	layer = 10
 	_timer = _label(42, Control.PRESET_CENTER_TOP, Vector2(0, 26))
-	_best = _label(24, Control.PRESET_CENTER_TOP, Vector2(0, 84), false, MangaType.caption())
+	_best = _label(24, Control.PRESET_CENTER_TOP, Vector2(0, 84), MangaType.caption())
 	_split = _label(28, Control.PRESET_CENTER_TOP, Vector2(0, 112))
 	_countdown = _label(150, Control.PRESET_CENTER, Vector2(0, -60))
 	_goal = PanelContainer.new()
@@ -43,9 +43,9 @@ func _ready() -> void:
 	_goal.visible = false
 
 
-func _label(size: int, preset: int, offset: Vector2, extrude := true, font: Font = null) -> Label:
+func _label(size: int, preset: int, offset: Vector2, font: Font = null) -> Label:
 	var l := Label.new()
-	MangaType.pop(l, size, extrude, font)
+	MangaType.pop(l, size, font)
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	l.set_anchors_preset(preset)
 	l.grow_horizontal = Control.GROW_DIRECTION_BOTH

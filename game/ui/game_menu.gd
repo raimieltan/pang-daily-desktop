@@ -66,7 +66,7 @@ func _build_title() -> void:
 	_value_button(menu, _camera_text, _cycle_camera)
 	_value_button(menu, _time_text, _toggle_time)
 	_button(menu, "QUIT", get_tree().quit)
-	var hint := MangaType.label("↑ ↓  SELECT     ENTER  GO", 20, false, MangaType.caption())
+	var hint := MangaType.label("↑ ↓  SELECT     ENTER  GO", 20, MangaType.caption())
 	hint.add_theme_color_override("font_color", MangaType.INK)
 	hint.remove_theme_constant_override("outline_size")
 	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -126,7 +126,6 @@ func _build_pause() -> void:
 		var key := Label.new()
 		key.text = pair[0]
 		MangaType.ink(key, 24, MangaType.caption())
-		key.add_theme_color_override("font_color", MangaType.RED)
 		grid.add_child(key)
 		var what := Label.new()
 		what.text = pair[1]
@@ -267,7 +266,7 @@ class TitleArt extends Control:
 		title.grow_vertical = Control.GROW_DIRECTION_BOTH
 		title.position.y -= 18
 		add_child(title)
-		var sub := MangaType.label("TOUGE  ·  MOUNTAIN PASS", 30, false, MangaType.caption())
+		var sub := MangaType.label("TOUGE  ·  MOUNTAIN PASS", 30, MangaType.caption())
 		sub.add_theme_color_override("font_color", MangaType.INK)
 		sub.add_theme_color_override("font_outline_color", MangaType.PAPER)
 		sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
