@@ -37,3 +37,9 @@ The command writes `civic_fd_2007_modular.glb`, `mounting_interfaces.json`, `val
   dropped under the hood.
 
 The rims are flat discs, because the source paints its spokes in a texture.
+
+## Tune
+
+The car drives on `fwd_fd2r` (`sim/vehicle/handling_presets.gd`), with `fwd_fd2r_drift` as its drift
+tune. It uses the real FD2R figures: 1,270 kg, a K20A making 215 Nm at 6,100 rpm with an 8,400 rpm
+redline, a 6-speed gearbox (3.266 to 0.738, final drive 4.764), a helical LSD and stiff springs.

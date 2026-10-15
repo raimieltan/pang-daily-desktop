@@ -13,9 +13,9 @@ const CARS := [
 	{ "id": "eg_hatch", "name": "EG HATCH", "drive": "FWD",
 		"model": "res://assets/vehicles/civic_eg/civic_eg_modular.glb", "preset": "fwd_sport_hatch",
 		"spec": "HIGH-REV FOUR  ·  1,060 KG", "blurb": "FEATHERWEIGHT HATCH. CARRY SPEED, NEVER LIFT." },
-	{ "id": "civic_fd", "name": "CIVIC FD", "drive": "FWD",
-		"model": "res://assets/vehicles/civic-fd/civic_fd_2007_modular.glb", "preset": "fwd_sport_hatch",
-		"spec": "HIGH-REV FOUR  ·  1,060 KG", "blurb": "SHARP SEDAN WITH A PLANTED NOSE." },
+	{ "id": "civic_fd", "name": "CIVIC FD2R", "drive": "FWD",
+		"model": "res://assets/vehicles/civic-fd/civic_fd_2007_modular.glb", "preset": "fwd_fd2r",
+		"spec": "8,400 RPM FOUR  ·  1,270 KG", "blurb": "STIFF TYPE R SEDAN. LSD PULLS THE NOSE IN; KEEP IT ABOVE 6,000." },
 ]
 
 

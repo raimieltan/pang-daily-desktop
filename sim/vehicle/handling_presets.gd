@@ -97,6 +97,29 @@ const PRESETS := {
 		"handbrake": { "rearGripMultiplier": 0.35, "rearBrakeMps2": 6.5 },
 		"mechanicalOverrides": { "differential": { "lock": 0.65 } },
 	} },
+	# Civic FD2 Type R: K20A that wants 8,000+ rpm, close six-speed, helical LSD, stiff springs.
+	# Heavier and far less torque than the turbo cars; it keeps up on corner speed, not shove.
+	"fwd_fd2r": { "extends": "fwd_sport_hatch", "overrides": {
+		"chassis": { "massKg": 1270.0, "frontWeight": 0.62, "cgHeightM": 0.49, "trackWidthM": 1.5, "yawInertiaScale": 1.05 },
+		"drive": { "accelerationMps2": 5.0, "topSpeedKmh": 235.0 },
+		"brakes": { "decelerationMps2": 9.6, "frontBias": 0.66 },
+		"tires": { "frontGrip": 1.03, "rearGrip": 1.02 },
+		"balance": { "understeer": 0.32, "liftOffRotation": 0.12 },
+		"assists": { "traction": 0.3, "stability": 0.4 },
+		"mechanicalOverrides": {
+			"engine": { "torqueNm": 215.0, "clutchTorqueNm": 330.0, "idleRpm": 900.0, "redlineRpm": 8400.0, "peakTorqueRpm": 6100.0,
+				"inertia": 0.2, "gearRatios": [3.266, 2.13, 1.517, 1.147, 0.921, 0.738], "finalDrive": 4.764, "shiftSeconds": 0.14 },
+			"differential": { "type": "lsd", "lock": 0.35, "preloadNm": 40.0 },
+			"suspension": { "frontSpring": 36000.0, "rearSpring": 32000.0, "frontAntiRoll": 12000.0, "rearAntiRoll": 10000.0 },
+		},
+	} },
+	"fwd_fd2r_drift": { "extends": "fwd_fd2r", "overrides": {
+		"tires": { "rearGrip": 0.95 },
+		"balance": { "understeer": 0.26, "rearSlideFalloff": 0.2, "liftOffRotation": 0.22 },
+		"assists": { "stability": 0.15 },
+		"handbrake": { "rearGripMultiplier": 0.38, "rearBrakeMps2": 6.5 },
+		"mechanicalOverrides": { "differential": { "lock": 0.5 } },
+	} },
 	"fwd_sport_hatch_drift": { "extends": "fwd_sport_hatch", "overrides": {
 		"tires": { "rearGrip": 0.94 },
 		"balance": { "understeer": 0.3, "rearSlideFalloff": 0.2, "liftOffRotation": 0.2 },
