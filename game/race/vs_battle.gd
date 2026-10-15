@@ -44,6 +44,7 @@ var _in_intro := false
 func _ready() -> void:
 	hud = RaceHud.new()
 	hud.visible = false
+	hud.add_to_group(&"play_hud")
 	add_child(hud)
 
 
@@ -88,6 +89,13 @@ func start() -> void:
 	_in_intro = false
 	run = TimeAttackRun.new(track.start_distance, track.finish_distance)
 	session.camera.snap.call_deferred()
+	var field_cars: Array[CarBody] = [session.car]
+	field_cars.append_array(rivals)
+	var field_names: Array[String] = ["YOU"]
+	for k in rivals.size():
+		field_names.append(RIVALS[k]["name"])
+	session.replay.begin(field_cars, field_names)
+	session.camera.director.set_cars(field_cars, field_names)
 
 
 func stop() -> void:
@@ -99,6 +107,7 @@ func stop() -> void:
 	_clear_rivals()
 	if session.minimap:
 		session.minimap.rivals.clear()
+	session.camera.director.set_cars([session.car], ["YOU"])
 
 
 ## Grid behind the start line, two wide: [player, rival 1, rival 2, …]. One rival lines up

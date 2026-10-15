@@ -23,6 +23,7 @@ func _ready() -> void:
 	var spawn := track.pose_at(track.start_distance - 12.0, 0.0)
 	session = DriveSession.new(spawn["position"], spawn["heading"])
 	session.reset_pose = _reset_pose
+	session.track = track
 	add_child(session)
 	session.minimap.track = track
 	music = MusicPlayer.new()
@@ -42,6 +43,7 @@ func _ready() -> void:
 	vs_battle.intro = intro
 	vs_battle.music = music
 	add_child(vs_battle)
+	session.replay.frozen_nodes.assign([time_attack, vs_battle])
 	menu = GameMenu.new()
 	menu.session = session
 	menu.time_attack = time_attack

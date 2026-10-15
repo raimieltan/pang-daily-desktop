@@ -1,7 +1,8 @@
 extends SceneTree
 ## Scripted visual checks (needs a window, not --headless):
 ## `godot --path . -s res://tools/screenshot.gd -- <scene> <out_dir> <scenario>`
-## Scenarios: day, brake, drift, scrape, night, overview. Each scripts the pedals, saves PNGs at
+## Scenarios: day, brake, drift, scrape, night, overview, spectate (autopilot VS, every cinematic
+## shot, then the replay at full and quarter speed). Each scripts the pedals, saves PNGs at
 ## the interesting moments and prints frame-time stats (vsync off) for the driving part.
 
 const SCENARIOS := {
@@ -54,7 +55,15 @@ func _initialize() -> void:
 	var scene_path: String = args[0] if args.size() > 0 else "res://scenes/touge.tscn"
 	if args.size() > 1: _out = args[1]
 	if args.size() > 2: _scenario = args[2]
-	_steps = SCENARIOS[_scenario]
+	_steps = SCENARIOS[_scenario] if SCENARIOS.has(_scenario) else []
+	if _scenario == "spectate":
+		_steps = [[0.5, 0, 0, 0, 0, ""], [14.0, 0, 0, 0, 0, "spec_live"]]
+		for i in CinematicDirector.Shot.size():
+			_steps.append([15.0 + i * 1.6, 0, 0, 0, 0, ""])
+			_steps.append([16.2 + i * 1.6, 0, 0, 0, 0, "cine_%d_%s" % [i, CinematicDirector.SHOT_NAMES[i].replace(" ", "_").to_lower()]])
+		var t0 := 16.0 + CinematicDirector.Shot.size() * 1.6
+		_steps.append_array([[t0, 0, 0, 0, 0, ""], [t0 + 1.5, 0, 0, 0, 0, "replay_hud"], [t0 + 1.6, 0, 0, 0, 0, ""],
+			[t0 + 3.0, 0, 0, 0, 0, "replay_slow"], [t0 + 3.2, 0, 0, 0, 0, ""], [t0 + 4.5, 0, 0, 0, 0, "replay_clean"]])
 	DirAccess.make_dir_recursive_absolute(_out)
 	DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_DISABLED)
 	# Never steal keyboard focus from whoever is playing on this machine.
@@ -96,7 +105,10 @@ func _process(delta: float) -> bool:
 			root.scaling_3d_scale = float(OS.get_environment("PANG_SCALE"))
 		print("3d scale ", root.scaling_3d_scale, " window ", root.size)
 		RenderingServer.viewport_set_measure_render_time(root.get_viewport_rid(), true)
-	if session.car.input_source != _scripted:
+	if _scenario == "spectate":
+		if _scene.vs_battle._in_intro:
+			_scene.intro.skip()
+	elif session.car.input_source != _scripted:
 		session.car.input_source = _scripted
 	_t += delta
 	if _t > 2.0:
@@ -112,6 +124,24 @@ func _process(delta: float) -> bool:
 		if _scenario == "vs" and _step == 0:
 			_scene.time_attack.free_drive()
 			_scene.vs_battle.start()
+		if _scenario == "spectate":
+			var cine := session.camera.director
+			var shots := CinematicDirector.Shot.size()
+			if _step == 0:
+				_scene.menu._start_spectate()
+			elif _step >= 2 and _step < 2 + shots * 2 and _step % 2 == 0:
+				cine._new_shot(cine.focus_car())
+				cine.shot = (_step - 2) / 2
+				if cine.shot == CinematicDirector.Shot.TRACKSIDE or cine.shot == CinematicDirector.Shot.FLYBY:
+					cine._find_anchor(cine.focus_car())
+				cine._shot_time = 99.0
+			elif _step == 2 + shots * 2:
+				session.replay.start()
+			elif _step == 4 + shots * 2:
+				session.replay.speed_index = 1
+				Engine.time_scale = 0.25
+			elif _step == 6 + shots * 2:
+				session.set_clean_feed(true)
 		if _scenario == "pause" and _step == 1:
 			_scene.menu.open_pause()
 		if _scenario == "settings":

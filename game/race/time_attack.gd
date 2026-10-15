@@ -37,6 +37,7 @@ func _ready() -> void:
 			e.physical_keycode = key
 			InputMap.action_add_event("restart_run", e)
 	hud = RaceHud.new()
+	hud.add_to_group(&"play_hud")
 	add_child(hud)
 	_ghost_visual = _make_ghost()
 	add_child(_ghost_visual)
@@ -86,6 +87,7 @@ func restart(with_intro := false) -> void:
 	hud.visible = true
 	run = TimeAttackRun.new(track.start_distance, track.finish_distance)
 	hud.show_run(best)
+	session.replay.begin([session.car] as Array[CarBody], ["YOU"] as Array[String])
 
 
 ## Free drive: drop the run and its HUD; the car keeps going where it is.
@@ -96,6 +98,7 @@ func free_drive() -> void:
 	run = null
 	hud.visible = false
 	_ghost_visual.visible = false
+	session.replay.begin([session.car] as Array[CarBody], ["YOU"] as Array[String])
 
 
 func _filter_input(input: VehicleTypes.DriverInput) -> VehicleTypes.DriverInput:

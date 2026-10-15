@@ -7,7 +7,8 @@ extends CanvasLayer
 const CONTROLS := [
 	["W  ↑", "THROTTLE"], ["S  ↓", "BRAKE"], ["A  D", "STEER"], ["SPACE", "HANDBRAKE"],
 	["R", "RESET TO ROAD"], ["ENTER", "RESTART / REMATCH"], ["V", "CAMERA"], ["N", "DAY / NIGHT"],
-	["T", "TUNE"], ["Y", "TIRES"], ["H", "TELEMETRY"], ["ESC", "PAUSE"],
+	["T", "TUNE"], ["Y", "TIRES"], ["H", "TELEMETRY"], ["P", "AUTOPILOT"],
+	["F", "REPLAY"], ["U", "CLEAN FEED (NO HUD)"], ["ESC", "PAUSE"],
 ]
 
 ## Set by tools (screenshots) to start straight on the road.
@@ -17,6 +18,7 @@ var session: DriveSession
 var time_attack: TimeAttack
 var vs_battle: VsBattle
 var music: MusicPlayer
+var _replay_button: Button
 var _wash := ColorRect.new()
 var _title := Control.new()
 var _pause := Control.new()
@@ -76,17 +78,19 @@ func _ready() -> void:
 
 
 func _build_title() -> void:
+	session.replay.restore_hud = func(): _set_play_hud(true)
 	_title.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(_title)
 	var column := _column(_title)
 	var art := TitleArt.new()
-	art.custom_minimum_size = Vector2(640, 270)
+	art.custom_minimum_size = Vector2(640, 220)
 	column.add_child(art)
 	var menu := VBoxContainer.new()
 	menu.add_theme_constant_override("separation", 6)
 	menu.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	column.add_child(menu)
 	_title_first = _button(menu, "VS BATTLE", func(): _open_garage("VS BATTLE", _start_vs))
+	_button(menu, "SPECTATE", func(): _open_garage("SPECTATE", _start_spectate))
 	_button(menu, "TIME ATTACK", _start_time_attack)
 	_button(menu, "FREE DRIVE", func(): _open_garage("FREE DRIVE", _start_free_drive))
 	_button(menu, "SETTINGS", func(): _open_settings(open_title))
@@ -115,6 +119,7 @@ func _build_pause() -> void:
 	left.add_child(heading)
 	_pause_first = _button(left, "RESUME", _close)
 	_restart_button = _button(left, "RESTART", _restart_mode)
+	_replay_button = _button(left, "WATCH REPLAY", _toggle_replay)
 	_value_button(left, func(): return "TUNE: " + ("DRIFT" if session.car.preset.ends_with("drift") else "STOCK"),
 		func(): session.car.toggle_tune())
 	_value_button(left, func(): return "TIRES: " + session.car.tire_product.to_upper(),
@@ -419,6 +424,8 @@ func _toggle_time() -> void:
 
 
 func open_title() -> void:
+	session.replay.stop()
+	session.set_autopilot(false)
 	_show(_title, _title_first)
 	_set_play_hud(false)
 	if music:
@@ -428,6 +435,8 @@ func open_title() -> void:
 
 func open_pause() -> void:
 	_restart_button.visible = time_attack.active or vs_battle.active
+	_replay_button.visible = session.replay.playing or session.replay.can_play()
+	_replay_button.text = "EXIT REPLAY" if session.replay.playing else "WATCH REPLAY"
 	_show(_pause, _pause_first)
 	if music:
 		music.duck(true)
@@ -476,6 +485,7 @@ func _set_play_hud(on: bool) -> void:
 
 
 func _start_vs() -> void:
+	_leave_watch()
 	vs_battle.opponents = GameSettings.value("opponents")
 	time_attack.free_drive()
 	_close()
@@ -483,12 +493,14 @@ func _start_vs() -> void:
 
 
 func _start_time_attack() -> void:
+	_leave_watch()
 	vs_battle.stop()
 	_close()
 	time_attack.restart(true)
 
 
 func _start_free_drive() -> void:
+	_leave_watch()
 	vs_battle.stop()
 	time_attack.free_drive()
 	_close()
@@ -496,11 +508,38 @@ func _start_free_drive() -> void:
 
 
 func _restart_mode() -> void:
+	session.replay.stop()
 	_close()
 	if vs_battle.active:
 		vs_battle.start()
 	else:
 		time_attack.restart()
+
+
+## Out of any replay, autopilot and cinematic view before a mode starts.
+func _leave_watch() -> void:
+	session.replay.stop()
+	session.set_autopilot(false)
+	if session.camera.mode == ChaseCamera.Mode.CINEMATIC:
+		session.camera.mode = ChaseCamera.Mode.CHASE
+
+
+## A VS battle you watch: your car on autopilot, the cinematic camera directing.
+func _start_spectate() -> void:
+	_start_vs()
+	session.camera.mode = ChaseCamera.Mode.CINEMATIC
+	# The grid placement lands on the next physics step; take the lane from there.
+	await get_tree().physics_frame
+	await get_tree().physics_frame
+	session.set_autopilot(true)
+
+
+func _toggle_replay() -> void:
+	_close()
+	if session.replay.playing:
+		session.replay.stop()
+	else:
+		session.replay.start()
 
 
 func _unhandled_input(event: InputEvent) -> void:

@@ -87,6 +87,11 @@ func _process(_delta: float) -> void:
 		_rebuild_skids()
 
 
+## Forget where each tire last laid rubber, so the next skid starts fresh (after a teleport).
+func reset_trails() -> void:
+	_last_point = [null, null, null, null]
+
+
 func _add_segment(a: Vector3, b: Vector3, right: Vector3, amount: float) -> void:
 	var dir := (b - a).normalized()
 	var side := dir.cross(Vector3.UP).normalized() * SKID_WIDTH * 0.5

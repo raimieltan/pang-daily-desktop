@@ -4,12 +4,13 @@ extends Camera3D
 ## stay readable, lags a little so speed and weight transfer show, and looks a little ahead with
 ## speed. Owns the manga page: the MangaCompositor pass (tone + ink lines), the MangaOverlay
 ## (speed lines, impact, panel border) and impact shake. M toggles the manga pass for comparison.
-## V cycles the view: chase, far chase, hood and bumper (mounted on the car body).
+## V cycles the view: chase, far chase, hood, bumper (mounted on the car body) and cinematic
+## (a `CinematicDirector` cutting between TV, fly-by, heli and mounted shots).
 
 signal mode_changed(mode: Mode)
 
-enum Mode { CHASE, FAR, HOOD, BUMPER }
-const MODE_NAMES := ["CHASE", "FAR", "HOOD", "BUMPER"]
+enum Mode { CHASE, FAR, HOOD, BUMPER, CINEMATIC }
+const MODE_NAMES := ["CHASE", "FAR", "HOOD", "BUMPER", "CINE"]
 ## Chase rigs: [distance, height, look_height]. Mounted views: car-local eye point.
 const CHASE_RIGS := { Mode.CHASE: [5.6, 1.9, 0.9], Mode.FAR: [8.6, 3.0, 1.0] }
 const MOUNTS := { Mode.HOOD: Vector3(0.0, 1.22, -0.45), Mode.BUMPER: Vector3(0.0, 0.52, -2.25) }
@@ -24,6 +25,8 @@ const MOUNTS := { Mode.HOOD: Vector3(0.0, 1.22, -0.45), Mode.BUMPER: Vector3(0.0
 @export var max_look_ahead := 4.5
 
 var target: CarBody
+## The cinematic view's director (cars, focus, shots). Created here; maps set its `track`.
+var director: CinematicDirector
 var mode := Mode.CHASE:
 	set(value):
 		mode = value
@@ -33,6 +36,8 @@ var mode := Mode.CHASE:
 			look_height = CHASE_RIGS[mode][2]
 		# Hide the car's own body in the bumper view: the eye sits just ahead of the nose.
 		cull_mask = 0xFFFFF & ~CarVisual.CAR_RENDER_LAYER if mode == Mode.BUMPER else 0xFFFFF
+		if director:
+			director.active = mode == Mode.CINEMATIC
 		snap()
 		mode_changed.emit(mode)
 var manga: MangaCompositor
@@ -56,6 +61,10 @@ func _ready() -> void:
 	compositor = comp
 	overlay = MangaOverlay.new()
 	add_child(overlay)
+	director = CinematicDirector.new()
+	add_child(director)
+	if target:
+		director.set_cars([target], ["YOU"])
 	_noise.frequency = 2.5
 	get_viewport().size_changed.connect(_fit_render_scale)
 	_fit_render_scale()
@@ -99,6 +108,9 @@ func _unhandled_input(event: InputEvent) -> void:
 func snap() -> void:
 	if target == null or not is_inside_tree():
 		return
+	if mode == Mode.CINEMATIC:
+		director.cut()
+		return
 	_yaw = _heading(-target.global_basis.z)
 	if MOUNTS.has(mode):
 		_mount(target.global_transform, 0.0)
@@ -118,6 +130,10 @@ func _process(delta: float) -> void:
 	RenderingServer.global_shader_parameter_set("manga_px_angle", deg_to_rad(fov) / maxf(h, 1.0))
 	if target == null:
 		return
+	if mode == Mode.CINEMATIC:
+		var shot_car := director.update(self, delta)
+		_effects(delta, shot_car.linear_velocity.length() if shot_car and director.speed_lines() else 0.0)
+		return
 	var xf := target.get_global_transform_interpolated()
 	var forward := -xf.basis.z
 	var velocity := target.linear_velocity
@@ -134,6 +150,10 @@ func _process(delta: float) -> void:
 	else:
 		fov = lerpf(fov, 68.0 + clampf(speed * 0.25, 0.0, 12.0), 1.0 - exp(-2.0 * delta))
 		look_at(xf.origin + Vector3.UP * look_height + direction * minf(speed * look_ahead, max_look_ahead))
+	_effects(delta, speed)
+
+
+func _effects(delta: float, speed: float) -> void:
 	# Shake: trauma² so small knocks barely move the frame.
 	_trauma = maxf(0.0, _trauma - delta * 1.6)
 	if _trauma > 0.0:

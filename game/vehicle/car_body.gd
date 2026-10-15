@@ -50,6 +50,10 @@ var _parked := true
 var _pending_place = null
 var _z_offset := 0.0
 var _cg_height := 0.52
+## Replay playback: while set, each step poses the car from `replay_frame` instead of the sim.
+var replaying := false
+var replay_frame := PackedFloat32Array()
+var _live_layers := Vector2i.ZERO
 
 
 func _ready() -> void:
@@ -143,6 +147,10 @@ func _to_world(xf: Transform3D, x: float, y: float, z: float) -> Vector3:
 
 func _integrate_forces(state: PhysicsDirectBodyState3D) -> void:
 	var dt := state.step
+	if replaying:
+		if replay_frame.size() >= REPLAY_STRIDE:
+			_apply_replay(state)
+		return
 	if _pending_place != null:
 		_apply_place(state)
 		return
@@ -299,3 +307,86 @@ func _apply_place(state: PhysicsDirectBodyState3D) -> void:
 	_previous_velocities = [0.0, 0.0, 0.0, 0.0]
 	_hold_anchor = null
 	_parked = true
+
+
+# ---------------------------------------------------------------- replay
+## Floats per recorded car frame: pose, velocities, pedals/engine, then 11 per wheel.
+const REPLAY_STRIDE := 18 + 4 * 11
+
+
+## Appends this step's pose and everything the visual, effects and audio read (see REPLAY_STRIDE).
+func capture_replay(out: PackedFloat32Array) -> void:
+	var xf := global_transform
+	var q := xf.basis.get_rotation_quaternion()
+	var s := model.state
+	var mech := model.mechanics
+	out.append_array([xf.origin.x, xf.origin.y, xf.origin.z, q.x, q.y, q.z, q.w,
+		linear_velocity.x, linear_velocity.y, linear_velocity.z, angular_velocity.x, angular_velocity.y, angular_velocity.z,
+		s.throttle, s.brake, 1.0 if s.reversing else 0.0, mech.engine_rpm, s.steer_angle])
+	for i in 4:
+		var c := solver.corners[i]
+		var w := mech.wheels[i]
+		out.append_array([c.steering_angle, c.wheel_position.y, 1.0 if c.is_grounded else 0.0, w.angular_velocity,
+			w.slip_angle, w.slip_ratio, 1.0 if w.is_locked else 0.0, w.slip_energy, _points[i].x, _points[i].y, _points[i].z])
+
+
+## Hand the car to (or back from) a replay: no collisions or gravity while it is posed.
+func set_replaying(on: bool) -> void:
+	if on == replaying:
+		return
+	replaying = on
+	if on:
+		_live_layers = Vector2i(collision_layer, collision_mask)
+		collision_layer = 0
+		collision_mask = 0
+		gravity_scale = 0.0
+	else:
+		# Land on the last frame now: the next step must already be live.
+		if replay_frame.size() >= REPLAY_STRIDE:
+			var rid := get_rid()
+			var f := replay_frame
+			PhysicsServer3D.body_set_state(rid, PhysicsServer3D.BODY_STATE_TRANSFORM, _replay_transform(f))
+			PhysicsServer3D.body_set_state(rid, PhysicsServer3D.BODY_STATE_LINEAR_VELOCITY, Vector3(f[7], f[8], f[9]))
+			PhysicsServer3D.body_set_state(rid, PhysicsServer3D.BODY_STATE_ANGULAR_VELOCITY, Vector3(f[10], f[11], f[12]))
+			_apply_replay_state(f)
+		collision_layer = _live_layers.x
+		collision_mask = _live_layers.y
+		gravity_scale = 1.0
+		replay_frame = PackedFloat32Array()
+		_hold_anchor = null
+
+
+func _apply_replay(state: PhysicsDirectBodyState3D) -> void:
+	var f := replay_frame
+	state.transform = _replay_transform(f)
+	state.linear_velocity = Vector3(f[7], f[8], f[9])
+	state.angular_velocity = Vector3(f[10], f[11], f[12])
+	_apply_replay_state(f)
+
+
+static func _replay_transform(f: PackedFloat32Array) -> Transform3D:
+	return Transform3D(Basis(Quaternion(f[3], f[4], f[5], f[6]).normalized()), Vector3(f[0], f[1], f[2]))
+
+
+func _apply_replay_state(f: PackedFloat32Array) -> void:
+	var s := model.state
+	s.throttle = f[13]
+	s.brake = f[14]
+	s.reversing = f[15] > 0.5
+	model.mechanics.engine_rpm = f[16]
+	s.steer_angle = f[17]
+	for i in 4:
+		var o := 18 + i * 11
+		var c := solver.corners[i]
+		var w := model.mechanics.wheels[i]
+		c.steering_angle = f[o]
+		c.wheel_position.y = f[o + 1]
+		c.is_grounded = f[o + 2] > 0.5
+		w.is_grounded = c.is_grounded
+		w.angular_velocity = f[o + 3]
+		w.slip_angle = f[o + 4]
+		w.slip_ratio = f[o + 5]
+		w.is_locked = f[o + 6] > 0.5
+		w.slip_energy = f[o + 7]
+		_points[i] = Vector3(f[o + 8], f[o + 9], f[o + 10])
+		_normals[i] = Vector3.UP
