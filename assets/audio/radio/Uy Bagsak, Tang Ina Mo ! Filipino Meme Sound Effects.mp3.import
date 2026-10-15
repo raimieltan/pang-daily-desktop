@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://dcqpnfsxvxelc"
+path="res://.godot/imported/Uy Bagsak, Tang Ina Mo ! Filipino Meme Sound Effects.mp3-c6ea75a29f3d86579ae39cc943a7ac0d.mp3str"
+
+[deps]
+
+source_file="res://assets/audio/radio/Uy Bagsak, Tang Ina Mo ! Filipino Meme Sound Effects.mp3"
+dest_files=["res://.godot/imported/Uy Bagsak, Tang Ina Mo ! Filipino Meme Sound Effects.mp3-c6ea75a29f3d86579ae39cc943a7ac0d.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

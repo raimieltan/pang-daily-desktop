@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://ce3fwr0lef278"
+path="res://.godot/imported/Banal Na Aso Santong Kabayo.mp3-4011ca18473337eae7942ff8f2fcbd33.mp3str"
+
+[deps]
+
+source_file="res://assets/audio/radio/Banal Na Aso Santong Kabayo.mp3"
+dest_files=["res://.godot/imported/Banal Na Aso Santong Kabayo.mp3-4011ca18473337eae7942ff8f2fcbd33.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

@@ -84,3 +84,8 @@ Licences were taken from Freesound pages or search snippets. Re-check each page 
 | impact/*.ogg | raw/kenney_impact-sounds/ | copied | CC0, Kenney (kenney.nl) |
 
 The CC-BY credits must appear in the game's credits screen.
+
+## radio/ (carried over from the Babylon build)
+
+Commercial songs, a radio broadcast, a mall ambience recording and a meme sound, downloaded as
+placeholders. They are NOT licensed for distribution; replace or license them before any public build.

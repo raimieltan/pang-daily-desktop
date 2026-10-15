@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://04hc6bwr86mb"
+path="res://.godot/imported/90.7 Love Radio Sunday Showdown.mp3-9726480873b254de7e536fd6a3d1427d.mp3str"
+
+[deps]
+
+source_file="res://assets/audio/radio/90.7 Love Radio Sunday Showdown.mp3"
+dest_files=["res://.godot/imported/90.7 Love Radio Sunday Showdown.mp3-9726480873b254de7e536fd6a3d1427d.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4
