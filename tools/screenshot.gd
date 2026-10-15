@@ -6,6 +6,7 @@ extends SceneTree
 
 const SCENARIOS := {
 	# [until_seconds, throttle, brake, steer, handbrake, shot name or ""]
+	"night_default": [[2.0, 0, 0, 0, 0, ""], [9.0, 0.85, 0, 0, 0, "night_default"]],
 	"day": [[2.0, 0, 0, 0, 0, ""], [9.0, 0.85, 0, 0, 0, "day_drive"]],
 	"brake": [[2.0, 0, 0, 0, 0, ""], [9.0, 1, 0, 0, 0, ""], [9.6, 0, 1, 0, 0, "brake"]],
 	"drift": [[2.0, 0, 0, 0, 0, ""], [9.0, 1, 0, 0, 0, ""], [10.3, 0.6, 0, -1, 1, "drift_mid"], [11.2, 0.6, 0, 0.4, 0, "drift_after"]],
@@ -26,6 +27,9 @@ var _step := 0
 var _frames := 0
 var _frame_time_sum := 0.0
 var _worst := 0.0
+var _gpu := 0.0
+var _cpu := 0.0
+var _proc := 0.0
 var _input := VehicleTypes.DriverInput.new()
 
 
@@ -40,10 +44,18 @@ func _initialize() -> void:
 	# Never steal keyboard focus from whoever is playing on this machine.
 	DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_NO_FOCUS, true)
 	root.size = Vector2i(1280, 720)
+	if OS.has_environment("PANG_RES"):
+		var r := OS.get_environment("PANG_RES").split("x")
+		var size := Vector2i(int(r[0]), int(r[1]))
+		DisplayServer.window_set_size(size)
+		root.size = size
 	_scene = load(scene_path).instantiate()
 	root.add_child(_scene)
 	if _scenario == "night":
 		MangaArt.set_night(true)
+	elif _scenario != "switch":
+		# Night is the default now; the day scenarios ask for day.
+		MangaArt.set_night(false)
 
 
 func _scripted() -> VehicleTypes.DriverInput:
@@ -52,10 +64,23 @@ func _scripted() -> VehicleTypes.DriverInput:
 
 func _process(delta: float) -> bool:
 	var session: DriveSession = _scene.session
+	if _t == 0.0:
+		if OS.has_environment("PANG_MANGA_OFF"):
+			session.camera.manga.enabled = false
+		if OS.has_environment("PANG_SCALE"):
+			root.scaling_3d_scale = float(OS.get_environment("PANG_SCALE"))
+		session.camera._fit_render_scale()
+		if OS.has_environment("PANG_SCALE"):
+			root.scaling_3d_scale = float(OS.get_environment("PANG_SCALE"))
+		print("3d scale ", root.scaling_3d_scale, " window ", root.size)
+		RenderingServer.viewport_set_measure_render_time(root.get_viewport_rid(), true)
 	if session.car.input_source != _scripted:
 		session.car.input_source = _scripted
 	_t += delta
 	if _t > 2.0:
+		_gpu += RenderingServer.viewport_get_measured_render_time_gpu(root.get_viewport_rid())
+		_cpu += RenderingServer.viewport_get_measured_render_time_cpu(root.get_viewport_rid())
+		_proc += Performance.get_monitor(Performance.TIME_PROCESS) * 1000.0
 		_frames += 1
 		_frame_time_sum += delta
 		_worst = maxf(_worst, delta)
@@ -71,6 +96,7 @@ func _process(delta: float) -> bool:
 		_step += 1
 		if _step >= _steps.size():
 			var avg := _frame_time_sum / maxf(1, _frames)
+			print("  gpu %.2f ms, render cpu %.2f ms, script process %.2f ms per frame" % [_gpu / _frames, _cpu / _frames, _proc / _frames])
 			print("perf %s: %d frames, avg %.2f ms (%.0f fps), worst %.2f ms, physics %.2f ms, objects drawn %d, primitives %d" % [
 				_scenario, _frames, avg * 1000.0, 1.0 / avg, _worst * 1000.0,
 				Performance.get_monitor(Performance.TIME_PHYSICS_PROCESS) * 1000.0,
@@ -87,7 +113,7 @@ func _overview_camera(session: DriveSession) -> void:
 	cam.global_position = p + Vector3(120, 160, 260)
 	cam.look_at(p + Vector3(0, -40, -160))
 	cam.far = 4000
-	cam.add_child(MangaArt.post_quad())
+	cam.compositor = _scene.session.camera.compositor
 	cam.current = true
 
 
@@ -96,8 +122,7 @@ func _shot(name: String) -> void:
 	if _scenario == "overview":
 		RenderingServer.force_draw()
 	if OS.has_environment("PANG_NO_PAGE"):
-		for q in root.find_children("MangaPage", "MeshInstance3D", true, false):
-			q.visible = false
+		_scene.session.camera.manga.enabled = false
 	var image := root.get_texture().get_image()
 	var path := _out.path_join(name + ".png")
 	image.save_png(path)

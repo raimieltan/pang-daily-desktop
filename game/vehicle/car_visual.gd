@@ -80,11 +80,12 @@ func _build_lamps(model: Node) -> void:
 		if node == null:
 			continue
 		var spot := SpotLight3D.new()
-		spot.light_color = Color(1.0, 0.9, 0.66)
+		spot.light_color = Color.WHITE
 		spot.spot_range = 48.0
 		spot.spot_angle = 26.0
 		spot.spot_attenuation = 0.5
-		spot.spot_angle_attenuation = 0.4
+		# Near-flat across the cone, then a hard drop at its edge: a cut-out white beam.
+		spot.spot_angle_attenuation = 0.05
 		spot.light_energy = 0.0
 		spot.shadow_enabled = false
 		spot.light_cull_mask = 1

@@ -14,6 +14,7 @@ var debug_visible := false:
 
 
 func _ready() -> void:
+	layer = 10
 	var panel := PanelContainer.new()
 	var style := StyleBoxFlat.new()
 	style.bg_color = Color(0.05, 0.06, 0.08, 0.72)

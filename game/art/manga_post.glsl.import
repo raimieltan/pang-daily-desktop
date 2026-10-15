@@ -1,0 +1,14 @@
+[remap]
+
+importer="glsl"
+type="RDShaderFile"
+uid="uid://barcpavk8euoc"
+path="res://.godot/imported/manga_post.glsl-d289b368d2234e7100ddd4149b85532a.res"
+
+[deps]
+
+source_file="res://game/art/manga_post.glsl"
+dest_files=["res://.godot/imported/manga_post.glsl-d289b368d2234e7100ddd4149b85532a.res"]
+
+[params]
+

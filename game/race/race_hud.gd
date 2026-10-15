@@ -18,6 +18,7 @@ var _count_value := -1
 
 
 func _ready() -> void:
+	layer = 10
 	_font.font_names = ["Impact", "Arial Black", "Helvetica Neue", "sans-serif"]
 	_font.font_weight = 900
 	_timer = _label(46, Control.PRESET_CENTER_TOP, Vector2(0, 26))

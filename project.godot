@@ -12,7 +12,7 @@ config_version=5
 
 config/name="pang-daily"
 run/main_scene="res://scenes/touge.tscn"
-config/features=PackedStringArray("4.7", "Mobile")
+config/features=PackedStringArray("4.7", "Forward Plus")
 config/icon="res://icon.svg"
 
 [display]
@@ -33,8 +33,12 @@ common/physics_interpolation=true
 
 [rendering]
 
+lights_and_shadows/directional_shadow/size=2048
+lights_and_shadows/directional_shadow/soft_shadow_filter_quality=0
+lights_and_shadows/positional_shadow/soft_shadow_filter_quality=0
+
 rendering_device/driver.windows="d3d12"
-renderer/rendering_method="mobile"
+renderer/rendering_method="forward_plus"
 
 [shader_globals]
 
@@ -57,6 +61,14 @@ manga_outline_scale={
 manga_fx_intensity={
 "type": "float",
 "value": 1.0
+}
+manga_ambient={
+"type": "float",
+"value": 0.05
+}
+manga_px_angle={
+"type": "float",
+"value": 0.0007
 }
 manga_res_scale={
 "type": "float",
