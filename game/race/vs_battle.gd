@@ -14,8 +14,8 @@ const RIVALS := [
 		"preset": "fwd_sport_hatch", "paint": Color(0.93, 0.93, 0.9), "skill": 1.0 },
 	{ "name": "ATE LIZA", "car": "CIVIC FD", "model": "res://assets/vehicles/civic-fd/civic_fd_2007_modular.glb",
 		"preset": "fwd_sport_hatch", "paint": Color(0.85, 0.1, 0.12), "skill": 0.97 },
-	{ "name": "KAPITAN", "car": "DALAGAN GSR", "model": "res://assets/vehicles/dalagan_evo/dalagan_evo_modular.glb",
-		"preset": "awd_gsr", "paint": Color(0.12, 0.3, 0.75), "skill": 0.9 },
+	{ "name": "KAPITAN", "car": "SILAK BOX", "model": "res://assets/vehicles/lancer/lancer_box_1983_modular.glb",
+		"preset": "rwd_box_turbo", "paint": Color(0.12, 0.3, 0.75), "skill": 0.9 },
 ]
 
 var track: TrackData

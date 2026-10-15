@@ -76,6 +76,20 @@ const PRESETS := {
 		"tires": { "frontGrip": 1.0, "rearGrip": 1.0 },
 		"balance": { "understeer": 0.38 },
 	} },
+	# Banwa Silak 1983, the Lancer EX box type on an A172 build: light, near 50/50, rear drive
+	# through an LSD with SR20DET-style gearing. Power is kept near the GSR's so it races it fairly.
+	"rwd_box_turbo": { "extends": "awd_gsr", "overrides": {
+		"chassis": { "massKg": 1090.0, "frontWeight": 0.53, "cgHeightM": 0.48, "trackWidthM": 1.456, "yawInertiaScale": 1.0 },
+		"drive": { "drivetrain": "RWD", "accelerationMps2": 5.2, "topSpeedKmh": 230.0 },
+		"brakes": { "decelerationMps2": 9.2, "frontBias": 0.62 },
+		"balance": { "understeer": 0.3, "liftOffRotation": 0.15 },
+		"mechanicalOverrides": {
+			"engine": { "torqueNm": 330.0, "clutchTorqueNm": 500.0, "redlineRpm": 7200.0, "peakTorqueRpm": 4000.0,
+				"gearRatios": [3.321, 1.902, 1.308, 1.0, 0.759], "finalDrive": 4.083 },
+			"differential": { "type": "lsd", "lock": 0.4, "preloadNm": 60.0 },
+			"suspension": { "frontSpring": 30000.0, "rearSpring": 28000.0, "frontAntiRoll": 11000.0, "rearAntiRoll": 7000.0 },
+		},
+	} },
 	"fwd_worn_sedan_drift": { "extends": "fwd_worn_sedan", "overrides": {
 		"tires": { "rearGrip": 0.94 },
 		"balance": { "understeer": 0.36, "rearSlideFalloff": 0.2, "liftOffRotation": 0.2 },
