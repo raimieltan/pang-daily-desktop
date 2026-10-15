@@ -5,7 +5,7 @@ extends Node3D
 
 const WHEEL_NAMES := ["wheel_fl", "wheel_fr", "wheel_rl", "wheel_rr"]
 
-@export var model_scene: PackedScene = preload("res://assets/vehicles/banwa_dalagan_1996_modular.glb")
+@export var model_scene: PackedScene = preload("res://assets/vehicles/dalagan_evo/dalagan_evo_modular.glb")
 ## The car is the color on the page (docs/ART_DIRECTION.md §3).
 @export var paint_color := Color(0.96, 0.74, 0.08)
 

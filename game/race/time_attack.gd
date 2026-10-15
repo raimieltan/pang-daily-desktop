@@ -132,7 +132,7 @@ func _process(_delta: float) -> void:
 func _make_ghost() -> Node3D:
 	var root := Node3D.new()
 	root.name = "Ghost"
-	var model: Node3D = preload("res://assets/vehicles/banwa_dalagan_1996_modular.glb").instantiate()
+	var model: Node3D = preload("res://assets/vehicles/dalagan_evo/dalagan_evo_modular.glb").instantiate()
 	model.rotation.y = PI
 	root.add_child(model)
 	var m := ShaderMaterial.new()

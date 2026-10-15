@@ -1,0 +1,11 @@
+Model Information:
+* title:	Mitsubishi Lancer Evolution 5 Stylized Toon
+* source:	https://sketchfab.com/3d-models/mitsubishi-lancer-evolution-5-stylized-toon-c6f74d4645cb47aea7813f24bc59386f
+* author:	Ponter (https://sketchfab.com/ponter)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Mitsubishi Lancer Evolution 5 Stylized Toon" (https://sketchfab.com/3d-models/mitsubishi-lancer-evolution-5-stylized-toon-c6f74d4645cb47aea7813f24bc59386f) by Ponter (https://sketchfab.com/ponter) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
