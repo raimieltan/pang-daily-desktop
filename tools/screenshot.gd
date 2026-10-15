@@ -21,7 +21,7 @@ const SCENARIOS := {
 	# Menus: the title on launch; the pause menu over a run.
 	"title": [[1.5, 0, 0, 0, 0, "title"]],
 	"pause": [[2.0, 0, 0, 0, 0, ""], [6.0, 0.85, 0, 0, 0, ""], [6.3, 0, 0, 0, 0, "pause"]],
-	# Garage: opened from FREE DRIVE, focus moves to the Silak, it is picked and driven.
+	# Garage: opened from FREE DRIVE, focus moves to the Silak (or PANG_CAR), it is picked and driven.
 	"garage": [[1.0, 0, 0, 0, 0, ""], [2.5, 0, 0, 0, 0, "garage"], [3.0, 0, 0, 0, 0, ""], [4.5, 0, 0, 0, 0, "garage_silak"],
 		[5.0, 0, 0, 0, 0, ""], [12.0, 0.85, 0, 0, 0, "garage_drive"]],
 	# Settings page from the title (music slider lit), and the VS garage with its opponents gauge.
@@ -126,8 +126,8 @@ func _process(delta: float) -> bool:
 			var menu: GameMenu = _scene.menu
 			match _step:
 				0: menu._open_garage("FREE DRIVE", menu._start_free_drive)
-				2: menu._car_buttons["silak_box"].grab_focus()
-				4: menu._car_buttons["silak_box"].pressed.emit()
+				2: menu._car_buttons[OS.get_environment("PANG_CAR") if OS.has_environment("PANG_CAR") else "silak_box"].grab_focus()
+				4: menu._car_buttons[OS.get_environment("PANG_CAR") if OS.has_environment("PANG_CAR") else "silak_box"].pressed.emit()
 		if step[5] != "":
 			if _scenario == "overview":
 				_overview_camera(session)
