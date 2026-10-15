@@ -221,7 +221,8 @@ func _integrate(dt: float, input: VehicleTypes.DriverInput, contact: VehicleType
 		0.0 if not input.engine_available else (raw_brake if s.reversing else raw_throttle),
 		raw_throttle if s.reversing else raw_brake,
 		input.handbrake if hb["enabled"] else 0.0, input.device,
-		{ "vx": s.vx, "vy": s.vy, "yaw_rate": yaw, "rear_slip_ratio": rear_slip, "front_axle_m": a, "rear_axle_m": b }, p, pedals)
+		{ "vx": s.vx, "vy": s.vy, "yaw_rate": yaw, "rear_slip_ratio": rear_slip, "front_axle_m": a, "rear_axle_m": b,
+			"front_peak_slip": c["tires"]["frontPeakSlipDeg"] * DEG }, p, pedals)
 	var controls := assistance
 	if not input.engine_available:
 		controls.throttle_assisted = 0.0

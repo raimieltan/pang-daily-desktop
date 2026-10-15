@@ -20,6 +20,8 @@ func _close(label: String, actual: float, expected: float, tolerance: float) -> 
 
 func _run(scenario: Dictionary) -> Array[Dictionary]:
 	var model := HandlingModel.new(HandlingPresets.resolve(scenario["preset"]))
+	# Godot-only keyboard assist; the TS reference has none.
+	model.config["mechanical"]["steering"]["gripLimitedLock"] = false
 	model.sync_motion(scenario["vx"], 0.0, 0.0)
 	var contact := VehicleTypes.AxleContact.grounded()
 	var samples: Array[Dictionary] = []

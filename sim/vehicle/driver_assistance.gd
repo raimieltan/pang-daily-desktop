@@ -29,6 +29,7 @@ var right_hold_time := 0.0
 var _filtered_angle := 0.0
 var _previous_intent := 0.0
 var _transition_time := 0.0
+var _grip_window := INF
 
 
 func reset() -> void:
@@ -36,7 +37,7 @@ func reset() -> void:
 	actual_steering = 0.0; steering_velocity = 0.0; drift_factor = 0.0
 	throttle_raw = 0.0; throttle_filtered = 0.0; throttle_assisted = 0.0
 	brake = 0.0; handbrake = 0.0; left_hold_time = 0.0; right_hold_time = 0.0
-	_filtered_angle = 0.0; _previous_intent = 0.0; _transition_time = 0.0
+	_filtered_angle = 0.0; _previous_intent = 0.0; _transition_time = 0.0; _grip_window = INF
 
 
 ## `motion`: vx, vy, yaw_rate, rear_slip_ratio, front_axle_m, rear_axle_m.
@@ -78,6 +79,24 @@ func step(dt: float, steering: float, throttle: float, brake_in: float, handbrak
 	var player := steer * max_angle * authority
 	# Full opposed intent replaces the assist; agreeing input reinforces it.
 	var target := SimMath.clamp_(player + counter * (1.0 - absf(steer) * (1.0 if player * counter < 0.0 else 0.35)), -max_angle, max_angle)
+	# Grip-limited lock (Forza "normal steering"): at speed a key or stick asks for the angle that puts
+	# the front tires at their useful slip, measured from where the front axle is really travelling,
+	# never the whole rack. The window follows a slide, so countersteer is always reachable.
+	if not keyboard and device != "controller":
+		_grip_window = INF
+	elif st.get("gripLimitedLock", false):
+		# The handbrake is a request to rotate: a handbrake turn gets the whole rack.
+		var gate := SimMath.smoothstep_(st.get("gripLockFromKph", 18.0), st.get("gripLockFullKph", 45.0), speed) * forward_gate \
+			* (1.0 - maxf(handbrake, SimMath.clamp_(handbrake_in, 0.0, 1.0)))
+		var slip_window: float = motion.get("front_peak_slip", 7.0 * SimMath.DEG) * st.get("gripLockSlip", 0.8)
+		_grip_window = SimMath.lerp_(max_angle, slip_window, gate)
+		target = SimMath.clamp_(target, front_direction - _grip_window, front_direction + _grip_window)
+		# Yaw limiter: past the yaw rate the tires can hold on this path (mu*g/v) the rack backs out of
+		# the turn instead of adding rotation, the steering half of a stability assist.
+		var yaw_cap: float = st.get("gripLockMu", 0.85) * 9.81 / maxf(5.0, vx)
+		var over := (absf(yaw_rate) - yaw_cap) / yaw_cap
+		if over > 0.0 and target * yaw_rate > 0.0:
+			target *= 1.0 - SimMath.clamp_(over * st.get("yawLimitGain", 4.0), 0.0, 1.0) * gate
 	left_hold_time = left_hold_time + dt if steer < 0.0 else 0.0
 	right_hold_time = right_hold_time + dt if steer > 0.0 else 0.0
 	if keyboard and drift > 0.2 and steer * _previous_intent < 0.0:
@@ -97,6 +116,10 @@ func step(dt: float, steering: float, throttle: float, brake_in: float, handbrak
 		rate *= profile["transition"]
 	if device == "wheel" or device == "ai":
 		rate = rack_rate
+	elif keyboard and st.get("gripLimitedLock", false):
+		# Keys are all-or-nothing: at speed the rack takes ~0.3 s to its (grip-limited) lock, like a
+		# thumb rolling a stick, instead of snapping there in a tenth of a second.
+		rate = minf(rate, SimMath.lerp_(rack_rate, st.get("keyboardHighSpeedRate", 2.5), speed_t))
 	# Rates are normalized rack travel/sec. Acceleration and damping avoid instant reversals.
 	var error := target - actual_steering
 	var rack_speed := rate * max_angle * authority
