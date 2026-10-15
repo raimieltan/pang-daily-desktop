@@ -46,7 +46,7 @@ func _process(_delta: float) -> void:
 	var gear := "R" if s.reversing else str(mech.gear)
 	_speedo.text = "%d km/h  %s\n%d rpm" % [absf(car.speed_kmh()), gear, mech.engine_rpm]
 	var lines: PackedStringArray = []
-	lines.append("PANG DAILY · drive test       [T] tune  [Y] tires  [R] reset  [H] hud")
+	lines.append("PANG DAILY                    [T] tune  [Y] tires  [R] reset  [H] hud")
 	lines.append("tune %-22s tires %s   device %s" % [car.preset, car.tire_product, car.last_input.device])
 	lines.append("thr %.2f→%.2f  brk %.2f  hb %.2f  clutch %.2f  axle %5.0f Nm  tcs-cut %.2f" % [
 		a.throttle_raw, s.throttle, s.brake, s.handbrake, mech.clutch, mech.axle_torque, d.traction_cut])

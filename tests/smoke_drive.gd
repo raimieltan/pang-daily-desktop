@@ -7,7 +7,8 @@ var _t := 0.0
 
 
 func _initialize() -> void:
-	_scene = load("res://scenes/drive_test.tscn").instantiate()
+	var args := OS.get_cmdline_user_args()
+	_scene = load(args[0] if args.size() > 0 else "res://scenes/drive_test.tscn").instantiate()
 	root.add_child(_scene)
 
 
@@ -24,8 +25,10 @@ func _physics_process(delta: float) -> bool:
 	var car: CarBody = _scene.car
 	if car.input_source != _scripted:
 		car.input_source = _scripted
-	if fmod(_t, 1.0) < delta:
+	if fmod(_t, 1.0) < delta or (_t < 2.6 and _t > 1.9 and fmod(_t, 0.1) < delta):
 		var m := car.model
+		var a := m.mechanics.assistance
+		print("    filtered=%.3f drift=%.2f vx=%.2f vy=%.2f held=%s" % [a._filtered_angle, a.drift_factor, m.state.vx, m.state.vy, m.diagnostics.held])
 		print("t=%5.2f  pos=(%6.2f %5.2f %7.2f)  kmh=%6.1f  gear=%d rpm=%4.0f  yaw=%+5.1f°/s  loads=%s  q=%s  grounded=%s" % [
 			_t, car.global_position.x, car.global_position.y, car.global_position.z, car.speed_kmh(), m.mechanics.gear,
 			m.mechanics.engine_rpm, rad_to_deg(m.state.yaw_rate),

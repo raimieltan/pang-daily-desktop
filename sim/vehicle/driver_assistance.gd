@@ -56,6 +56,9 @@ func step(dt: float, steering: float, throttle: float, brake_in: float, handbrak
 	var angle := atan2(vy, vx)
 	var angle_delta := atan2(sin(angle - _filtered_angle), cos(angle - _filtered_angle))
 	_filtered_angle += angle_delta * (1.0 - exp(-dt / 0.07))
+	# Wrap: the TS original lets this wind up past ±π when the car twitches near standstill, which
+	# pins drift-factor at 1 for the rest of the run (twitchy keyboard authority, phantom countersteer).
+	_filtered_angle = wrapf(_filtered_angle, -PI, PI)
 	var forward_gate := SimMath.smoothstep_(3.0, 15.0, speed) * (1.0 if vx > 0.0 else 0.0)
 	var predicted_angle := _filtered_angle - yaw_rate * 0.22
 	var drift := SimMath.smoothstep_(cs.get("startAngleDeg", 5.0) * SimMath.DEG, cs.get("fullAngleDeg", 22.0) * SimMath.DEG,

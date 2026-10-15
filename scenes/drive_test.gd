@@ -6,50 +6,18 @@ const SPAWN := Vector3(0.0, 0.5, 20.0)
 const SPAWN_HEADING := 0.0
 const CONE_LAYER := 4
 
-var car: CarBody
-var camera: ChaseCamera
-var hud: TelemetryHud
-var _input := PlayerInput.new()
+var session: DriveSession
+var car: CarBody:
+	get: return session.car
 
 
 func _ready() -> void:
-	PlayerInput.register_actions()
 	_build_environment()
 	_build_ground()
 	_build_features()
-
-	car = CarBody.new()
-	car.name = "Dalagan"
-	car.collision_mask |= CONE_LAYER
-	car.input_source = _input.read
-	add_child(car)
-	car.global_position = SPAWN
-	var visual := CarVisual.new()
-	visual.car = car
-	car.add_child(visual)
-	car.place(SPAWN, SPAWN_HEADING)
-
-	camera = ChaseCamera.new()
-	camera.target = car
-	add_child(camera)
-	camera.global_position = SPAWN + Vector3(0, 2, 6)
-	camera.current = true
-
-	hud = TelemetryHud.new()
-	hud.car = car
-	add_child(hud)
-
-
-func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("reset_car"):
-		car.place(SPAWN, SPAWN_HEADING)
-		camera.snap.call_deferred()
-	elif event.is_action_pressed("toggle_tune"):
-		car.set_preset("fwd_worn_sedan_drift" if car.preset == "fwd_worn_sedan" else "fwd_worn_sedan")
-	elif event.is_action_pressed("toggle_tires"):
-		car.set_tire_product("street" if car.tire_product == "stock" else "stock")
-	elif event.is_action_pressed("toggle_hud"):
-		hud.visible = not hud.visible
+	session = DriveSession.new(SPAWN, SPAWN_HEADING)
+	add_child(session)
+	session.car.collision_mask |= CONE_LAYER
 
 
 func _build_environment() -> void:
