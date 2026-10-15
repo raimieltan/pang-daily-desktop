@@ -68,6 +68,7 @@ func _initialize() -> void:
 
 	b.build_guardrails(root, root)
 	b.build_trees(root, root, bounds, grid)
+	b.build_backdrop(root, root, bounds)
 	b.build_gantry(root, root, data.start_distance, "START", Color(0.75, 0.12, 0.1))
 	b.build_gantry(root, root, data.finish_distance, "GOAL", Color(0.1, 0.25, 0.7))
 	print("dressing  %d ms" % (Time.get_ticks_msec() - started))

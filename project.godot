@@ -35,3 +35,30 @@ common/physics_interpolation=true
 
 rendering_device/driver.windows="d3d12"
 renderer/rendering_method="mobile"
+
+[shader_globals]
+
+manga_night={
+"type": "float",
+"value": 0.0
+}
+manga_tone_contrast={
+"type": "float",
+"value": 1.0
+}
+manga_tone_density={
+"type": "float",
+"value": 1.0
+}
+manga_outline_scale={
+"type": "float",
+"value": 1.0
+}
+manga_fx_intensity={
+"type": "float",
+"value": 1.0
+}
+manga_res_scale={
+"type": "float",
+"value": 0.667
+}

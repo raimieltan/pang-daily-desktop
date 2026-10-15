@@ -1,7 +1,7 @@
 // Shared screentone helpers (docs/ART_DIRECTION.md §2). Screen-space, so tone keeps a constant
 // printed size at any distance. `coverage` is the share of ink (0 = paper, 1 = solid ink).
 
-const float TONE_PITCH = 5.0;      // px between dots / hatch lines at 1080p
+const float TONE_PITCH = 5.0;      // px between dots / hatch lines at 1080p (scale with tone_res_scale)
 const float SQRT_HALF = 0.70710678;
 
 vec2 tone_rotate(vec2 p) {
@@ -44,6 +44,11 @@ float tone_hatch(vec2 frag, float coverage, float pitch) {
 // Random stipple (gravel, dirt).
 float tone_stipple(vec2 frag, float coverage) {
 	return step(tone_hash(floor(frag / 1.5)), coverage);
+}
+
+// Keeps printed tone the same size relative to the frame at any resolution.
+float tone_res_scale(vec2 viewport) {
+	return max(viewport.y / 1080.0, 0.5);
 }
 
 // pattern: 0 dots, 1 hatch, 2 stipple.

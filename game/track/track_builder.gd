@@ -519,7 +519,7 @@ func build_guardrails(parent: Node3D, owner: Node) -> void:
 	beam.owner = owner
 	var post_mesh := BoxMesh.new()
 	post_mesh.size = Vector3(0.1, 0.9, 0.1)
-	post_mesh.material = MangaArt.world(0.9, MangaArt.Pattern.HATCH)
+	post_mesh.material = MangaArt.world_preset("post")
 	var post_instance := Scatter.make("GuardrailPosts", post_mesh, posts)
 	parent.add_child(post_instance)
 	post_instance.owner = owner
@@ -593,7 +593,7 @@ func build_gantry(parent: Node3D, owner: Node, distance: float, label: String, c
 	parent.add_child(root)
 	root.owner = owner
 	var mat := MangaArt.accent(color)
-	var post_mat := MangaArt.world(0.85, MangaArt.Pattern.HATCH)
+	var post_mat := MangaArt.world_preset("post")
 	for x in [-4.6, 4.6]:
 		var post := MeshInstance3D.new()
 		var box := BoxMesh.new()
@@ -636,3 +636,51 @@ func track_data(start_distance: float, finish_back: float) -> TrackData:
 	data.start_distance = start_distance
 	data.finish_distance = (pts.size() - 1) * SPACING - finish_back
 	return data
+
+
+# --- Backdrop ----------------------------------------------------------------------------------
+
+## Two rings of distant ridges around the map: light-gray silhouettes that give the page depth
+## (near ridge a little darker than the far one) and an ink skyline from the page pass.
+func build_backdrop(parent: Node3D, owner: Node, bounds: Rect2) -> void:
+	var center := bounds.get_center()
+	var low := INF
+	for p in pts:
+		low = minf(low, p.y)
+	var noise := FastNoiseLite.new()
+	noise.seed = seed_ + 99
+	noise.frequency = 1.6
+	noise.fractal_octaves = 3
+	var rings := [
+		{ "name": "RidgeNear", "radius": bounds.size.length() * 0.5 + 180.0, "base": low - 40.0, "height": 140.0, "vary": 170.0, "far_value": 0.78 },
+		{ "name": "RidgeFar", "radius": bounds.size.length() * 0.5 + 700.0, "base": low - 60.0, "height": 300.0, "vary": 260.0, "far_value": 0.88 },
+	]
+	for ring in rings:
+		var st := SurfaceTool.new()
+		st.begin(Mesh.PRIMITIVE_TRIANGLES)
+		var segments := 240
+		var prev_base := Vector3.ZERO
+		var prev_peak := Vector3.ZERO
+		for k in segments + 1:
+			var a := TAU * k / segments
+			var dir := Vector3(cos(a), 0.0, sin(a))
+			var r: float = ring["radius"]
+			var h: float = ring["height"] + (noise.get_noise_1d(float(k) / segments * 6.0 + ring["radius"]) * 0.5 + 0.5) * ring["vary"]
+			var base := Vector3(center.x, ring["base"], center.y) + dir * r
+			var peak := Vector3(center.x, ring["base"] + h, center.y) + dir * (r + h * 0.9)
+			if k > 0:
+				# Both windings: the ridge is seen from inside the ring.
+				for v in [prev_base, prev_peak, peak, prev_base, peak, base, prev_base, peak, prev_peak, prev_base, base, peak]:
+					st.add_vertex(v)
+			prev_base = base
+			prev_peak = peak
+		st.generate_normals()
+		var m := MangaArt.world_preset("backdrop")
+		m.set_shader_parameter("far_value", ring["far_value"])
+		st.set_material(m)
+		var mi := MeshInstance3D.new()
+		mi.name = ring["name"]
+		mi.mesh = st.commit()
+		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		parent.add_child(mi)
+		mi.owner = owner

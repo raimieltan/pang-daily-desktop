@@ -13,6 +13,7 @@ const ACTIONS := {
 	"toggle_tune": [KEY_T],
 	"toggle_tires": [KEY_Y],
 	"toggle_hud": [KEY_H],
+	"toggle_night": [KEY_N],
 }
 
 var _last_device := "keyboard"

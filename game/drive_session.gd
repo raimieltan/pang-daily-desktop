@@ -8,6 +8,7 @@ signal car_reset
 var car: CarBody
 var camera: ChaseCamera
 var hud: TelemetryHud
+var fx: CarFx
 ## func(car: CarBody) -> Dictionary { "position": Vector3, "heading": float }; defaults to the spawn.
 var reset_pose: Callable
 var _input := PlayerInput.new()
@@ -37,6 +38,11 @@ func _ready() -> void:
 	camera.current = true
 	camera.snap.call_deferred()
 
+	fx = CarFx.new()
+	fx.car = car
+	fx.camera = camera
+	add_child(fx)
+
 	hud = TelemetryHud.new()
 	hud.car = car
 	add_child(hud)
@@ -58,5 +64,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		car.set_preset("fwd_worn_sedan_drift" if car.preset == "fwd_worn_sedan" else "fwd_worn_sedan")
 	elif event.is_action_pressed("toggle_tires"):
 		car.set_tire_product("street" if car.tire_product == "stock" else "stock")
+	elif event.is_action_pressed("toggle_night"):
+		MangaArt.set_night(MangaArt.night < 0.5)
 	elif event.is_action_pressed("toggle_hud"):
 		hud.visible = not hud.visible

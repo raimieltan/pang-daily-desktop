@@ -29,6 +29,10 @@ var collision_config := {
 ## Tire product on all four corners. The Babylon starter car leaves the factory on stock eco rubber.
 @export_enum("stock", "street") var tire_product := "stock"
 
+## A body contact this step: { point, normal, dv (m/s of impulse), slide (m/s along the surface) }.
+## Read by effects after the physics step; side hits (walls, rails) only.
+signal wall_contact(point: Vector3, normal: Vector3, dv: float, slide: float)
+
 var model: HandlingModel
 var solver: SuspensionSolver
 var contact := VehicleTypes.AxleContact.new()
@@ -58,6 +62,8 @@ func _ready() -> void:
 	contact.wheels = [false, false, false, false]
 	set_tire_product(tire_product)
 
+	contact_monitor = true
+	max_contacts_reported = 4
 	collision_layer = VEHICLE_LAYER
 	collision_mask = STATIC_LAYER | VEHICLE_LAYER
 	can_sleep = false
@@ -171,6 +177,25 @@ func _integrate_forces(state: PhysicsDirectBodyState3D) -> void:
 	else:
 		_hold_anchor = null
 	_apply_tire_forces(state, xf, forward, up)
+	_report_contacts(state, up)
+
+
+func _report_contacts(state: PhysicsDirectBodyState3D, up: Vector3) -> void:
+	for i in state.get_contact_count():
+		var normal := state.get_contact_local_normal(i)
+		# Walls and rails only: the road and terrain under the car push mostly up.
+		if absf(normal.dot(up)) > 0.8:
+			continue
+		var point := state.get_contact_local_position(i)
+		var velocity := state.get_contact_local_velocity_at_position(i)
+		var slide := (velocity - normal * velocity.dot(normal)).length()
+		var dv := state.get_contact_impulse(i).length() / mass
+		wall_contact.emit.call_deferred(point, normal, dv, slide)
+
+
+## World contact point and ground normal under wheel `i` (FL, FR, RL, RR) from the last step.
+func wheel_contact(i: int) -> Dictionary:
+	return { "point": _points[i], "normal": _normals[i], "grounded": solver.corners[i].is_grounded }
 
 
 func _step_suspension(state: PhysicsDirectBodyState3D, xf: Transform3D, dt: float, linear: Vector3, angular: Vector3,
