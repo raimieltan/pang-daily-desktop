@@ -5,6 +5,12 @@ extends CanvasLayer
 var car: CarBody
 var _label: Label
 var _speedo: Label
+var _panel: PanelContainer
+## The debug panel is a tool: hidden until H. The speedometer always shows.
+var debug_visible := false:
+	set(value):
+		debug_visible = value
+		if _panel: _panel.visible = value
 
 
 func _ready() -> void:
@@ -16,6 +22,8 @@ func _ready() -> void:
 	panel.add_theme_stylebox_override("panel", style)
 	panel.position = Vector2(12, 12)
 	add_child(panel)
+	_panel = panel
+	panel.visible = debug_visible
 	_label = Label.new()
 	var font := SystemFont.new()
 	font.font_names = ["Menlo", "Consolas", "monospace"]
@@ -24,7 +32,12 @@ func _ready() -> void:
 	panel.add_child(_label)
 
 	_speedo = Label.new()
+	var brush := SystemFont.new()
+	brush.font_names = ["Impact", "Arial Black", "Helvetica Neue", "sans-serif"]
+	brush.font_weight = 900
+	_speedo.add_theme_font_override("font", brush)
 	_speedo.add_theme_font_size_override("font_size", 44)
+	_speedo.add_theme_color_override("font_color", Color(0.953, 0.937, 0.898))
 	_speedo.add_theme_color_override("font_outline_color", Color.BLACK)
 	_speedo.add_theme_constant_override("outline_size", 8)
 	_speedo.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)

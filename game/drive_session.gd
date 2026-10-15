@@ -9,8 +9,11 @@ var car: CarBody
 var camera: ChaseCamera
 var hud: TelemetryHud
 var fx: CarFx
+var audio: CarAudio
 ## func(car: CarBody) -> Dictionary { "position": Vector3, "heading": float }; defaults to the spawn.
 var reset_pose: Callable
+## Optional func(DriverInput) -> DriverInput applied to the player's input (race starts, cutscenes).
+var input_filter: Callable
 var _input := PlayerInput.new()
 var _spawn := { "position": Vector3.ZERO, "heading": 0.0 }
 
@@ -23,7 +26,7 @@ func _ready() -> void:
 	PlayerInput.register_actions()
 	car = CarBody.new()
 	car.name = "PlayerCar"
-	car.input_source = _input.read
+	car.input_source = _read_input
 	add_child(car)
 	car.global_position = _spawn["position"]
 	car.rotation.y = _spawn["heading"]
@@ -43,9 +46,18 @@ func _ready() -> void:
 	fx.camera = camera
 	add_child(fx)
 
+	audio = CarAudio.new()
+	audio.car = car
+	add_child(audio)
+
 	hud = TelemetryHud.new()
 	hud.car = car
 	add_child(hud)
+
+
+func _read_input() -> VehicleTypes.DriverInput:
+	var input := _input.read()
+	return input_filter.call(input) if input_filter.is_valid() else input
 
 
 func reset_car() -> void:
@@ -67,4 +79,4 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event.is_action_pressed("toggle_night"):
 		MangaArt.set_night(MangaArt.night < 0.5)
 	elif event.is_action_pressed("toggle_hud"):
-		hud.visible = not hud.visible
+		hud.debug_visible = not hud.debug_visible

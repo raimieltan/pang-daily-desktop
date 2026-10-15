@@ -74,3 +74,13 @@ Licences were taken from Freesound pages or search snippets. Re-check each page 
 
 - Ziph, "Some sounds" (CC0, 27 MB zip, synthetic engine plus recorded handbrake and gears): https://opengameart.org/node/166538. Its file list could not be checked before downloading. It is a good candidate for a gear-lever clunk.
 - Sonniss GDC Game Audio Bundles (advertised as royalty-free; the licence terms were not verified here): https://sonniss.com/gameaudiogdc. Each bundle is many GB, so none was downloaded. Vehicle libraries in them are worth browsing.
+
+## Shipped picks (processed copies tracked in git)
+
+| File | Made from | Processing | Licence / credit |
+|---|---|---|---|
+| engine/i4_loop.wav | raw/engine-loop/engine-loop-1-normalized.wav | mono, 44.1 kHz 16-bit | **CC-BY 3.0**: "Car Engine Loop" by Iwan 'qubodup' Gabovitch, https://opengameart.org/content/car-engine-loop-96khz-4s |
+| tire/squeal_loop.wav | raw/tire/tires_squal_loop.wav | mono, 44.1 kHz 16-bit | **CC-BY 3.0**: see the tire row above for the exact attribution line |
+| impact/*.ogg | raw/kenney_impact-sounds/ | copied | CC0, Kenney (kenney.nl) |
+
+The CC-BY credits must appear in the game's credits screen.

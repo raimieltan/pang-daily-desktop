@@ -9,6 +9,7 @@ var session: DriveSession
 var car: CarBody:
 	get: return session.car if session else null
 var track: TrackData = TRACK
+var time_attack: TimeAttack
 var _progress_index := 0
 
 
@@ -19,6 +20,10 @@ func _ready() -> void:
 	session = DriveSession.new(spawn["position"], spawn["heading"])
 	session.reset_pose = _reset_pose
 	add_child(session)
+	time_attack = TimeAttack.new()
+	time_attack.track = track
+	time_attack.session = session
+	add_child(time_attack)
 
 
 func _physics_process(_delta: float) -> void:
