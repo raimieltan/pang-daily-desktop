@@ -34,6 +34,7 @@ func _ready() -> void:
 	time_attack.track = track
 	time_attack.session = session
 	time_attack.intro = intro
+	time_attack.music = music
 	add_child(time_attack)
 	vs_battle = VsBattle.new()
 	vs_battle.track = track

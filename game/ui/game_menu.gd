@@ -21,6 +21,12 @@ var _wash := ColorRect.new()
 var _title := Control.new()
 var _pause := Control.new()
 var _garage := Control.new()
+var _settings := Control.new()
+var _settings_first: Button
+## Where BACK on the settings page goes: the title or the pause menu.
+var _settings_return: Callable
+var _bars: Array[InkBar] = []
+var _opponents_button: Button
 var _title_first: Button
 var _pause_first: Button
 ## Garage page: the mode it leads into, its buttons per car id, and the spec card.
@@ -57,6 +63,12 @@ func _ready() -> void:
 	_build_title()
 	_build_pause()
 	_build_garage()
+	_build_settings()
+	GameSettings.apply_audio()
+	if music:
+		music.set_user_volume(GameSettings.value("music"))
+	if not skip_title:
+		GameSettings.apply_display()
 	if skip_title:
 		_close()
 	else:
@@ -77,8 +89,7 @@ func _build_title() -> void:
 	_title_first = _button(menu, "VS BATTLE", func(): _open_garage("VS BATTLE", _start_vs))
 	_button(menu, "TIME ATTACK", _start_time_attack)
 	_button(menu, "FREE DRIVE", func(): _open_garage("FREE DRIVE", _start_free_drive))
-	_value_button(menu, _camera_text, _cycle_camera)
-	_value_button(menu, _time_text, _toggle_time)
+	_button(menu, "SETTINGS", func(): _open_settings(open_title))
 	_button(menu, "QUIT", get_tree().quit)
 	var hint := MangaType.label("↑ ↓  SELECT     ENTER  GO", 20, MangaType.caption())
 	hint.add_theme_color_override("font_color", MangaType.INK)
@@ -104,12 +115,11 @@ func _build_pause() -> void:
 	left.add_child(heading)
 	_pause_first = _button(left, "RESUME", _close)
 	_restart_button = _button(left, "RESTART", _restart_mode)
-	_value_button(left, _camera_text, _cycle_camera)
-	_value_button(left, _time_text, _toggle_time)
 	_value_button(left, func(): return "TUNE: " + ("DRIFT" if session.car.preset.ends_with("drift") else "STOCK"),
 		func(): session.car.toggle_tune())
 	_value_button(left, func(): return "TIRES: " + session.car.tire_product.to_upper(),
 		func(): session.car.set_tire_product("street" if session.car.tire_product == "stock" else "stock"))
+	_button(left, "SETTINGS", func(): _open_settings(open_pause))
 	_button(left, "MAIN MENU", open_title)
 	_button(left, "QUIT", get_tree().quit)
 
@@ -162,6 +172,8 @@ func _build_garage() -> void:
 		var b := _button(left, spec["name"], _pick_car.bind(spec["id"]))
 		b.focus_entered.connect(_show_card.bind(spec))
 		_car_buttons[spec["id"]] = b
+	_opponents_button = _slider(left, func(): return "OPPONENTS", 1, GameSettings.MAX_OPPONENTS, "opponents", 400)
+	_opponents_button.focus_entered.connect(func(): _show_card(session.car_spec))
 	_button(left, "BACK", open_title)
 
 	# Spec card: turntable in the car shader, a drivetrain stamp, name and blurb in Bangers.
@@ -235,7 +247,89 @@ func _slab(text: String, color: Color) -> Label:
 	return l
 
 
+## Settings: sound sliders on the left, display and view toggles on the right. Saved as they change.
+func _build_settings() -> void:
+	_settings.set_anchors_preset(Control.PRESET_FULL_RECT)
+	add_child(_settings)
+	var column := _column(_settings)
+	column.add_child(MangaType.label("SETTINGS", 84))
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 48)
+	column.add_child(row)
+	var sound := VBoxContainer.new()
+	sound.add_theme_constant_override("separation", 6)
+	row.add_child(sound)
+	sound.add_child(_slab("SOUND", MangaType.RED))
+	_settings_first = _slider(sound, func(): return "MASTER", 0, 10, "master")
+	_slider(sound, func(): return "MUSIC", 0, 10, "music")
+	_slider(sound, func(): return "ENGINE", 0, 10, "engine")
+	_slider(sound, func(): return "EFFECTS", 0, 10, "effects")
+	var view := VBoxContainer.new()
+	view.add_theme_constant_override("separation", 6)
+	row.add_child(view)
+	view.add_child(_slab("DISPLAY", MangaType.RED))
+	_value_button(view, func(): return "FULLSCREEN: " + ("ON" if GameSettings.value("fullscreen") else "OFF"),
+		func(): _toggle_setting("fullscreen"))
+	_value_button(view, func(): return "VSYNC: " + ("ON" if GameSettings.value("vsync") else "OFF"),
+		func(): _toggle_setting("vsync"))
+	_value_button(view, _camera_text, _cycle_camera)
+	_value_button(view, _time_text, _toggle_time)
+	var back := _button(column, "BACK", func(): _settings_return.call())
+	back.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	var hint := MangaType.label("← →  ADJUST     ENTER  CHANGE     ESC  BACK", 20, MangaType.caption())
+	hint.add_theme_color_override("font_color", MangaType.INK)
+	hint.remove_theme_constant_override("outline_size")
+	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	column.add_child(hint)
+
+
+func _open_settings(back_to: Callable) -> void:
+	_settings_return = back_to
+	_show(_settings, _settings_first)
+
+
+func _toggle_setting(key: String) -> void:
+	GameSettings.set_value(key, not GameSettings.value(key))
+	GameSettings.apply_display()
+
+
+## A setting with an ink-box gauge on the right: ← → adjust, Enter/click steps up and wraps.
+func _slider(parent: Control, text: Callable, lo: int, hi: int, key: String, width := 560) -> Button:
+	var change := func(v: int) -> void:
+		GameSettings.set_value(key, v)
+		_apply_setting(key)
+		_refresh()
+	var b := _value_button(parent, text, func():
+		var v: int = GameSettings.value(key)
+		change.call(lo if v >= hi else v + 1))
+	b.custom_minimum_size.x = width
+	var bar := InkBar.new()
+	bar.button = b
+	bar.lo = lo
+	bar.hi = hi
+	bar.key = key
+	b.add_child(bar)
+	_bars.append(bar)
+	b.focus_entered.connect(bar.queue_redraw)
+	b.focus_exited.connect(bar.queue_redraw)
+	b.gui_input.connect(func(e: InputEvent) -> void:
+		var step := -1 if e.is_action_pressed("ui_left") else (1 if e.is_action_pressed("ui_right") else 0)
+		if step != 0:
+			b.accept_event()
+			change.call(clampi(int(GameSettings.value(key)) + step, lo, hi)))
+	return b
+
+
+func _apply_setting(key: String) -> void:
+	if key == "music":
+		if music:
+			music.set_user_volume(GameSettings.value("music"))
+	elif key in GameSettings.BUSES:
+		GameSettings.apply_audio()
+
+
 func _open_garage(mode: String, next: Callable) -> void:
+	_opponents_button.visible = mode == "VS BATTLE"
 	_garage_mode.text = mode
 	_garage_next = next
 	_show(_garage, _car_buttons[session.car_spec["id"]])
@@ -303,6 +397,8 @@ func _value_button(parent: Control, text: Callable, action: Callable) -> Button:
 func _refresh() -> void:
 	for pair in _value_buttons:
 		(pair[0] as Button).text = (pair[1] as Callable).call()
+	for bar in _bars:
+		bar.queue_redraw()
 
 
 func _camera_text() -> String:
@@ -327,7 +423,7 @@ func open_title() -> void:
 	_set_play_hud(false)
 	if music:
 		music.duck(false)
-		music.play_track(&"menu")
+		music.stop_music()
 
 
 func open_pause() -> void:
@@ -341,6 +437,7 @@ func _show(screen: Control, first: Button) -> void:
 	_title.visible = screen == _title
 	_pause.visible = screen == _pause
 	_garage.visible = screen == _garage
+	_settings.visible = screen == _settings
 	_wash.visible = true
 	_refresh()
 	get_tree().paused = true
@@ -352,6 +449,7 @@ func _close() -> void:
 	_title.visible = false
 	_pause.visible = false
 	_garage.visible = false
+	_settings.visible = false
 	_wash.visible = false
 	get_viewport().gui_release_focus()
 	_set_play_hud(true)
@@ -378,6 +476,7 @@ func _set_play_hud(on: bool) -> void:
 
 
 func _start_vs() -> void:
+	vs_battle.opponents = GameSettings.value("opponents")
 	time_attack.free_drive()
 	_close()
 	vs_battle.start()
@@ -386,7 +485,6 @@ func _start_vs() -> void:
 func _start_time_attack() -> void:
 	vs_battle.stop()
 	_close()
-	music.play_track(&"race_alt")
 	time_attack.restart(true)
 
 
@@ -394,7 +492,7 @@ func _start_free_drive() -> void:
 	vs_battle.stop()
 	time_attack.free_drive()
 	_close()
-	music.play_track(&"menu")
+	music.stop_music()
 
 
 func _restart_mode() -> void:
@@ -413,6 +511,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		_close()
 	elif _garage.visible:
 		open_title()
+	elif _settings.visible:
+		_settings_return.call()
 	elif not _title.visible:
 		open_pause()
 
@@ -496,3 +596,42 @@ class CarPreview extends SubViewportContainer:
 
 	func _process(delta: float) -> void:
 		_pivot.rotate_y(delta * 0.5)
+
+
+## A setting's level as a row of slanted ink boxes, filled up to the value. Paper on the lit
+## (focused) button, ink otherwise.
+class InkBar extends Control:
+	const BOX := Vector2(18, 22)
+	const GAP := 6.0
+	var button: Button
+	var lo := 0
+	var hi := 10
+	var key := ""
+
+	func _ready() -> void:
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
+		var w := (hi - (0 if lo == 0 else lo - 1)) * (BOX.x + GAP)
+		anchor_left = 1.0
+		anchor_right = 1.0
+		anchor_top = 0.5
+		anchor_bottom = 0.5
+		offset_left = -w - 22.0
+		offset_right = -22.0
+		offset_top = -BOX.y / 2.0
+		offset_bottom = BOX.y / 2.0
+
+	func _draw() -> void:
+		var lit := button.has_focus()
+		var ink := MangaType.PAPER if lit else MangaType.INK
+		var first := 0 if lo == 0 else lo - 1
+		var v: int = GameSettings.value(key)
+		for i in range(first, hi):
+			var x := (i - first) * (BOX.x + GAP)
+			var slant := 5.0
+			var pts := PackedVector2Array([Vector2(x + slant, 0), Vector2(x + BOX.x + slant, 0),
+				Vector2(x + BOX.x - slant, BOX.y), Vector2(x - slant, BOX.y)])
+			if i < v:
+				draw_colored_polygon(pts, ink)
+			else:
+				pts.append(pts[0])
+				draw_polyline(pts, ink, 3.0)

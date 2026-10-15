@@ -16,6 +16,10 @@ const RIVALS := [
 		"preset": "fwd_sport_hatch", "paint": Color(0.85, 0.1, 0.12), "skill": 0.97 },
 	{ "name": "KAPITAN", "car": "SILAK BOX", "model": "res://assets/vehicles/lancer/lancer_box_1983_modular.glb",
 		"preset": "rwd_box_turbo", "paint": Color(0.12, 0.3, 0.75), "skill": 0.9 },
+	{ "name": "BUKO", "car": "DALAGAN GSR", "model": "res://assets/vehicles/dalagan_evo/dalagan_evo_modular.glb",
+		"preset": "awd_gsr", "paint": Color(0.1, 0.42, 0.24), "skill": 0.93 },
+	{ "name": "TISOY", "car": "EG HATCH", "model": "res://assets/vehicles/civic_eg/civic_eg_modular.glb",
+		"preset": "fwd_sport_hatch", "paint": Color(0.09, 0.09, 0.1), "skill": 0.92 },
 ]
 
 var track: TrackData
@@ -23,6 +27,8 @@ var session: DriveSession
 var hud: RaceHud
 var intro: RaceIntro
 var music: MusicPlayer
+## How many of RIVALS line up (1…RIVALS.size()); the menu sets it from GameSettings.
+var opponents := 3
 var run: TimeAttackRun
 var active := false
 var rivals: Array[CarBody] = []
@@ -50,18 +56,19 @@ func start() -> void:
 	_finish_times.clear()
 	_player_place = 0
 	_clock = 0.0
-	var grid := _grid()
+	var field := RIVALS.slice(0, clampi(opponents, 1, RIVALS.size()))
+	var grid := _grid(field.size())
 	var pose: Dictionary = grid[0]
 	session.car.place(pose["position"], pose["heading"])
 	session.camera.snap.call_deferred()
 	_index_hint = track.index_at(track.start_distance)
-	for k in RIVALS.size():
-		_spawn_rival(RIVALS[k], grid[k + 1], k)
+	for k in field.size():
+		_spawn_rival(field[k], grid[k + 1], k)
 	hud.visible = true
-	hud.show_versus(RIVALS.map(func(r): return r["name"]))
+	hud.show_versus(field.map(func(r): return r["name"]))
 	_in_intro = true
 	if music:
-		music.play_track(&"race")
+		music.play_track(&"intro" if intro else &"race")
 	await get_tree().physics_frame
 	await get_tree().physics_frame
 	if session.minimap:
@@ -75,6 +82,8 @@ func start() -> void:
 		await intro.finished
 		if not active:
 			return
+		if music:
+			music.play_track(&"race")
 	hud.visible = true
 	_in_intro = false
 	run = TimeAttackRun.new(track.start_distance, track.finish_distance)
@@ -92,14 +101,19 @@ func stop() -> void:
 		session.minimap.rivals.clear()
 
 
-## Grid behind the start line: two wide, the player on the second row left.
-func _grid() -> Array:
+## Grid behind the start line, two wide: [player, rival 1, rival 2, …]. One rival lines up
+## beside the player; with more, the player starts second row left and rivals fill the rest.
+func _grid(rival_count: int) -> Array:
 	var slots := []
-	for row in 2:
+	for row in ceili((rival_count + 1) / 2.0):
 		for side in [-1.0, 1.0]:
 			slots.append(track.pose_at(track.start_distance - 6.0 - row * GRID_ROW, side * GRID_LANE))
-	# Player second row, left; rivals fill the rest front to back.
-	return [slots[2], slots[0], slots[1], slots[3]]
+	var mine := 2 if rival_count >= 2 else 0
+	var out := [slots[mine]]
+	for i in slots.size():
+		if i != mine:
+			out.append(slots[i])
+	return out
 
 
 func _spawn_rival(spec: Dictionary, pose: Dictionary, k: int) -> void:

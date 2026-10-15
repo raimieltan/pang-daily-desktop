@@ -24,6 +24,9 @@ const SCENARIOS := {
 	# Garage: opened from FREE DRIVE, focus moves to the Silak, it is picked and driven.
 	"garage": [[1.0, 0, 0, 0, 0, ""], [2.5, 0, 0, 0, 0, "garage"], [3.0, 0, 0, 0, 0, ""], [4.5, 0, 0, 0, 0, "garage_silak"],
 		[5.0, 0, 0, 0, 0, ""], [12.0, 0.85, 0, 0, 0, "garage_drive"]],
+	# Settings page from the title (music slider lit), and the VS garage with its opponents gauge.
+	"settings": [[1.0, 0, 0, 0, 0, ""], [2.0, 0, 0, 0, 0, ""], [3.0, 0, 0, 0, 0, "settings"],
+		[3.2, 0, 0, 0, 0, ""], [4.5, 0, 0, 0, 0, "garage_vs"]],
 	# Camera views, one per shot after a short run (V cycles them in game).
 	# VS battle: intro (crane, a rival card, the player card), then racing the rivals.
 	"vs": [[0.3, 0, 0, 0, 0, ""], [1.8, 0, 0, 0, 0, "vs_intro_grid"], [4.4, 0, 0, 0, 0, "vs_intro_rival"], [10.2, 0, 0, 0, 0, "vs_intro_player"],
@@ -111,6 +114,14 @@ func _process(delta: float) -> bool:
 			_scene.vs_battle.start()
 		if _scenario == "pause" and _step == 1:
 			_scene.menu.open_pause()
+		if _scenario == "settings":
+			var menu: GameMenu = _scene.menu
+			match _step:
+				0: menu._open_settings(menu.open_title)
+				1: menu._value_buttons.filter(func(p): return p[0].text == "MUSIC")[0][0].grab_focus()
+				3:
+					menu._open_garage("VS BATTLE", menu._start_vs)
+					menu._opponents_button.grab_focus.call_deferred()
 		if _scenario == "garage":
 			var menu: GameMenu = _scene.menu
 			match _step:

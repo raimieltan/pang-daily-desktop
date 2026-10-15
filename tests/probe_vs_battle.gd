@@ -1,7 +1,7 @@
 extends SceneTree
 ## End-to-end VS battle, headless at 4× speed: the player's car gets an AI driver too, so all four
 ## race Pass 1. Prints positions every 10 s and the finish; exits 0 if everyone finished.
-## `godot --headless --path . -s res://tests/probe_vs_battle.gd -- [player_skill]`
+## `godot --headless --path . -s res://tests/probe_vs_battle.gd -- [player_skill] [opponents]`
 
 var _scene
 var _vs: VsBattle
@@ -24,6 +24,8 @@ func _physics_process(delta: float) -> bool:
 	if not _started:
 		_started = true
 		_vs = _scene.vs_battle
+		if OS.get_cmdline_user_args().size() > 1:
+			_vs.opponents = int(OS.get_cmdline_user_args()[1])
 		_scene.time_attack.free_drive()
 		_vs.start()
 		_scene.intro.skip()

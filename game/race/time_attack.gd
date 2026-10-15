@@ -16,6 +16,7 @@ var run: TimeAttackRun
 var best := {}
 var hud: RaceHud
 var intro: RaceIntro
+var music: MusicPlayer
 var _in_intro := false
 var _ghost_data := PackedFloat32Array()
 var _ghost_visual: Node3D
@@ -68,6 +69,8 @@ func restart(with_intro := false) -> void:
 		add_child(_ghost_visual)
 	_ghost_visual.visible = false
 	if with_intro and intro:
+		if music:
+			music.play_track(&"intro")
 		hud.visible = false
 		_in_intro = true
 		await get_tree().physics_frame
@@ -78,6 +81,8 @@ func restart(with_intro := false) -> void:
 		if not active:
 			return
 		session.camera.snap.call_deferred()
+	if music and active:
+		music.play_track(&"race_alt")
 	hud.visible = true
 	run = TimeAttackRun.new(track.start_distance, track.finish_distance)
 	hud.show_run(best)

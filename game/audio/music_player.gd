@@ -1,7 +1,8 @@
 class_name MusicPlayer
 extends Node
 ## Background music: one looping track at a time on the "Music" bus, crossfaded between tracks.
-## Ids: &"race" (VS battles, time attack), &"race_alt", &"menu" (title menu, free drive).
+## Ids: &"race" (VS battles), &"race_alt" (time attack), &"intro" (race intros). Menus and free
+## drive are silent: music plays only around a race.
 ## Missing ids fall back to the race track. duck() lowers the music for cutscenes and pause.
 ## Race ids first shuffle through any .ogg/.mp3 dropped into RACE_PLAYLIST (your own tracks).
 
@@ -16,7 +17,7 @@ const CROSSFADE := 1.5
 const TRACKS := {
 	&"race": "res://assets/audio/music/race_hot_roadway.ogg",
 	&"race_alt": "res://assets/audio/music/race_technomania101.ogg",
-	&"menu": "res://assets/audio/music/menu_midnight_drive.ogg",
+	&"intro": "res://assets/audio/music/menu_midnight_drive.ogg",
 }
 
 var current: StringName = &""
@@ -25,6 +26,7 @@ var _players: Array[AudioStreamPlayer] = []
 var _active := 0
 var _ducked := false
 var _base_db := BUS_DB
+var _user_db := 0.0
 var _tweens: Array[Tween] = [null, null]
 
 
@@ -44,7 +46,7 @@ func _ready() -> void:
 func play_track(id: StringName) -> void:
 	var path: String = TRACKS.get(id, TRACKS[&"race"])
 	var mine := _playlist()
-	if id != &"menu" and not mine.is_empty():
+	if id != &"intro" and not mine.is_empty():
 		path = mine[randi() % mine.size()]
 	if not ResourceLoader.exists(path):
 		path = TRACKS[&"race"]
@@ -79,9 +81,15 @@ func duck(on: bool) -> void:
 	_ducked = on
 	var idx := AudioServer.get_bus_index(BUS)
 	var from := AudioServer.get_bus_volume_db(idx)
-	var to := _base_db + (DUCK_DB if on else 0.0)
+	var to := _base_db + _user_db + (DUCK_DB if on else 0.0)
 	var t := create_tween()
 	t.tween_method(func(db: float) -> void: AudioServer.set_bus_volume_db(idx, db), from, to, 0.4)
+
+
+## The player's music volume (GameSettings steps 0–10), on top of the mix level and any duck.
+func set_user_volume(steps: int) -> void:
+	_user_db = GameSettings.volume_db(steps)
+	AudioServer.set_bus_volume_db(AudioServer.get_bus_index(BUS), _base_db + _user_db + (DUCK_DB if _ducked else 0.0))
 
 
 func _fade(i: int, to_db: float, time: float, stop_after: bool) -> void:
