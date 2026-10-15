@@ -28,7 +28,7 @@ func _ready() -> void:
 	style.border_color = INK
 	style.set_border_width_all(6)
 	style.set_content_margin_all(28)
-	style.shadow_color = MangaType.RED
+	style.shadow_color = MangaType.INK
 	style.shadow_size = 1
 	style.shadow_offset = Vector2(10, 10)
 	_goal.add_theme_stylebox_override("panel", style)

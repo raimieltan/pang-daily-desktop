@@ -60,7 +60,7 @@ func _paint() -> void:
 		box.set_border_width_all(3)
 		box.set_content_margin_all(8)
 		if on:
-			box.shadow_color = MangaType.RED
+			box.shadow_color = MangaType.INK
 			box.shadow_size = 1
 			box.shadow_offset = Vector2(5, 5)
 		chip.add_theme_stylebox_override("normal", box)

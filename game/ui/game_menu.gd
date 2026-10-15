@@ -106,7 +106,7 @@ func _build_pause() -> void:
 	box.border_color = MangaType.INK
 	box.set_border_width_all(4)
 	box.set_content_margin_all(22)
-	box.shadow_color = MangaType.RED
+	box.shadow_color = MangaType.INK
 	box.shadow_size = 1
 	box.shadow_offset = Vector2(8, 8)
 	card.add_theme_stylebox_override("panel", box)
@@ -157,7 +157,7 @@ func _button(parent: Control, text: String, action: Callable) -> Button:
 	lit.bg_color = MangaType.INK
 	lit.set_content_margin_all(6)
 	lit.content_margin_left = 18
-	lit.shadow_color = MangaType.RED
+	lit.shadow_color = MangaType.INK
 	lit.shadow_size = 1
 	lit.shadow_offset = Vector2(7, 7)
 	for state in ["normal", "disabled"]:
