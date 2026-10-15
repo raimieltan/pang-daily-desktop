@@ -55,6 +55,20 @@ Every file below was downloaded on 2026-10-15. Its licence was checked on the it
 
 All three music tracks are CC0, so no attribution is required. Courtesy credit: MintoDog, Fupi, congusbongus (OpenGameArt).
 
+#### music/race/ (race playlist, Pixabay)
+
+The user downloaded these on 2026-10-15. MusicPlayer shuffles them for VS battles and time attack. They are under the Pixabay Content License (https://pixabay.com/service/license-summary/): free to use in a game, and attribution is not required. The license forbids redistributing the tracks on their own, so they may ship only inside the game. All are 256 kb/s, 48 kHz stereo MP3s.
+
+| Path | Title | Author | Source URL |
+|---|---|---|---|
+| music/race/ztmusic-zt-dangerous-love-eurobeat-502187.mp3 | Dangerous Love (Eurobeat) | ZTMusic | https://pixabay.com/music/synthwave-zt-dangerous-love-%E3%83%87%E3%83%B3%E3%82%B8%E3%83%A3%E3%83%A9%E3%82%B9%E3%83%A9%E3%83%96-eurobeat-502187/ |
+| music/race/ztmusic-ztmusic-chasing-eurobeat-196646.mp3 | Chasing (Eurobeat) | ZTMusic | Pixabay track id 196646 |
+| music/race/ztmusic-ztmusic-live-on-jp-eurobeat-435974.mp3 | Live on! (JP Eurobeat) | ZTMusic | Pixabay track id 435974 |
+| music/race/ztmusic-ztmusic-midnight-run-eurobeat-470925.mp3 | Midnight Run (Eurobeat) | ZTMusic | Pixabay track id 470925 |
+| music/race/ztmusic-ztmusic-night-blaze-eurobeat-471070.mp3 | Night Blaze (Eurobeat) | ZTMusic | Pixabay track id 471070 |
+
+Courtesy credit: ZTMusic (Pixabay).
+
 ### Required attribution text (CC-BY files only, for the in-game credits)
 
 - "Car Engine Loop 96kHz, 4s" by Iwan 'qubodup' Gabovitch (https://opengameart.org/content/car-engine-loop-96khz-4s), licensed CC-BY 3.0 (https://creativecommons.org/licenses/by/3.0/).
