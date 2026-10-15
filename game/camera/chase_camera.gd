@@ -11,6 +11,7 @@ extends Camera3D
 
 var target: CarBody
 var _yaw := 0.0
+var _page: MeshInstance3D
 
 
 func _ready() -> void:
@@ -18,7 +19,9 @@ func _ready() -> void:
 	physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 	fov = 68.0
 	near = 0.1
-	far = 1500.0
+	far = 3000.0
+	_page = MangaArt.post_quad()
+	add_child(_page)
 
 
 func snap() -> void:
@@ -40,6 +43,7 @@ func _process(delta: float) -> void:
 	_yaw = lerp_angle(_yaw, wanted, 1.0 - exp(-swing_rate * delta))
 	global_position = global_position.lerp(_desired(xf.origin), 1.0 - exp(-follow_rate * delta))
 	var speed := velocity.length()
+	(_page.material_override as ShaderMaterial).set_shader_parameter("speed_lines", smoothstep(16.0, 36.0, speed))
 	fov = lerpf(fov, 68.0 + clampf(speed * 0.25, 0.0, 12.0), 1.0 - exp(-2.0 * delta))
 	look_at(xf.origin + Vector3.UP * look_height)
 

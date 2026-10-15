@@ -503,7 +503,7 @@ func build_guardrails(parent: Node3D, owner: Node) -> void:
 			var wall_high := base + Vector3.UP * 1.0
 			if i > run["from"]:
 				# W-beam face toward the road (double sided via material).
-				for v in [prev_low, low, high, prev_low, high, prev_high]:
+				for v in [prev_low, low, high, prev_low, high, prev_high, prev_low, high, low, prev_low, prev_high, high]:
 					beam_tool.add_vertex(v)
 				wall_faces.append_array([prev_wall_low, wall_low, wall_high, prev_wall_low, wall_high, prev_wall_high])
 			prev_low = low; prev_high = high; prev_wall_low = wall_low; prev_wall_high = wall_high
@@ -519,16 +519,8 @@ func build_guardrails(parent: Node3D, owner: Node) -> void:
 	beam.owner = owner
 	var post_mesh := BoxMesh.new()
 	post_mesh.size = Vector3(0.1, 0.9, 0.1)
-	post_mesh.material = TrackMaterials.guardrail()
-	var mm := MultiMesh.new()
-	mm.transform_format = MultiMesh.TRANSFORM_3D
-	mm.mesh = post_mesh
-	mm.instance_count = posts.size()
-	for k in posts.size():
-		mm.set_instance_transform(k, posts[k])
-	var post_instance := MultiMeshInstance3D.new()
-	post_instance.name = "GuardrailPosts"
-	post_instance.multimesh = mm
+	post_mesh.material = MangaArt.world(0.9, MangaArt.Pattern.HATCH)
+	var post_instance := Scatter.make("GuardrailPosts", post_mesh, posts)
 	parent.add_child(post_instance)
 	post_instance.owner = owner
 	var body := StaticBody3D.new()
@@ -567,16 +559,8 @@ func build_trees(parent: Node3D, owner: Node, bounds: Rect2, grid: Dictionary) -
 		var scale := rng.randf_range(0.8, 1.35)
 		var basis := Basis(Vector3.UP, rng.randf() * TAU).scaled(Vector3(scale, scale * rng.randf_range(0.9, 1.2), scale))
 		transforms.append(Transform3D(basis, Vector3(x, h - 0.2, z)))
-	var mm := MultiMesh.new()
-	mm.transform_format = MultiMesh.TRANSFORM_3D
-	mm.mesh = TrackMaterials.cedar_mesh()
-	mm.instance_count = transforms.size()
-	for k in transforms.size():
-		mm.set_instance_transform(k, transforms[k])
 	print("trees: %d" % transforms.size())
-	var trees := MultiMeshInstance3D.new()
-	trees.name = "Trees"
-	trees.multimesh = mm
+	var trees := Scatter.make("Trees", TrackMaterials.cedar_mesh(), transforms)
 	trees.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	parent.add_child(trees)
 	trees.owner = owner
@@ -608,13 +592,13 @@ func build_gantry(parent: Node3D, owner: Node, distance: float, label: String, c
 	root.transform = Transform3D(Basis.looking_at(fwd[i] * Vector3(1, 0, 1), Vector3.UP), pts[i])
 	parent.add_child(root)
 	root.owner = owner
-	var mat := StandardMaterial3D.new()
-	mat.albedo_color = color
+	var mat := MangaArt.accent(color)
+	var post_mat := MangaArt.world(0.85, MangaArt.Pattern.HATCH)
 	for x in [-4.6, 4.6]:
 		var post := MeshInstance3D.new()
 		var box := BoxMesh.new()
 		box.size = Vector3(0.25, 5.2, 0.25)
-		box.material = mat
+		box.material = post_mat
 		post.mesh = box
 		post.position = Vector3(x, 2.6, 0)
 		root.add_child(post)
@@ -631,8 +615,9 @@ func build_gantry(parent: Node3D, owner: Node, distance: float, label: String, c
 	text.text = label
 	text.font_size = 96
 	text.pixel_size = 0.006
-	text.modulate = Color.WHITE
-	text.outline_size = 16
+	text.modulate = MangaArt.PAPER
+	text.outline_modulate = MangaArt.INK
+	text.outline_size = 24
 	text.position = Vector3(0, 4.9, 0.1)
 	text.rotation.y = PI   # face oncoming cars
 	root.add_child(text)

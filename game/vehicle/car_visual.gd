@@ -6,6 +6,8 @@ extends Node3D
 const WHEEL_NAMES := ["wheel_fl", "wheel_fr", "wheel_rl", "wheel_rr"]
 
 @export var model_scene: PackedScene = preload("res://assets/vehicles/banwa_dalagan_1996_modular.glb")
+## The car is the color on the page (docs/ART_DIRECTION.md §3).
+@export var paint_color := Color(0.96, 0.74, 0.08)
 
 var car: CarBody
 var _hubs: Array[Node3D] = []
@@ -18,6 +20,7 @@ func _ready() -> void:
 	rotation.y = PI
 	var model := model_scene.instantiate()
 	add_child(model)
+	MangaArt.apply_car(model, paint_color)
 	for name in WHEEL_NAMES:
 		var wheel := model.find_child(name, true, false) as Node3D
 		if wheel == null:

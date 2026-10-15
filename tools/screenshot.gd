@@ -44,8 +44,11 @@ func _process(delta: float) -> bool:
 				cam.global_position = p + Vector3(120, 260, 260)
 				cam.look_at(p + Vector3(0, -60, -120))
 				cam.far = 4000
-				var env: Environment = _scene.get_node("WorldEnvironment").environment if _scene.has_node("WorldEnvironment") else null
-				if env: env.fog_enabled = false
+				var page := MangaArt.post_quad()
+				var pm := page.material_override as ShaderMaterial
+				pm.set_shader_parameter("fade_start", 500.0)
+				pm.set_shader_parameter("fade_end", 1400.0)
+				cam.add_child(page)
 				cam.current = true
 				_stage = 2
 				_t = 100.0
