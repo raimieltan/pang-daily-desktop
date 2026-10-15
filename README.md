@@ -19,3 +19,4 @@ Carried over from the Babylon repo (2026-10-15), which is retired:
   wheels, mounting interfaces and QA previews. `.blend` and baseline sources in `source/`.
 - `assets/audio/radio/` — the radio tracks and ambience. Not CC-licensed (see `CREDITS.md`).
 - `tools/vehicle_builders/` — the Blender Python and Node scripts that built the car models.
+# pang-daily-desktop
