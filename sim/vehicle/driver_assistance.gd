@@ -88,12 +88,21 @@ func step(dt: float, steering: float, throttle: float, brake_in: float, handbrak
 		# The handbrake is a request to rotate: a handbrake turn gets the whole rack.
 		var gate := SimMath.smoothstep_(st.get("gripLockFromKph", 18.0), st.get("gripLockFullKph", 45.0), speed) * forward_gate \
 			* (1.0 - maxf(handbrake, SimMath.clamp_(handbrake_in, 0.0, 1.0)))
-		var slip_window: float = motion.get("front_peak_slip", 7.0 * SimMath.DEG) * st.get("gripLockSlip", 0.8)
+		# front_peak_slip is where lateral force peaks (frontPeakSlipDeg is only the curve's knee, ~76% force).
+		# Fast swaps are where a big window pendulums the rear, so it narrows above ~80 km/h, where
+		# sweepers need little lock anyway.
+		var slip_fraction := SimMath.lerp_(st.get("gripLockSlip", 0.7), st.get("gripLockSlipHighSpeed", 0.3),
+			SimMath.smoothstep_(st.get("gripLockTaperFromKph", 80.0), st.get("gripLockTaperFullKph", 140.0), speed))
+		var slip_window: float = motion.get("front_peak_slip", 14.5 * SimMath.DEG) * slip_fraction
 		_grip_window = SimMath.lerp_(max_angle, slip_window, gate)
 		target = SimMath.clamp_(target, front_direction - _grip_window, front_direction + _grip_window)
 		# Yaw limiter: past the yaw rate the tires can hold on this path (mu*g/v) the rack backs out of
-		# the turn instead of adding rotation, the steering half of a stability assist.
-		var yaw_cap: float = st.get("gripLockMu", 0.85) * 9.81 / maxf(5.0, vx)
+		# the turn instead of adding rotation, the steering half of a stability assist. mu is the tires'
+		# live grip with a margin: a fixed, low mu bled lock out of every limit corner (heavy understeer).
+		var grip_mu: float = motion.get("grip_mu", 0.0)
+		if grip_mu < 0.3:
+			grip_mu = st.get("gripLockMu", 0.85)
+		var yaw_cap: float = grip_mu * st.get("yawLimitMargin", 1.1) * 9.81 / maxf(5.0, vx)
 		var over := (absf(yaw_rate) - yaw_cap) / yaw_cap
 		if over > 0.0 and target * yaw_rate > 0.0:
 			target *= 1.0 - SimMath.clamp_(over * st.get("yawLimitGain", 4.0), 0.0, 1.0) * gate

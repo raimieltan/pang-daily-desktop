@@ -155,6 +155,14 @@ static func _fx_at(omega: float, radius: float, u: float, peak_slip_ratio: float
 	return max_long * sx * saturation / demand
 
 
+## Peak lateral acceleration the tires can hold right now (last step's caps), in g.
+func _lateral_grip_mu(mass: float) -> float:
+	var total := 0.0
+	for w in wheels:
+		total += w.max_lateral_grip
+	return total * PEAK_SATURATION / (mass * G)
+
+
 func _integrate(dt: float, input: VehicleTypes.DriverInput, contact: VehicleTypes.AxleContact) -> void:
 	var model = _model
 	var c: Dictionary = model.config
@@ -222,7 +230,7 @@ func _integrate(dt: float, input: VehicleTypes.DriverInput, contact: VehicleType
 		raw_throttle if s.reversing else raw_brake,
 		input.handbrake if hb["enabled"] else 0.0, input.device,
 		{ "vx": s.vx, "vy": s.vy, "yaw_rate": yaw, "rear_slip_ratio": rear_slip, "front_axle_m": a, "rear_axle_m": b,
-			"front_peak_slip": c["tires"]["frontPeakSlipDeg"] * DEG }, p, pedals)
+			"front_peak_slip": atan(PEAK_DEMAND * tan(c["tires"]["frontPeakSlipDeg"] * DEG)), "grip_mu": _lateral_grip_mu(mass) }, p, pedals)
 	var controls := assistance
 	if not input.engine_available:
 		controls.throttle_assisted = 0.0

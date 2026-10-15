@@ -14,7 +14,7 @@ const STOCK_MECHANICAL := {
 	"suspension": { "frontSpring": 28000.0, "rearSpring": 24000.0, "damping": 0.75, "frontAntiRoll": 10000.0, "rearAntiRoll": 7000.0,
 		"rideHeightOffsetM": 0.0, "camberDeg": -1.0, "toeDeg": 0.05, "casterDeg": 6.0 },
 	"steering": { "roadAngleDeg": 34.0, "driftAngleDeg": 34.0, "rackRate": 7.0, "rackAcceleration": 22.0, "returnRate": 5.5,
-		"gripLimitedLock": true, "gripLockSlip": 0.8, "gripLockMu": 0.85, "yawLimitGain": 4.0, "keyboardHighSpeedRate": 2.5 },
+		"gripLimitedLock": true, "gripLockSlip": 0.7, "gripLockSlipHighSpeed": 0.3, "gripLockMu": 0.85, "yawLimitGain": 4.0, "keyboardHighSpeedRate": 2.5 },
 	"assistance": "standard", "tcs": "off", "esc": false, "abs": true,
 }
 
