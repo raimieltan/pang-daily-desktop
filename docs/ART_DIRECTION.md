@@ -129,7 +129,51 @@ Lettering is part of the scene, so it gets occluded and rotated with the camera.
 Performance budget: the post pass does one depth read plus a 4-tap edge kernel; the tone shaders are
 ALU-only. No extra render targets.
 
-## 9. Do / Don't
+## 9. Refinement pass (2026-10-15): what is implemented
+
+**Grayscale hierarchy.** World materials have a gray *value* (lit/shadow) with screentone printed
+over it at a per-material contrast, so not every surface is equally noisy. Presets live in
+`MangaArt.WORLD_PRESETS`:
+
+| Surface | Lit / shadow value | Tone | Notes |
+|---|---|---|---|
+| Sky | paper `#F3EFE5` → warm gray horizon band | sparse dots at the horizon | `manga_sky.gdshader`: ink-contoured cumulus, sun with drawn rays |
+| Distant ridges | 0.80 / 0.68, far 0.84–0.88 | barely any | two rings; ink skyline from the page pass |
+| Hillside | 0.88 / 0.56 | sparse dots, hatching on steep faces | |
+| Cedars | 0.40 / 0.16 | hatching | dark near, mid-gray midground, pale far (distance in-shader) |
+| Road | 0.66 / 0.40, slightly cool | light dots; **directional hatching in cast shadow** | paint stays paper |
+| Rock cuts | 0.64 / 0.26 | hatching | darkest big surface near the road |
+| Guardrail / posts | 0.98 / 0.72 · ink | none | brightest line on the valley side |
+
+Distance in the world shader thins tone (×0.25) and pales value toward `far_value`; the page pass
+adds a capped haze (`fade_max` 0.72), so far shapes stay light-gray silhouettes rather than vanishing.
+
+**Cars.** Material kinds: paint (warm highlight on top panels → body color → darker *warmer*
+shadow → deep shadow with fine hatching, plus a glint and a thin edge highlight), glass (cool dark
+with diagonal reflection streaks), rubber/trim, metal (bright with a hard dark band), lamps (glow
+driven by state). Outline width is per part: 2.2 cm on the body, 0.6–1.8 cm on details.
+
+**Selective color accents (all state-driven).**
+| Accent | Trigger | Where |
+|---|---|---|
+| Taillights + red road pool | brake pedal; dim tail lamps at night | `CarVisual._update_lamps` |
+| Warm headlight cones | night | spot lights, banded in the world shader |
+| Yellow-orange sparks | sliding along a wall/rail > 4 m/s | `CarFx` (contact slide speed) |
+| Impact frame + shake | contact impulse > 3 m/s Δv | page pass `impact`, `ChaseCamera.add_impact` |
+| Pale blue-white streaks | top ~20% of speed-line intensity | page pass |
+| Ink skid marks, cloud smoke | tire slip angle/ratio past the limit; smoke only on heavy slides | `CarFx` |
+
+**Night (N).** The page inverts: dark tones, pale outlines, ink sky with stars and a crescent moon;
+car lamps become the light.
+
+**Tuning knobs** (Project Settings → Shader Globals): `manga_tone_contrast`, `manga_tone_density`,
+`manga_outline_scale`, `manga_fx_intensity`, `manga_night`, `manga_res_scale` (set by the camera).
+
+**Known limits.** Screentone is screen-anchored (printed-page look), so on large surfaces it
+"swims" slightly relative to the geometry in motion; the road's lower contrast and larger pitch
+keep it calm, but it is not verified on a 60 Hz display by eye yet.
+
+## 10. Do / Don't
 
 **Do:** hard light bands, solid blacks, constant-size screentone, color only on cars, drawn
 motion effects, paper-white distance.

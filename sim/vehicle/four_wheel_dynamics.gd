@@ -142,9 +142,12 @@ static func _fx_at(omega: float, radius: float, u: float, peak_slip_ratio: float
 	var kappa := (omega * radius - u) / maxf(absf(u), 1.0)
 	var sx := kappa / peak_slip_ratio
 	var demand := sqrt(sx * sx + sy * sy)
-	var saturation := (1.0 - exp(-1.5 * demand)) * (1.0 - breakaway * SimMath.smoothstep_(1.0, 5.0, demand))
-	var scale := saturation / demand if demand > 1e-9 else 1.5
-	return max_long * sx * scale
+	# smoothstep(1, 5, demand), inlined: this runs ~300 times per physics step.
+	var st := clampf((demand - 1.0) * 0.25, 0.0, 1.0)
+	var saturation := (1.0 - exp(-1.5 * demand)) * (1.0 - breakaway * st * st * (3.0 - 2.0 * st))
+	if demand <= 1e-9:
+		return max_long * sx * 1.5
+	return max_long * sx * saturation / demand
 
 
 func _integrate(dt: float, input: VehicleTypes.DriverInput, contact: VehicleTypes.AxleContact) -> void:
@@ -395,7 +398,8 @@ func _integrate(dt: float, input: VehicleTypes.DriverInput, contact: VehicleType
 		var span := (absf(torques[i]) + brake_torque + max_long * radius) / wheel_inertia * dt + 1.0
 		var lo := minf(0.0, free) - span
 		var hi := maxf(0.0, free) + span
-		for n in 24:
+		# 20 halvings: 16 measurably moved ABS-cycling wheel speeds off the TS reference.
+		for n in 20:
 			var mid := (lo + hi) / 2.0
 			var response := SimMath.move_toward_(free - _fx_at(mid, radius, u, peak_slip, sy, max_long, breakaway) * react, 0.0, brake_step)
 			if mid - response > 0.0:

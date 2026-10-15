@@ -16,11 +16,10 @@ const SLIDE_RATIO := 0.22
 var car: CarBody
 var camera: ChaseCamera
 
-var _skid_mesh := ImmediateMesh.new()
+var _skid_mesh := ArrayMesh.new()
+var _skid_verts := PackedVector3Array()
+var _skid_colors := PackedColorArray()
 var _skid_instance := MeshInstance3D.new()
-# Ring buffer of quads: 4 corners + intensity each.
-var _segments: Array[PackedVector3Array] = []
-var _alphas := PackedFloat32Array()
 var _next := 0
 var _dirty := false
 var _last_point: Array = [null, null, null, null]
@@ -40,6 +39,8 @@ func _ready() -> void:
 	skid_mat.vertex_color_use_as_albedo = true
 	skid_mat.render_priority = -1
 	_skid_instance.material_override = skid_mat
+	# Marks span the whole run; skip per-frame culling work on a mesh that is always nearby.
+	_skid_instance.extra_cull_margin = 1000.0
 	add_child(_skid_instance)
 	for i in 4:
 		_smoke.append(_make_smoke())
@@ -89,31 +90,39 @@ func _add_segment(a: Vector3, b: Vector3, right: Vector3, amount: float) -> void
 	var side := dir.cross(Vector3.UP).normalized() * SKID_WIDTH * 0.5
 	if side.length_squared() < 1e-6:
 		side = right * SKID_WIDTH * 0.5
-	var quad := PackedVector3Array([a - side, a + side, b + side, b - side])
-	if _segments.size() < MAX_SEGMENTS:
-		_segments.append(quad)
-		_alphas.append(amount)
-	else:
-		_segments[_next] = quad
-		_alphas[_next] = amount
+	var ink := MangaArt.INK
+	var col := Color(ink.r, ink.g, ink.b, 0.55 + 0.4 * amount)
+	var quad := [a - side, a + side, b + side, a - side, b + side, b - side]
+	# Ring buffer of 6 vertices per segment, written in place once full.
+	var base := _skid_verts.size()
+	if _segments_count() >= MAX_SEGMENTS:
+		base = _next * 6
 		_next = (_next + 1) % MAX_SEGMENTS
+		for k in 6:
+			_skid_verts[base + k] = quad[k]
+			_skid_colors[base + k] = col
+	else:
+		for k in 6:
+			_skid_verts.append(quad[k])
+			_skid_colors.append(col)
 	_dirty = true
 
 
+func _segments_count() -> int:
+	return _skid_verts.size() / 6
+
+
+## One native call per rebuild (only on frames that added marks).
 func _rebuild_skids() -> void:
 	_dirty = false
 	_skid_mesh.clear_surfaces()
-	if _segments.is_empty():
+	if _skid_verts.is_empty():
 		return
-	_skid_mesh.surface_begin(Mesh.PRIMITIVE_TRIANGLES)
-	var ink := MangaArt.INK
-	for k in _segments.size():
-		var q := _segments[k]
-		var col := Color(ink.r, ink.g, ink.b, 0.35 + 0.5 * _alphas[k])
-		for idx in [0, 1, 2, 0, 2, 3]:
-			_skid_mesh.surface_set_color(col)
-			_skid_mesh.surface_add_vertex(q[idx])
-	_skid_mesh.surface_end()
+	var arrays := []
+	arrays.resize(Mesh.ARRAY_MAX)
+	arrays[Mesh.ARRAY_VERTEX] = _skid_verts
+	arrays[Mesh.ARRAY_COLOR] = _skid_colors
+	_skid_mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
 
 
 func _make_smoke() -> CPUParticles3D:

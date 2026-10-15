@@ -560,10 +560,12 @@ func build_trees(parent: Node3D, owner: Node, bounds: Rect2, grid: Dictionary) -
 		var basis := Basis(Vector3.UP, rng.randf() * TAU).scaled(Vector3(scale, scale * rng.randf_range(0.9, 1.2), scale))
 		transforms.append(Transform3D(basis, Vector3(x, h - 0.2, z)))
 	print("trees: %d" % transforms.size())
-	var trees := Scatter.make("Trees", TrackMaterials.cedar_mesh(), transforms)
-	trees.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	var trees := Scatter.make_chunked("Trees", TrackMaterials.cedar_mesh(), transforms)
 	parent.add_child(trees)
 	trees.owner = owner
+	for part in trees.get_children():
+		(part as GeometryInstance3D).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		part.owner = owner
 
 
 static func _grid_height(bounds: Rect2, grid: Dictionary, x: float, z: float) -> float:

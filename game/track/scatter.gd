@@ -27,3 +27,22 @@ static func make(name_: String, mesh: Mesh, transforms_: Array[Transform3D]) -> 
 		box = AABB(p, Vector3.ZERO) if i == 0 else box.expand(p)
 	s.custom_aabb = box.grow(15.0)
 	return s
+
+
+## Splits instances into square chunks of `chunk` metres, each its own Scatter with a visibility
+## range, so frustum culling and distance culling work per chunk instead of for the whole forest.
+static func make_chunked(name_: String, mesh: Mesh, transforms_: Array[Transform3D], chunk := 140.0, visible_to := 480.0) -> Node3D:
+	var root := Node3D.new()
+	root.name = name_
+	var buckets := {}
+	for t in transforms_:
+		var key := Vector2i(floori(t.origin.x / chunk), floori(t.origin.z / chunk))
+		if not buckets.has(key):
+			buckets[key] = [] as Array[Transform3D]
+		(buckets[key] as Array[Transform3D]).append(t)
+	for key in buckets:
+		var part := make("%s_%d_%d" % [name_, key.x, key.y], mesh, buckets[key])
+		part.visibility_range_end = visible_to
+		part.visibility_range_end_margin = 30.0
+		root.add_child(part)
+	return root
