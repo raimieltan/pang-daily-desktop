@@ -1,80 +1,237 @@
 {
-  "vehicle": "banwa_silak_1983",
-  "contract": "silak83-v1",
-  "triangles": 19856,
-  "drawCalls": 96,
-  "materials": 14,
-  "bounds_min": [
-    -0.9129999876022339,
-    -1.1920928966180355e-8,
-    -2.2100000381469727
-  ],
-  "bounds_max": [
-    0.9129999876022339,
-    1.3947551250457764,
-    2.1870000143051147
-  ],
-  "dimensions_xyz": [
-    1.8259999752044678,
-    1.3947551369667053,
-    4.397000052452087
-  ],
-  "wheelbase": 2.5,
-  "track": 1.456,
-  "wheel_radius": 0.3,
-  "ground_contact_y": 0,
-  "axes": {
-    "up": "+Y",
-    "forward": "+Z",
-    "left": "+X"
+ "generator": "Blender 5.2.2 LTS",
+ "source": "build-silak83.py",
+ "triangles": 6084,
+ "draw_calls": 67,
+ "nodes": [
+  "airbox",
+  "attach_bumper_front",
+  "attach_bumper_rear",
+  "attach_chin_front",
+  "attach_engine",
+  "attach_fender_fl",
+  "attach_fender_fr",
+  "attach_hood",
+  "attach_lip_front",
+  "attach_overfender_rl",
+  "attach_overfender_rr",
+  "attach_sideskirt_l",
+  "attach_sideskirt_r",
+  "attach_spoiler_rear",
+  "attach_trunk",
+  "battery",
+  "bumper_front_stock",
+  "bumper_rear_stock",
+  "chin_front_stock",
+  "engine_stock",
+  "exhaust",
+  "fender_fl_stock",
+  "fender_fr_stock",
+  "grille",
+  "headlight_l",
+  "headlight_r",
+  "hood_stock",
+  "indicator_-1",
+  "indicator_1",
+  "intake",
+  "lip_front_stock",
+  "mirror_l",
+  "mirror_r",
+  "overfender_rl_stock",
+  "overfender_rr_stock",
+  "radiator_fins",
+  "rear_glass",
+  "rear_panel",
+  "shell_base",
+  "sideskirt_l_stock",
+  "sideskirt_r_stock",
+  "spoiler_rear_stock",
+  "strut_caps",
+  "strut_towers",
+  "taillight_l",
+  "taillight_r",
+  "trunk_stock",
+  "vehicle_root",
+  "wheel_fl",
+  "wheel_fr",
+  "wheel_rl",
+  "wheel_rr",
+  "window_front_-1",
+  "window_front_1",
+  "window_rear_-1",
+  "window_rear_1",
+  "windshield"
+ ],
+ "materials": [
+  "amber",
+  "chrome",
+  "engine_dark",
+  "engine_metal",
+  "glass",
+  "headlight",
+  "paint",
+  "rim",
+  "rim_dark",
+  "taillight",
+  "tire",
+  "trim"
+ ],
+ "bounds_min": [
+  -0.95,
+  0.0,
+  -2.3
+ ],
+ "bounds_max": [
+  0.95,
+  1.408,
+  2.115
+ ],
+ "slots": {
+  "hood": {
+   "translation": [
+    0.0,
+    0.945,
+    0.87
+   ],
+   "part": "hood_stock"
   },
-  "mesh_nodes": 55,
-  "attachment_nodes": [
-    "attach_fender_fr",
-    "attach_sideskirt_r",
-    "attach_fender_fl",
-    "attach_sideskirt_l",
-    "attach_hood",
-    "attach_trunk",
-    "attach_bumper_front",
-    "attach_bumper_rear",
-    "attach_chin_front",
-    "attach_lip_front",
-    "attach_spoiler_rear",
-    "attach_engine",
-    "attach_wheel_fl",
-    "attach_wheel_fr",
-    "attach_wheel_rl",
-    "attach_wheel_rr",
-    "attach_headlight_l",
-    "attach_headlight_r",
-    "attach_taillight_l",
-    "attach_taillight_r",
-    "attach_grille",
-    "attach_exhaust",
-    "attach_lip_rear",
-    "attach_overfender_rl",
-    "attach_overfender_rr"
-  ],
-  "required_nodes_present": true,
-  "export_reimport_checks": true,
-  "zero_area_triangles": 0,
-  "invalid_normals": 0,
-  "engine_clearance_conservative": 0.11200001537799831,
-  "drivetrain_geometry": [
-    "engine_stock",
-    "rwd_gearbox",
-    "rwd_prop_shaft",
-    "rwd_rear_axle"
-  ],
-  "source": {
-    "file": "../banwa_dalagan_1996_modular.glb",
-    "sha256": "82d2f1bfa8b946c389af27c801b13bf3d096de8d39ca6104e6e562a4791a5291"
+  "trunk": {
+   "translation": [
+    0.0,
+    0.962,
+    -1.62
+   ],
+   "part": "trunk_stock"
   },
-  "issues": [],
-  "limitations": [
-    "Assembled closed components are not globally boolean-unioned.",
-    "Open exhaust outlet is intentional.",
-    "No collision mesh, suspension rig, LODs or texture atlas is embedded; runtime supplies collision and handling."
-  ]
+  "fender_fl": {
+   "translation": [
+    0.736,
+    0.5774,
+    1.4
+   ],
+   "part": "fender_fl_stock"
+  },
+  "fender_fr": {
+   "translation": [
+    -0.736,
+    0.5774,
+    1.4
+   ],
+   "part": "fender_fr_stock"
+  },
+  "bumper_front": {
+   "translation": [
+    0.0,
+    0.41,
+    1.88
+   ],
+   "part": "bumper_front_stock"
+  },
+  "bumper_rear": {
+   "translation": [
+    0.0,
+    0.3975,
+    -2.1275
+   ],
+   "part": "bumper_rear_stock"
+  },
+  "sideskirt_l": {
+   "translation": [
+    0.675,
+    0.25,
+    -0.04
+   ],
+   "part": "sideskirt_l_stock"
+  },
+  "sideskirt_r": {
+   "translation": [
+    -0.675,
+    0.25,
+    -0.04
+   ],
+   "part": "sideskirt_r_stock"
+  },
+  "chin_front": {
+   "translation": [
+    0.0,
+    0.245,
+    1.9775
+   ],
+   "part": "chin_front_stock"
+  },
+  "lip_front": {
+   "translation": [
+    0.0,
+    0.245,
+    1.9775
+   ],
+   "part": "lip_front_stock"
+  },
+  "spoiler_rear": {
+   "translation": [
+    0.0,
+    0.868,
+    -2.06
+   ],
+   "part": "spoiler_rear_stock"
+  },
+  "overfender_rl": {
+   "translation": [
+    0.826,
+    0.4873,
+    -1.22
+   ],
+   "part": "overfender_rl_stock"
+  },
+  "overfender_rr": {
+   "translation": [
+    -0.826,
+    0.4873,
+    -1.22
+   ],
+   "part": "overfender_rr_stock"
+  },
+  "engine": {
+   "translation": [
+    0.0,
+    0.3,
+    1.2
+   ],
+   "part": "engine_stock"
+  }
+ },
+ "wheels": {
+  "wheel_fl": {
+   "origin": [
+    0.728,
+    0.3,
+    1.28
+   ],
+   "radius": 0.3
+  },
+  "wheel_fr": {
+   "origin": [
+    -0.728,
+    0.3,
+    1.28
+   ],
+   "radius": 0.3
+  },
+  "wheel_rl": {
+   "origin": [
+    0.728,
+    0.3,
+    -1.22
+   ],
+   "radius": 0.3
+  },
+  "wheel_rr": {
+   "origin": [
+    -0.728,
+    0.3,
+    -1.22
+   ],
+   "radius": 0.3
+  }
+ }
 }

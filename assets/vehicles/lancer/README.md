@@ -1,44 +1,33 @@
-# Banwa Silak 1983 — Lancer-inspired RWD sedan
+# Banwa Silak 1983 — Lancer EX "box type", A172 build
 
-Fictional 1.8 Turbo rear-wheel-drive sedan, derived from the project's Dalagan modular geometry with a boxier cabin, rectangular lamps and grille, black tail panel, slim bumpers, ducktail, and longitudinal drivetrain. The source GLB is preserved; its SHA-256 is recorded in `mounting_interfaces.json`.
+Fictional RWD sedan modelled on the 1983 Mitsubishi Lancer EX box type sold in the Philippines (A172), styled as a JDM restomod: white paint, bolt-on arch flares, a lowered and tucked stance, deep-dish five-spoke wheels, a body-colour bumper with intercooler and black lip, and a ducktail. No badges or logos.
+
+## Source
+
+There is no 3D model of this car, so it is built from photos at the real size (4225 L × 1620 W × 1385 H mm). The side profile is traced from a side-view drawing, scaled so its axles land on the game's. The styling follows a "Lancer A172 JDM concept build" reference sheet. Three-quarter photos of real PH cars confirm the details.
 
 ## Files
 
-- `lancer_box_1983_modular.glb`: runtime asset, flat-shaded white paint and opaque dark glass.
-- `lancer_box_1983_viewer.html`: self-contained workshop viewer; open locally to toggle assemblies and explode the model.
-- `mounting_interfaces.json`: `silak83-v1` mounting positions and panel boundary loops.
-- `validation.json`: geometry, bounds, budget, wheel-pivot and engine-clearance checks.
-- `previews/contact_sheet.png`: 14 assembled, removal, underside and exploded views rendered from the exported model.
-- `preview-validation.json`: removal checks and browser errors for those renders.
+- `lancer_box_1983_modular.glb`: runtime asset, flat shaded.
+- `mounting_interfaces.json`: slot frames, wheel pivots and panel boundary loops.
+- `validation.json`: triangles, draw calls, materials, bounds, slot frames and wheel pivots, read back from the exported GLB.
+- `previews/`: assembled, panel-removal and exploded renders of the exported GLB.
 
-## Rebuild and inspect
+## Rebuild
 
 From the repository root:
 
 ```sh
-node scripts/build-lancer-box-model.mjs
-node scripts/validate-lancer-box-model.mjs
-node scripts/render-lancer-box-model.mjs
+blender --background --factory-startup --python tools/vehicle_builders/build-silak83.py
+blender --background --factory-startup --python tools/vehicle_builders/render-silak83-previews.py
 ```
 
-Rendering uses Playwright Chromium, or Google Chrome at its standard macOS application path. The generator reuses the bundled viewer from `banwa_dalagan_viewer.html`.
+The shape lives in `tools/vehicle_builders/build-silak83-live.py`. It also runs inside the open Blender session through the Blender MCP for live editing. `build-silak83.py` runs it, cuts the body along seam planes, assigns every face to a slot part or a named detail, keeps the Dalagan engine bay, exports, then re-imports the GLB and checks it. The working scene is saved to `assets/vehicles/source/silak83_modular.blend`.
 
 ## Asset contract
 
-Metres, +Y up, +Z forward, +X left in the asset. Runtime import handles the engine coordinate convention. Wheel pivots sit at y=0.30 m, x=±0.728 m, z=1.28/-1.22 m; wheelbase is 2.50 m. Wheels rotate about their local X axis. Preserve `vehicle_root`, `shell_base`, wheel names, and `attach_*` nodes when editing.
+Metres, +Y up, +Z forward, +X left. The wheel nodes `wheel_fl/fr/rl/rr` have their origins on their pivots at y=0.30, x=±0.728, z=+1.28/−1.22 (wheelbase 2.50 m, tire radius 0.30 m). The wheel meshes sit 25 mm further out than the pivot so they are flush with the flares. `headlight_l/r` and `taillight_l/r` are the lamp meshes CarVisual uses for the beams and brake streaks. Materials use the names MangaArt shades: paint, glass, trim, tire, rim, rim_dark, chrome, headlight, amber, taillight, engine_metal, engine_dark. Paint is recoloured at runtime.
 
-Hood, trunk, front fenders, bumpers, skirts, chin, front lip, spoiler and engine are separately removable. Fender indicators follow their fender; grille slats follow the grille. Engine removal does not remove the body. The engine sits 0.112 m below the closed hood under the conservative bounding-box check.
+Removable slots, each an `attach_<slot>` frame holding `<slot>_stock`: hood, trunk, fender_fl, fender_fr (each with its front flare), overfender_rl, overfender_rr (the rear flares), bumper_front (with intercooler and lamps), bumper_rear, chin_front, lip_front, sideskirt_l, sideskirt_r, spoiler_rear (ducktail) and engine. Removing the hood or a fender reveals the engine-bay walls. Removing the trunk lid reveals a trunk floor.
 
-The rebuilt model contains 19,856 triangles, 96 draw calls and 14 materials, within the 30,000 / 100 / 16 runtime budgets. Geometry validation reports no zero-area triangles or invalid normals.
-
-## Game integration
-
-Vehicle ID: `banwa_silak_1983`; handling preset: `rwd_box_turbo`. The runtime uses 1,090 kg, 53% front weight and rear-only drive force. Standalone fixtures expose all three cars: one driven, two parked at home with working Drive prompts. Account sessions retain their owned-vehicle filter. NPC and traffic templates remain bound to their actual vehicle IDs.
-
-Use `?car=banwa_silak_1983` in a standalone game session to select the car directly. Account ownership is not granted by this parameter.
-
-Validation covers actual Babylon GLB import, attachment slots, paint, wheel centers, removable trim, runtime/spec agreement, rear-only traction and multiple parked-car switching.
-
-## Limits
-
-The assembled components are not globally boolean-unioned. The open exhaust outlet is intentional. There are no embedded collision meshes, suspension rig, LODs or texture atlas; runtime supplies collision and handling. Browser previews verify the exported model, not a full interactive driving session.
+The exported model has 6,084 triangles, 67 draw calls and 12 materials, within the 30,000 / 100 / 16 runtime budgets.
