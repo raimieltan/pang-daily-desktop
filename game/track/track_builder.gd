@@ -686,3 +686,236 @@ func build_backdrop(parent: Node3D, owner: Node, bounds: Rect2) -> void:
 		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		parent.add_child(mi)
 		mi.owner = owner
+
+
+# --- Roadside furniture ----------------------------------------------------------------------------
+
+## Touge roadside props, all black-and-white graphics for the manga page:
+## chevron boards on the outside of tight corners, delineator posts, utility poles with sagging
+## wires along one stretch, convex traffic mirrors at hairpin apexes, and street lamps at the start
+## and goal (hard white pools at night).
+func build_props(parent: Node3D, owner: Node, start_distance: float, finish_distance: float) -> void:
+	var props := Node3D.new()
+	props.name = "Props"
+	parent.add_child(props)
+	props.owner = owner
+	_build_chevrons(props, owner)
+	_build_delineators(props, owner)
+	_build_poles(props, owner, 180.0, 720.0)
+	_build_mirrors(props, owner)
+	for d in [start_distance - 6.0, start_distance + 40.0, finish_distance - 20.0, finish_distance + 12.0]:
+		_build_street_lamp(props, owner, d)
+
+
+## Ground point beside the road at `lateral` metres (signed, right +) at sample `i`.
+func _roadside(i: int, lateral: float) -> Vector3:
+	var side := 1 if lateral > 0.0 else 0
+	var prof := _side_profile(i, side)
+	var offsets: PackedFloat64Array = prof["offsets"]
+	var heights: PackedFloat64Array = prof["heights"]
+	var x := absf(lateral)
+	var h: float = heights[heights.size() - 1]
+	for k in range(1, offsets.size()):
+		if x <= offsets[k]:
+			h = lerpf(heights[k - 1], heights[k], (x - offsets[k - 1]) / maxf(offsets[k] - offsets[k - 1], 1e-3))
+			break
+	return pts[i] + rgt[i] * lateral + Vector3.UP * h
+
+
+## Basis facing back down the road (toward oncoming traffic) at sample i.
+func _facing_traffic(i: int) -> Basis:
+	var z := -Vector3(fwd[i].x, 0.0, fwd[i].z).normalized()
+	var x := Vector3.UP.cross(z).normalized()
+	return Basis(x, Vector3.UP, z)
+
+
+func _build_chevrons(parent: Node3D, owner: Node) -> void:
+	var boards := { 1: [] as Array[Transform3D], -1: [] as Array[Transform3D] }
+	var posts: Array[Transform3D] = []
+	var last := -100
+	for i in range(0, pts.size(), 2):
+		var k := curvature[i]
+		if absf(k) < 1.0 / 60.0 or i - last < 13:
+			continue
+		last = i
+		# Outside of the corner: left of a right-hander, right of a left-hander.
+		var turn_right := k > 0.0
+		var lateral := -4.35 if turn_right else 4.35
+		var base := _roadside(i, lateral)
+		var basis := _facing_traffic(i)
+		boards[1 if turn_right else -1].append(Transform3D(basis, base + Vector3.UP * 1.35))
+		posts.append(Transform3D(Basis(), base + Vector3.UP * 0.6))
+	var quad := QuadMesh.new()
+	quad.size = Vector2(0.62, 0.78)
+	for dir in boards:
+		var m := MangaArt.world_preset("sign")
+		m.set_shader_parameter("pattern_dir", float(dir))
+		quad = quad.duplicate()
+		quad.material = m
+		var s := Scatter.make("Chevrons%s" % ("Right" if dir > 0 else "Left"), quad, boards[dir])
+		parent.add_child(s)
+		s.owner = owner
+	var post := CylinderMesh.new()
+	post.top_radius = 0.04
+	post.bottom_radius = 0.04
+	post.height = 1.2
+	post.radial_segments = 6
+	post.material = MangaArt.world_preset("post")
+	var ps := Scatter.make("ChevronPosts", post, posts)
+	parent.add_child(ps)
+	ps.owner = owner
+
+
+func _build_delineators(parent: Node3D, owner: Node) -> void:
+	var xforms: Array[Transform3D] = []
+	for i in range(10, pts.size(), 25):
+		for lateral in [-3.95, 3.95]:
+			xforms.append(Transform3D(Basis(), _roadside(i, lateral) + Vector3.UP * 0.5))
+	var mesh := CylinderMesh.new()
+	mesh.top_radius = 0.05
+	mesh.bottom_radius = 0.06
+	mesh.height = 1.0
+	mesh.radial_segments = 6
+	mesh.material = MangaArt.world_preset("delineator")
+	var s := Scatter.make("Delineators", mesh, xforms)
+	parent.add_child(s)
+	s.owner = owner
+
+
+func _build_poles(parent: Node3D, owner: Node, from_d: float, to_d: float) -> void:
+	var poles: Array[Transform3D] = []
+	var arms: Array[Transform3D] = []
+	var tops: Array[Vector3] = []
+	var i := roundi(from_d / SPACING)
+	while i < mini(roundi(to_d / SPACING), pts.size() - 1):
+		# On whichever side drops away (the valley), behind the rail.
+		var side := 0 if side_type[i][0] == Side.FILL else 1
+		var lateral := 6.2 * (1.0 if side == 1 else -1.0)
+		var base := _roadside(i, lateral)
+		var basis := _facing_traffic(i)
+		poles.append(Transform3D(Basis(), base + Vector3.UP * 4.5))
+		arms.append(Transform3D(basis, base + Vector3.UP * 8.4))
+		tops.append(base + Vector3.UP * 8.45)
+		i += 35
+	var pole := CylinderMesh.new()
+	pole.top_radius = 0.12
+	pole.bottom_radius = 0.16
+	pole.height = 9.0
+	pole.radial_segments = 8
+	pole.material = MangaArt.world_preset("pole")
+	var arm := BoxMesh.new()
+	arm.size = Vector3(1.8, 0.12, 0.12)
+	arm.material = MangaArt.world_preset("pole")
+	for pair in [["Poles", pole, poles], ["PoleArms", arm, arms]]:
+		var s := Scatter.make(pair[0], pair[1], pair[2])
+		parent.add_child(s)
+		s.owner = owner
+	# Three sagging wires between consecutive poles, as thin dark ribbons.
+	var st := SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	for k in range(1, tops.size()):
+		var a := tops[k - 1]
+		var b := tops[k]
+		var across := (b - a).cross(Vector3.UP).normalized()
+		for w in [-0.75, 0.0, 0.75]:
+			var prev := Vector3.ZERO
+			for n in 13:
+				var t := n / 12.0
+				var p: Vector3 = a.lerp(b, t) + across * w + Vector3.DOWN * (sin(PI * t) * 0.55)
+				if n > 0:
+					var hw := Vector3.UP * 0.018
+					for v in [prev - hw, prev + hw, p + hw, prev - hw, p + hw, p - hw, prev - hw, p + hw, prev + hw, prev - hw, p - hw, p + hw]:
+						st.add_vertex(v)
+				prev = p
+	st.generate_normals()
+	st.set_material(MangaArt.world_preset("pole"))
+	var wires := MeshInstance3D.new()
+	wires.name = "Wires"
+	wires.mesh = st.commit()
+	wires.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	parent.add_child(wires)
+	wires.owner = owner
+
+
+func _build_mirrors(parent: Node3D, owner: Node) -> void:
+	var discs: Array[Transform3D] = []
+	var posts: Array[Transform3D] = []
+	var i := 2
+	while i < pts.size() - 2:
+		# Hairpin apex: the tightest sample of a run tighter than 22 m radius.
+		if absf(curvature[i]) > 1.0 / 22.0:
+			var best := i
+			while i < pts.size() - 2 and absf(curvature[i]) > 1.0 / 22.0:
+				if absf(curvature[i]) > absf(curvature[best]):
+					best = i
+				i += 1
+			var lateral := -4.6 if curvature[best] > 0.0 else 4.6
+			var base := _roadside(best, lateral)
+			var basis := _facing_traffic(maxi(best - 25, 0))
+			discs.append(Transform3D(basis * Basis(Vector3.RIGHT, PI / 2.0), base + Vector3.UP * 2.6))
+			posts.append(Transform3D(Basis(), base + Vector3.UP * 1.25))
+		i += 1
+	var disc := CylinderMesh.new()
+	disc.top_radius = 0.42
+	disc.bottom_radius = 0.42
+	disc.height = 0.06
+	disc.radial_segments = 16
+	disc.material = MangaArt.world_preset("lamp_head")
+	var post := CylinderMesh.new()
+	post.top_radius = 0.05
+	post.bottom_radius = 0.05
+	post.height = 2.5
+	post.radial_segments = 6
+	post.material = MangaArt.world_preset("post")
+	for pair in [["Mirrors", disc, discs], ["MirrorPosts", post, posts]]:
+		var s := Scatter.make(pair[0], pair[1], pair[2])
+		parent.add_child(s)
+		s.owner = owner
+
+
+func _build_street_lamp(parent: Node3D, owner: Node, distance: float) -> void:
+	var i := clampi(roundi(distance / SPACING), 0, pts.size() - 1)
+	var base := _roadside(i, -4.7)
+	var root := Node3D.new()
+	root.name = "StreetLamp%d" % i
+	parent.add_child(root)
+	root.owner = owner
+	var pole := MeshInstance3D.new()
+	var pm := CylinderMesh.new()
+	pm.top_radius = 0.08
+	pm.bottom_radius = 0.12
+	pm.height = 7.0
+	pm.radial_segments = 8
+	pm.material = MangaArt.world_preset("pole")
+	pole.mesh = pm
+	pole.position = base + Vector3.UP * 3.5
+	root.add_child(pole)
+	pole.owner = owner
+	var reach := rgt[i] * 2.4
+	var arm := MeshInstance3D.new()
+	var am := BoxMesh.new()
+	am.size = Vector3(0.1, 0.1, 2.6)
+	am.material = MangaArt.world_preset("pole")
+	arm.mesh = am
+	arm.transform = Transform3D(Basis.looking_at(reach.normalized(), Vector3.UP), base + Vector3.UP * 7.0 + reach * 0.5)
+	root.add_child(arm)
+	arm.owner = owner
+	var head := MeshInstance3D.new()
+	var hm := BoxMesh.new()
+	hm.size = Vector3(0.5, 0.14, 0.28)
+	hm.material = MangaArt.world_preset("lamp_head")
+	head.mesh = hm
+	head.position = base + Vector3.UP * 6.95 + reach
+	root.add_child(head)
+	head.owner = owner
+	var light := SpotLight3D.new()
+	light.position = base + Vector3.UP * 6.8 + reach
+	light.rotation_degrees = Vector3(-90, 0, 0)
+	light.spot_range = 11.0
+	light.spot_angle = 38.0
+	light.spot_angle_attenuation = 0.05
+	light.spot_attenuation = 0.5
+	light.light_energy = 2.4
+	light.shadow_enabled = false
+	root.add_child(light)
+	light.owner = owner

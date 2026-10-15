@@ -38,6 +38,8 @@ group_uniforms;
 group_uniforms pattern;
 /// 0 none, 1 chevron sign (UV), 2 delineator band (UV).
 uniform int pattern_mode = 0;
+/// Chevron direction: +1 points to the board's +U (driver's right), −1 left.
+uniform float pattern_dir = 1.0;
 group_uniforms;
 
 varying float v_albedo;
@@ -72,7 +74,7 @@ void fragment() {
 	if (pattern_mode == 1) {
 		// Chevron: white board, black arrowheads pointing +U.
 		vec2 q = v_uv - 0.5;
-		float chev = abs(q.y) * 1.2 - q.x;
+		float chev = abs(q.y) * 1.2 - q.x * pattern_dir;
 		a = (fract(chev * 2.2) < 0.5 && abs(q.y) < 0.42 && abs(q.x) < 0.46) ? 0.03 : 0.95;
 	} else if (pattern_mode == 2) {
 		a = abs(v_uv.y - 0.2) < 0.08 ? 0.03 : 0.95;

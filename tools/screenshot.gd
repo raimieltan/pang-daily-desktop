@@ -65,6 +65,11 @@ func _scripted() -> VehicleTypes.DriverInput:
 func _process(delta: float) -> bool:
 	var session: DriveSession = _scene.session
 	if _t == 0.0:
+		if OS.has_environment("PANG_DIST"):
+			var d := float(OS.get_environment("PANG_DIST"))
+			var pose: Dictionary = _scene.track.pose_at(d)
+			session.car.place(pose["position"], pose["heading"])
+			session.camera.snap.call_deferred()
 		if OS.has_environment("PANG_MANGA_OFF"):
 			session.camera.manga.enabled = false
 		if OS.has_environment("PANG_SCALE"):
