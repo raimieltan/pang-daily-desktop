@@ -11,6 +11,7 @@ var hud: TelemetryHud
 var fx: CarFx
 var audio: CarAudio
 var day_night: DayNightSwitch
+var camera_picker: CameraPicker
 ## func(car: CarBody) -> Dictionary { "position": Vector3, "heading": float }; defaults to the spawn.
 var reset_pose: Callable
 ## Optional func(DriverInput) -> DriverInput applied to the player's input (race starts, cutscenes).
@@ -53,6 +54,10 @@ func _ready() -> void:
 
 	day_night = DayNightSwitch.new()
 	add_child(day_night)
+
+	camera_picker = CameraPicker.new()
+	camera_picker.camera = camera
+	add_child(camera_picker)
 
 	hud = TelemetryHud.new()
 	hud.car = car

@@ -20,6 +20,8 @@ var _ghost_visual: Node3D
 var _record := PackedFloat32Array()
 var _sample_clock := 0.0
 var _index_hint := 0
+## False in free drive: no timer, ghost or countdown.
+var active := true
 
 
 func _ready() -> void:
@@ -30,9 +32,6 @@ func _ready() -> void:
 			var e := InputEventKey.new()
 			e.physical_keycode = key
 			InputMap.action_add_event("restart_run", e)
-		var pad := InputEventJoypadButton.new()
-		pad.button_index = JOY_BUTTON_START
-		InputMap.action_add_event("restart_run", pad)
 	hud = RaceHud.new()
 	add_child(hud)
 	_ghost_visual = _make_ghost()
@@ -47,6 +46,8 @@ func _car_id() -> String:
 
 
 func restart() -> void:
+	active = true
+	hud.visible = true
 	run = TimeAttackRun.new(track.start_distance, track.finish_distance)
 	best = TimeAttackRecords.load_best(track_id, _car_id())
 	_ghost_data = TimeAttackRecords.load_ghost(track_id, _car_id())
@@ -58,6 +59,14 @@ func restart() -> void:
 	session.camera.snap.call_deferred()
 	_ghost_visual.visible = false
 	hud.show_run(best)
+
+
+## Free drive: drop the run and its HUD; the car keeps going where it is.
+func free_drive() -> void:
+	active = false
+	run = null
+	hud.visible = false
+	_ghost_visual.visible = false
 
 
 func _filter_input(input: VehicleTypes.DriverInput) -> VehicleTypes.DriverInput:
@@ -77,7 +86,7 @@ func _reset_pose(_car: CarBody) -> Dictionary:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("restart_run"):
+	if active and event.is_action_pressed("restart_run"):
 		restart()
 
 

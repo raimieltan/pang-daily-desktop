@@ -18,6 +18,11 @@ const SCENARIOS := {
 	"overview": [[2.0, 0, 0, 0, 0, ""], [9.0, 0.85, 0, 0, 0, "overview"]],
 	# Standing shot (pair with PANG_DIST) to check roadside props by day.
 	"props": [[1.5, 0, 0, 0, 0, "props_day"]],
+	# Menus: the title on launch; the pause menu over a run.
+	"title": [[1.5, 0, 0, 0, 0, "title"]],
+	"pause": [[2.0, 0, 0, 0, 0, ""], [6.0, 0.85, 0, 0, 0, ""], [6.3, 0, 0, 0, 0, "pause"]],
+	# Camera views, one per shot after a short run (V cycles them in game).
+	"cams": [[2.0, 0, 0, 0, 0, ""], [6.0, 0.85, 0, 0, 0, "cam_chase"], [6.3, 0.85, 0, 0, 0, "cam_far"], [6.6, 0.85, 0, 0, 0, "cam_hood"], [6.9, 0.85, 0, 0, 0, "cam_bumper"]],
 }
 
 var _scene
@@ -51,6 +56,7 @@ func _initialize() -> void:
 		var size := Vector2i(int(r[0]), int(r[1]))
 		DisplayServer.window_set_size(size)
 		root.size = size
+	GameMenu.skip_title = _scenario != "title"
 	_scene = load(scene_path).instantiate()
 	root.add_child(_scene)
 	if _scenario == "night":
@@ -94,10 +100,14 @@ func _process(delta: float) -> bool:
 	var step: Array = _steps[_step]
 	_input = VehicleTypes.DriverInput.make(step[1], step[2], step[3], step[4], "keyboard")
 	if _t >= step[0]:
+		if _scenario == "pause" and _step == 1:
+			_scene.menu.open_pause()
 		if step[5] != "":
 			if _scenario == "overview":
 				_overview_camera(session)
 			_shot(step[5])
+		if _scenario == "cams" and _step >= 1:
+			session.camera.mode = (_step % ChaseCamera.Mode.size()) as ChaseCamera.Mode
 		if _scenario == "switch" and _step == 0:
 			session.day_night.toggle()
 		_step += 1

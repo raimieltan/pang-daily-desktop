@@ -3,10 +3,9 @@ extends CanvasLayer
 ## Time-attack HUD in manga lettering (docs/ART_DIRECTION.md §7): ink and paper only, heavy
 ## outlined numerals, a speech-burst countdown, split deltas, and a GOAL panel.
 
-const PAPER := Color(0.953, 0.937, 0.898)
-const INK := Color(0.075, 0.072, 0.07)
+const PAPER := MangaType.PAPER
+const INK := MangaType.INK
 
-var _font := SystemFont.new()
 var _timer: Label
 var _best: Label
 var _split: Label
@@ -19,40 +18,34 @@ var _count_value := -1
 
 func _ready() -> void:
 	layer = 10
-	_font.font_names = ["Impact", "Arial Black", "Helvetica Neue", "sans-serif"]
-	_font.font_weight = 900
-	_timer = _label(46, Control.PRESET_CENTER_TOP, Vector2(0, 26))
-	_best = _label(20, Control.PRESET_CENTER_TOP, Vector2(0, 84))
-	_split = _label(30, Control.PRESET_CENTER_TOP, Vector2(0, 112))
+	_timer = _label(42, Control.PRESET_CENTER_TOP, Vector2(0, 26))
+	_best = _label(24, Control.PRESET_CENTER_TOP, Vector2(0, 84), false, MangaType.caption())
+	_split = _label(28, Control.PRESET_CENTER_TOP, Vector2(0, 112))
 	_countdown = _label(150, Control.PRESET_CENTER, Vector2(0, -60))
-	_countdown.add_theme_constant_override("outline_size", 28)
 	_goal = PanelContainer.new()
 	var style := StyleBoxFlat.new()
 	style.bg_color = PAPER
 	style.border_color = INK
 	style.set_border_width_all(6)
 	style.set_content_margin_all(28)
+	style.shadow_color = MangaType.RED
+	style.shadow_size = 1
+	style.shadow_offset = Vector2(10, 10)
 	_goal.add_theme_stylebox_override("panel", style)
 	_goal.set_anchors_preset(Control.PRESET_CENTER)
 	_goal.grow_horizontal = Control.GROW_DIRECTION_BOTH
 	_goal.grow_vertical = Control.GROW_DIRECTION_BOTH
 	_goal_text = Label.new()
-	_goal_text.add_theme_font_override("font", _font)
-	_goal_text.add_theme_font_size_override("font_size", 30)
-	_goal_text.add_theme_color_override("font_color", INK)
+	MangaType.ink(_goal_text, 30)
 	_goal_text.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_goal.add_child(_goal_text)
 	add_child(_goal)
 	_goal.visible = false
 
 
-func _label(size: int, preset: int, offset: Vector2) -> Label:
+func _label(size: int, preset: int, offset: Vector2, extrude := true, font: Font = null) -> Label:
 	var l := Label.new()
-	l.add_theme_font_override("font", _font)
-	l.add_theme_font_size_override("font_size", size)
-	l.add_theme_color_override("font_color", PAPER)
-	l.add_theme_color_override("font_outline_color", INK)
-	l.add_theme_constant_override("outline_size", maxi(6, size / 5))
+	MangaType.pop(l, size, extrude, font)
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	l.set_anchors_preset(preset)
 	l.grow_horizontal = Control.GROW_DIRECTION_BOTH

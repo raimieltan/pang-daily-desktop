@@ -9,15 +9,12 @@ const FADE_SECONDS := 0.6
 
 var _button := Button.new()
 var _tween: Tween
+var _target := -1.0
 
 
 func _ready() -> void:
 	layer = 5
-	var font := SystemFont.new()
-	font.font_names = ["Impact", "Arial Black", "Helvetica Neue", "sans-serif"]
-	font.font_weight = 900
-	_button.add_theme_font_override("font", font)
-	_button.add_theme_font_size_override("font_size", 22)
+	MangaType.ink(_button, 18)
 	for state in ["normal", "hover", "pressed"]:
 		var box := StyleBoxFlat.new()
 		box.bg_color = PAPER if state != "pressed" else INK
@@ -41,13 +38,19 @@ func _ready() -> void:
 
 
 func toggle() -> void:
-	var target := 0.0 if MangaArt.night >= 0.5 else 1.0
+	var target := 0.0 if heading_to_night() else 1.0
+	_target = target
 	if _tween:
 		_tween.kill()
 	_tween = create_tween()
 	_tween.tween_method(MangaArt.apply_night, MangaArt.night, target, FADE_SECONDS * absf(target - MangaArt.night))
 	_tween.tween_callback(_refresh)
 	_button.text = "☾ NIGHT…" if target > 0.5 else "☀ DAY…"
+
+
+## Where the page is going (mid-fade counts as already there).
+func heading_to_night() -> bool:
+	return _target > 0.5 if _tween and _tween.is_running() else MangaArt.night >= 0.5
 
 
 func _refresh() -> void:

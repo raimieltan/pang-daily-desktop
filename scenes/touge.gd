@@ -10,6 +10,7 @@ var car: CarBody:
 	get: return session.car if session else null
 var track: TrackData = TRACK
 var time_attack: TimeAttack
+var menu: GameMenu
 var _progress_index := 0
 
 
@@ -24,6 +25,10 @@ func _ready() -> void:
 	time_attack.track = track
 	time_attack.session = session
 	add_child(time_attack)
+	menu = GameMenu.new()
+	menu.session = session
+	menu.time_attack = time_attack
+	add_child(menu)
 
 
 func _physics_process(_delta: float) -> void:

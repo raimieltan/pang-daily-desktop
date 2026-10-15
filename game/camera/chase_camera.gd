@@ -4,6 +4,15 @@ extends Camera3D
 ## stay readable, lags a little so speed and weight transfer show, and looks a little ahead with
 ## speed. Owns the manga page: the MangaCompositor pass (tone + ink lines), the MangaOverlay
 ## (speed lines, impact, panel border) and impact shake. M toggles the manga pass for comparison.
+## V cycles the view: chase, far chase, hood and bumper (mounted on the car body).
+
+signal mode_changed(mode: Mode)
+
+enum Mode { CHASE, FAR, HOOD, BUMPER }
+const MODE_NAMES := ["CHASE", "FAR", "HOOD", "BUMPER"]
+## Chase rigs: [distance, height, look_height]. Mounted views: car-local eye point.
+const CHASE_RIGS := { Mode.CHASE: [5.6, 1.9, 0.9], Mode.FAR: [8.6, 3.0, 1.0] }
+const MOUNTS := { Mode.HOOD: Vector3(0.0, 1.22, -0.45), Mode.BUMPER: Vector3(0.0, 0.52, -2.25) }
 
 @export var distance := 5.6
 @export var height := 1.9
@@ -15,6 +24,17 @@ extends Camera3D
 @export var max_look_ahead := 4.5
 
 var target: CarBody
+var mode := Mode.CHASE:
+	set(value):
+		mode = value
+		if CHASE_RIGS.has(mode):
+			distance = CHASE_RIGS[mode][0]
+			height = CHASE_RIGS[mode][1]
+			look_height = CHASE_RIGS[mode][2]
+		# Hide the car's own body in the bumper view: the eye sits just ahead of the nose.
+		cull_mask = 0xFFFFF & ~CarVisual.CAR_RENDER_LAYER if mode == Mode.BUMPER else 0xFFFFF
+		snap()
+		mode_changed.emit(mode)
 var manga: MangaCompositor
 var overlay: MangaOverlay
 var _yaw := 0.0
@@ -44,6 +64,14 @@ func _ready() -> void:
 		var e := InputEventKey.new()
 		e.physical_keycode = KEY_M
 		InputMap.action_add_event("toggle_manga", e)
+	if not InputMap.has_action("cycle_camera"):
+		InputMap.add_action("cycle_camera")
+		var v := InputEventKey.new()
+		v.physical_keycode = KEY_V
+		InputMap.action_add_event("cycle_camera", v)
+		var pad := InputEventJoypadButton.new()
+		pad.button_index = JOY_BUTTON_Y
+		InputMap.action_add_event("cycle_camera", pad)
 
 
 ## Above `MAX_3D_HEIGHT` pixels the 3D (and the manga pass) renders at a lower internal scale and
@@ -64,11 +92,17 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("toggle_manga"):
 		manga.enabled = not manga.enabled
 		overlay.visible = manga.enabled
+	elif event.is_action_pressed("cycle_camera"):
+		mode = ((mode + 1) % Mode.size()) as Mode
 
 
 func snap() -> void:
-	if target:
-		_yaw = _heading(-target.global_basis.z)
+	if target == null or not is_inside_tree():
+		return
+	_yaw = _heading(-target.global_basis.z)
+	if MOUNTS.has(mode):
+		_mount(target.global_transform, 0.0)
+	else:
 		global_position = _desired(target.global_position)
 
 
@@ -93,8 +127,13 @@ func _process(delta: float) -> void:
 	_yaw = lerp_angle(_yaw, _heading(direction), 1.0 - exp(-swing_rate * delta))
 	global_position = global_position.lerp(_desired(xf.origin), 1.0 - exp(-follow_rate * delta))
 	var speed := velocity.length()
-	fov = lerpf(fov, 68.0 + clampf(speed * 0.25, 0.0, 12.0), 1.0 - exp(-2.0 * delta))
-	look_at(xf.origin + Vector3.UP * look_height + direction * minf(speed * look_ahead, max_look_ahead))
+	if MOUNTS.has(mode):
+		# Mounted views ride the body; wider FOV so speed reads from the road rushing past.
+		fov = lerpf(fov, 76.0 + clampf(speed * 0.2, 0.0, 10.0), 1.0 - exp(-2.0 * delta))
+		_mount(xf, speed)
+	else:
+		fov = lerpf(fov, 68.0 + clampf(speed * 0.25, 0.0, 12.0), 1.0 - exp(-2.0 * delta))
+		look_at(xf.origin + Vector3.UP * look_height + direction * minf(speed * look_ahead, max_look_ahead))
 	# Shake: trauma² so small knocks barely move the frame.
 	_trauma = maxf(0.0, _trauma - delta * 1.6)
 	if _trauma > 0.0:
@@ -108,6 +147,14 @@ func _process(delta: float) -> void:
 	_impact = maxf(0.0, _impact - delta * 3.5)
 	overlay.set_speed_kmh(speed * 3.6)
 	overlay.set_impact(_impact * MangaArt.fx_intensity())
+
+
+## Eye fixed to the car body, levelled a little so body roll reads without the horizon swimming.
+func _mount(xf: Transform3D, _speed: float) -> void:
+	var eye: Vector3 = xf * MOUNTS[mode]
+	var forward := -xf.basis.z
+	var up := xf.basis.y.lerp(Vector3.UP, 0.6).normalized()
+	global_transform = Transform3D(Basis.looking_at(forward, up), eye)
 
 
 func _desired(origin: Vector3) -> Vector3:

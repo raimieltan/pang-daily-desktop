@@ -33,14 +33,7 @@ func _ready() -> void:
 	panel.add_child(_label)
 
 	_speedo = Label.new()
-	var brush := SystemFont.new()
-	brush.font_names = ["Impact", "Arial Black", "Helvetica Neue", "sans-serif"]
-	brush.font_weight = 900
-	_speedo.add_theme_font_override("font", brush)
-	_speedo.add_theme_font_size_override("font_size", 44)
-	_speedo.add_theme_color_override("font_color", Color(0.953, 0.937, 0.898))
-	_speedo.add_theme_color_override("font_outline_color", Color.BLACK)
-	_speedo.add_theme_constant_override("outline_size", 8)
+	MangaType.pop(_speedo, 38)
 	_speedo.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
 	_speedo.grow_horizontal = Control.GROW_DIRECTION_BEGIN
 	_speedo.grow_vertical = Control.GROW_DIRECTION_BEGIN
@@ -62,7 +55,7 @@ func _process(_delta: float) -> void:
 	if not debug_visible:
 		return
 	var lines: PackedStringArray = []
-	lines.append("PANG DAILY                    [T] tune [Y] tires [N] night [R] reset [H] hud")
+	lines.append("PANG DAILY                    [T] tune [Y] tires [N] night [R] reset [H] hud [V] cam")
 	lines.append("tune %-22s tires %s   device %s" % [car.preset, car.tire_product, car.last_input.device])
 	lines.append("thr %.2f→%.2f  brk %.2f  hb %.2f  clutch %.2f  axle %5.0f Nm  tcs-cut %.2f" % [
 		a.throttle_raw, s.throttle, s.brake, s.handbrake, mech.clutch, mech.axle_torque, d.traction_cut])
