@@ -4,3 +4,7 @@
 
 # Downloaded source audio (credits in assets/audio/CREDITS.md); only the processed picks are tracked.
 assets/audio/raw/
+
+# Local tooling caches
+__pycache__/
+.serena/
