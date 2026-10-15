@@ -60,20 +60,21 @@ func _build_lamps(model: Node) -> void:
 		var node := model.find_child(name, true, false) as Node3D
 		if node == null:
 			continue
-		var streak := MeshInstance3D.new()
-		var plane := PlaneMesh.new()
-		plane.size = Vector2(0.5, 2.2)
+		var trail := MeshInstance3D.new()
+		var quad := QuadMesh.new()
+		quad.size = Vector2.ONE
 		var m := ShaderMaterial.new()
 		m.shader = STREAK_SHADER
-		plane.material = m
-		streak.mesh = plane
-		streak.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-		add_child(streak)
-		# GLB space: the lamp's x, just above the road, extending backwards (−Z) from the bumper.
-		var lamp := to_local(_mesh_center(node))
-		# The body origin can ride a few cm below the road surface; float the streak clear of it.
-		streak.position = Vector3(lamp.x, 0.12, lamp.z - 0.95)
-		_tail_streaks.append(streak)
+		quad.material = m
+		trail.mesh = quad
+		trail.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		# The trail is placed in the vertex shader; keep culling from dropping it.
+		trail.extra_cull_margin = 4.0
+		add_child(trail)
+		# At the lamp's face, +Z pointing behind the car (the GLB faces +Z, so behind is −Z).
+		trail.position = to_local(_mesh_center(node)) + Vector3(0, 0, -0.04)
+		trail.rotation.y = PI
+		_tail_streaks.append(trail)
 	for name in ["headlight_l", "headlight_r"]:
 		var node := model.find_child(name, true, false) as Node3D
 		if node == null:
@@ -109,11 +110,14 @@ func _update_lamps(delta: float) -> void:
 	var reverse_mat: ShaderMaterial = _materials.get("reverse")
 	if reverse_mat:
 		reverse_mat.set_shader_parameter("glow", 1.0 if s.reversing else 0.0)
-	# Reflections read far stronger on a dark road: subtle by day, vivid at night.
-	_streak = move_toward(_streak, braking * lerpf(0.6, 1.4, night) + night * 0.25, delta * 8.0)
+	# Brake light trails: brighter at night (tail lamps are on), longer with speed.
+	_streak = move_toward(_streak, braking * lerpf(0.7, 1.2, night) + night * 0.3, delta * 8.0)
+	var length := 0.3 + clampf(car.linear_velocity.length() * 0.07, 0.0, 2.2)
 	for st in _tail_streaks:
 		st.visible = _streak > 0.02
-		((st.mesh as PlaneMesh).material as ShaderMaterial).set_shader_parameter("intensity", _streak)
+		var m := (st.mesh as QuadMesh).material as ShaderMaterial
+		m.set_shader_parameter("intensity", _streak)
+		m.set_shader_parameter("trail_length", length)
 	for spot in _headlights:
 		spot.visible = night > 0.02
 		spot.light_energy = 5.0 * night
