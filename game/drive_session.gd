@@ -10,6 +10,7 @@ var camera: ChaseCamera
 var hud: TelemetryHud
 var fx: CarFx
 var audio: CarAudio
+var day_night: DayNightSwitch
 ## func(car: CarBody) -> Dictionary { "position": Vector3, "heading": float }; defaults to the spawn.
 var reset_pose: Callable
 ## Optional func(DriverInput) -> DriverInput applied to the player's input (race starts, cutscenes).
@@ -50,6 +51,9 @@ func _ready() -> void:
 	audio.car = car
 	add_child(audio)
 
+	day_night = DayNightSwitch.new()
+	add_child(day_night)
+
 	hud = TelemetryHud.new()
 	hud.car = car
 	add_child(hud)
@@ -77,6 +81,6 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event.is_action_pressed("toggle_tires"):
 		car.set_tire_product("street" if car.tire_product == "stock" else "stock")
 	elif event.is_action_pressed("toggle_night"):
-		MangaArt.set_night(MangaArt.night < 0.5)
+		day_night.toggle()
 	elif event.is_action_pressed("toggle_hud"):
 		hud.debug_visible = not hud.debug_visible

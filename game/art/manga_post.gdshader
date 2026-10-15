@@ -39,15 +39,23 @@ void vertex() {
 	POSITION = vec4(VERTEX.xy, 1.0, 1.0);
 }
 
+// "Over" compositing of one mark onto the overlay built so far (straight alpha).
+vec4 over(vec4 dst, vec3 color, float alpha) {
+	float a = alpha + dst.a * (1.0 - alpha);
+	if (a <= 0.0) return vec4(0.0);
+	return vec4((color * alpha + dst.rgb * dst.a * (1.0 - alpha)) / a, a);
+}
+
 void fragment() {
+	// An overlay, not a repaint: only the page's own marks (haze, ink lines, grain, speed lines,
+	// impact, border) are drawn, with alpha. Everything else, including transparent effects that
+	// the screen copy cannot contain (brake streaks, sparks, skid marks, the ghost), shows through.
 	vec2 uv = SCREEN_UV;
 	float res = max(VIEWPORT_SIZE.y / 1080.0, 0.5);
 	vec2 px = res * manga_outline_scale / VIEWPORT_SIZE;
-	vec3 col = texture(screen_tex, uv).rgb;
 	float z = linear_depth(uv, INV_PROJECTION_MATRIX);
 	bool sky = z > 2700.0;
-
-	// The sky is drawn by manga_sky.gdshader; this pass leaves it alone.
+	vec4 o = vec4(0.0);
 
 	// Ink lines: inverse depth is linear across planes, so its Laplacian only fires at silhouettes
 	// and creases, never on grazing ground.
@@ -63,15 +71,14 @@ void fragment() {
 
 	if (!sky) {
 		float fade = smoothstep(fade_start, fade_end, z) * fade_max;
-		vec3 haze_col = mix(haze, ink * 1.6, manga_night);
-		col = mix(col, haze_col, fade);
+		o = over(o, mix(haze, ink * 1.6, manga_night), fade);
 		// Lines outlast tone, but thin out in the distance.
 		vec3 line_col = mix(ink, vec3(0.5, 0.49, 0.47), manga_night * 0.7);
-		col = mix(col, line_col, edge * (1.0 - fade * 0.6));
+		o = over(o, line_col, edge * (1.0 - fade * 0.6));
 	}
 
-	// Paper grain.
-	col *= 0.975 + hash2(floor(FRAGCOORD.xy / (2.0 * res))) * 0.025;
+	// Paper grain: a faint ink speckle.
+	o = over(o, ink, (1.0 - hash2(floor(FRAGCOORD.xy / (2.0 * res)))) * 0.025);
 
 	vec2 c = (uv - vec2(0.5, 0.45)) * vec2(VIEWPORT_SIZE.x / VIEWPORT_SIZE.y, 1.0);
 	float r = length(c);
@@ -89,7 +96,7 @@ void fragment() {
 		float streak = on * thin * smoothstep(reach, reach + 0.25, r);
 		vec3 streak_col = mix(ink, paper, manga_night);
 		if (speed_lines > 0.6 && hash1(id * 9.1) > 0.82) streak_col = vec3(0.72, 0.84, 1.0);
-		col = mix(col, streak_col, streak * 0.8);
+		o = over(o, streak_col, streak * 0.8);
 	}
 
 	// Impact: burst lines from the screen edge inward and a brief inverted rim; the centre
@@ -101,17 +108,18 @@ void fragment() {
 		float burst = step(0.45, hash1(id + 3.3)) * (1.0 - smoothstep(0.0, 0.3, abs(local - 0.5)));
 		float reach = mix(0.75, 0.42, impact) + hash1(id * 5.1) * 0.12;
 		float rim = smoothstep(reach, reach + 0.05, r);
-		col = mix(col, ink, burst * rim * impact * fx);
 		float edge_band = smoothstep(0.62, 0.8, r) * impact * 0.6 * fx;
-		col = mix(col, vec3(1.0) - col, edge_band);
+		o = over(o, vec3(1.0) - texture(screen_tex, uv).rgb, edge_band);
+		o = over(o, ink, burst * rim * impact * fx);
 	}
 
 	// Panel: a paper gutter and a thin ink frame.
 	vec2 edge_uv = min(uv, 1.0 - uv);
 	float m = min(edge_uv.x * VIEWPORT_SIZE.x, edge_uv.y * VIEWPORT_SIZE.y);
 	float g = gutter * VIEWPORT_SIZE.y;
-	if (m < g) col = paper;
-	else if (m < g + border_px * res) col = ink;
+	if (m < g) o = vec4(paper, 1.0);
+	else if (m < g + border_px * res) o = vec4(ink, 1.0);
 
-	ALBEDO = col;
+	ALBEDO = o.rgb;
+	ALPHA = o.a;
 }

@@ -38,6 +38,8 @@ func _ready() -> void:
 	skid_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	skid_mat.vertex_color_use_as_albedo = true
 	skid_mat.render_priority = -1
+	# The strip's winding depends on travel direction; draw both faces.
+	skid_mat.cull_mode = BaseMaterial3D.CULL_DISABLED
 	_skid_instance.material_override = skid_mat
 	# Marks span the whole run; skip per-frame culling work on a mesh that is always nearby.
 	_skid_instance.extra_cull_margin = 1000.0

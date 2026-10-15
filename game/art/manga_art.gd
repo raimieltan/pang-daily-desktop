@@ -154,6 +154,8 @@ static func post_quad() -> MeshInstance3D:
 	quad.mesh = mesh
 	var m := ShaderMaterial.new()
 	m.shader = POST_SHADER
+	# Drawn last: the page is an alpha overlay of its own marks on top of the finished frame.
+	m.render_priority = Material.RENDER_PRIORITY_MAX
 	quad.material_override = m
 	quad.extra_cull_margin = 16384.0
 	quad.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
@@ -193,5 +195,10 @@ static func sun(energy := 1.0) -> DirectionalLight3D:
 
 ## Day/night: the page goes dark and car lamps become the light (docs/ART_DIRECTION.md §3, §6).
 static func set_night(on: bool) -> void:
-	night = 1.0 if on else 0.0
-	RenderingServer.global_shader_parameter_set("manga_night", night)
+	apply_night(1.0 if on else 0.0)
+
+
+## 0 = day .. 1 = night; values in between blend (used by the switch's fade).
+static func apply_night(value: float) -> void:
+	night = value
+	RenderingServer.global_shader_parameter_set("manga_night", value)

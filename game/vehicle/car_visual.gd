@@ -9,13 +9,13 @@ const WHEEL_NAMES := ["wheel_fl", "wheel_fr", "wheel_rl", "wheel_rr"]
 ## The car is the color on the page (docs/ART_DIRECTION.md §3).
 @export var paint_color := Color(0.96, 0.74, 0.08)
 
-const GLOW_SHADER := preload("res://game/art/manga_glow.gdshader")
+const STREAK_SHADER := preload("res://game/art/manga_streak.gdshader")
 const CAR_RENDER_LAYER := 2
 
 var car: CarBody
 var _materials := {}
-var _tail_glows: Array[MeshInstance3D] = []
-var _brake_light: OmniLight3D
+var _tail_streaks: Array[MeshInstance3D] = []
+var _streak := 0.0
 var _headlights: Array[SpotLight3D] = []
 var _hubs: Array[Node3D] = []
 var _wheels: Array[Node3D] = []
@@ -53,33 +53,27 @@ func _ready() -> void:
 		_rest_y.append(hub.position.y)
 
 
-## Lamps from the GLB's light meshes: taillight glow discs + a small red pool on the road when
-## braking, warm headlight spots at night. All selective color on the monochrome page.
+## Lamps from the GLB's light meshes: a red reflection streak on the road behind each taillight
+## while braking (faint at night), warm headlight spots at night. Selective color on the page.
 func _build_lamps(model: Node) -> void:
 	for name in ["taillight_l", "taillight_r"]:
 		var node := model.find_child(name, true, false) as Node3D
 		if node == null:
 			continue
-		var glow := MeshInstance3D.new()
-		var quad := QuadMesh.new()
-		quad.size = Vector2(0.42, 0.42)
+		var streak := MeshInstance3D.new()
+		var plane := PlaneMesh.new()
+		plane.size = Vector2(0.5, 2.2)
 		var m := ShaderMaterial.new()
-		m.shader = GLOW_SHADER
-		m.set_shader_parameter("color", Color(1.0, 0.1, 0.07))
-		quad.material = m
-		glow.mesh = quad
-		glow.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-		add_child(glow)
-		glow.global_position = _mesh_center(node) + global_basis.z * 0.06
-		_tail_glows.append(glow)
-	_brake_light = OmniLight3D.new()
-	_brake_light.light_color = Color(1.0, 0.12, 0.08)
-	_brake_light.omni_range = 2.2
-	_brake_light.light_cull_mask = 1
-	_brake_light.light_energy = 0.0
-	_brake_light.shadow_enabled = false
-	add_child(_brake_light)
-	_brake_light.position = Vector3(0, 0.45, -2.5)   # GLB space: just behind the bumper
+		m.shader = STREAK_SHADER
+		plane.material = m
+		streak.mesh = plane
+		streak.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		add_child(streak)
+		# GLB space: the lamp's x, just above the road, extending backwards (−Z) from the bumper.
+		var lamp := to_local(_mesh_center(node))
+		# The body origin can ride a few cm below the road surface; float the streak clear of it.
+		streak.position = Vector3(lamp.x, 0.12, lamp.z - 0.95)
+		_tail_streaks.append(streak)
 	for name in ["headlight_l", "headlight_r"]:
 		var node := model.find_child(name, true, false) as Node3D
 		if node == null:
@@ -96,7 +90,7 @@ func _build_lamps(model: Node) -> void:
 		spot.visible = false
 		add_child(spot)
 		spot.global_position = _mesh_center(node)
-		# GLB faces +Z; tilt the beam slightly down onto the road.
+		# GLB faces +Z; tilt the beam down onto the road.
 		spot.rotation = Vector3(-0.17, PI, 0.0)
 		_headlights.append(spot)
 
@@ -115,13 +109,13 @@ func _update_lamps(delta: float) -> void:
 	var reverse_mat: ShaderMaterial = _materials.get("reverse")
 	if reverse_mat:
 		reverse_mat.set_shader_parameter("glow", 1.0 if s.reversing else 0.0)
-	for g in _tail_glows:
-		(( g.mesh as QuadMesh).material as ShaderMaterial).set_shader_parameter("intensity", tail * 0.8)
-	if _brake_light:
-		_brake_light.light_energy = move_toward(_brake_light.light_energy, braking * 0.55 + night * 0.2, delta * 6.0)
-		_brake_light.visible = _brake_light.light_energy > 0.02
+	# Reflections read far stronger on a dark road: subtle by day, vivid at night.
+	_streak = move_toward(_streak, braking * lerpf(0.6, 1.4, night) + night * 0.25, delta * 8.0)
+	for st in _tail_streaks:
+		st.visible = _streak > 0.02
+		((st.mesh as PlaneMesh).material as ShaderMaterial).set_shader_parameter("intensity", _streak)
 	for spot in _headlights:
-		spot.visible = night > 0.5
+		spot.visible = night > 0.02
 		spot.light_energy = 5.0 * night
 
 

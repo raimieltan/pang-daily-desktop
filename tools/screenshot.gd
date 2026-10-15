@@ -12,6 +12,8 @@ const SCENARIOS := {
 	# Into the guardrail on the left of the start straight.
 	"scrape": [[2.0, 0, 0, 0, 0, ""], [8.0, 1, 0, 0, 0, ""], [9.0, 1, 0, -0.55, 0, ""], [9.3, 1, 0, -0.35, 0, "scrape_a"], [9.6, 1, 0, -0.3, 0, "scrape_b"], [10.0, 1, 0, -0.3, 0, "scrape_c"]],
 	"night": [[1.0, 0, 0, 0, 0, "night_spawn"], [8.0, 0.85, 0, 0, 0, "night_drive"], [8.6, 0, 1, 0, 0, "night_brake"]],
+	# Flips the on-screen day/night switch after the first shot.
+	"switch": [[2.5, 0, 0, 0, 0, "switch_day"], [2.8, 0, 0, 0, 0, "switch_mid"], [3.6, 0, 0, 0, 0, "switch_night"]],
 	"overview": [[2.0, 0, 0, 0, 0, ""], [9.0, 0.85, 0, 0, 0, "overview"]],
 }
 
@@ -35,6 +37,8 @@ func _initialize() -> void:
 	_steps = SCENARIOS[_scenario]
 	DirAccess.make_dir_recursive_absolute(_out)
 	DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_DISABLED)
+	# Never steal keyboard focus from whoever is playing on this machine.
+	DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_NO_FOCUS, true)
 	root.size = Vector2i(1280, 720)
 	_scene = load(scene_path).instantiate()
 	root.add_child(_scene)
@@ -62,6 +66,8 @@ func _process(delta: float) -> bool:
 			if _scenario == "overview":
 				_overview_camera(session)
 			_shot(step[5])
+		if _scenario == "switch" and _step == 0:
+			session.day_night.toggle()
 		_step += 1
 		if _step >= _steps.size():
 			var avg := _frame_time_sum / maxf(1, _frames)
@@ -89,6 +95,9 @@ func _shot(name: String) -> void:
 	# Overview: let the new camera render once before capturing.
 	if _scenario == "overview":
 		RenderingServer.force_draw()
+	if OS.has_environment("PANG_NO_PAGE"):
+		for q in root.find_children("MangaPage", "MeshInstance3D", true, false):
+			q.visible = false
 	var image := root.get_texture().get_image()
 	var path := _out.path_join(name + ".png")
 	image.save_png(path)
