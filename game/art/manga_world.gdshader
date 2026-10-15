@@ -22,9 +22,9 @@ group_uniforms;
 
 group_uniforms lamps;
 /// Lamp intensity above which the pool is hard paper white.
-uniform float lamp_core = 0.32;
+uniform float lamp_core = 0.6;
 /// How much light outside the core still reaches the tone ramp.
-uniform float lamp_falloff = 0.55;
+uniform float lamp_falloff = 0.8;
 group_uniforms;
 
 group_uniforms road;

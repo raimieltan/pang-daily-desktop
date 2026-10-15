@@ -26,7 +26,9 @@ layout(set = 0, binding = 3, std140) uniform Params {
 	vec4 lines2;    // depth sensitivity, normal sensitivity, jitter px, jitter scale px
 	vec4 paper;     // rgb (linear), grain strength
 	vec4 ink;       // rgb (linear), bleed strength
-	vec4 misc;      // car saturation threshold, white lines on ink (0/1), enabled (0/1), unused
+	vec4 misc;      // car saturation threshold, white lines on ink (0/1), enabled (0/1), gray blend
+	vec4 grays;     // band fill values 0..1 (ink→paper): band 0, band 1, band 2; dot strength
+	vec4 strokes;   // stroke angle (rad), stroke length px @1080p, grit amount, unused
 } p;
 
 // Integer hash (PCG-style): much cheaper than sin() hashes on Apple GPUs.
@@ -68,6 +70,37 @@ float tone_hatch(vec2 frag, float coverage, float pitch) {
 	return max(1.0 - smoothstep(w - 0.6, w + 0.6, a), 1.0 - smoothstep(w - 0.6, w + 0.6, b));
 }
 
+// Hand-inked pen hatching: parallel strokes at `angle`, each line broken into dashes of random
+// length and weight that taper at their ends, like the background work in Initial D panels.
+float tone_strokes(vec2 frag, float coverage, float pitch, float angle, float len) {
+	vec2 d = vec2(cos(angle), sin(angle));
+	float u = dot(frag, d);
+	float v = dot(frag, vec2(-d.y, d.x));
+	float line = floor(v / pitch);
+	float jitter = hash(vec2(line, 3.7));
+	float seg_len = len * (0.5 + jitter);
+	float su = u + hash(vec2(line, 9.1)) * 997.0;
+	float seg = floor(su / seg_len);
+	float r = hash(vec2(line, seg));
+	// Denser tone: more dashes present, and thicker.
+	if (r > coverage * 1.5 + 0.08) return 0.0;
+	float t = fract(su / seg_len);
+	float taper = smoothstep(0.0, 0.18, t) * smoothstep(1.0, 0.75, t);
+	float w = pitch * mix(0.12, 0.42, clamp(coverage * 1.2, 0.0, 1.0)) * (0.6 + 0.8 * r) * taper;
+	float dist = abs(fract(v / pitch) - 0.5) * pitch;
+	return 1.0 - smoothstep(w - 0.5, w + 0.5, dist);
+}
+
+float tone_pattern(vec2 frag, float coverage, float pitch, int mode, bool cross) {
+	if (mode == 2) {
+		float a = tone_strokes(frag, coverage, pitch, p.strokes.x, p.strokes.y * max(p.size.y / 1080.0, 0.5));
+		if (cross) a = max(a, tone_strokes(frag + 41.0, coverage * 0.8, pitch * 1.1, p.strokes.x + 0.9, p.strokes.y * 0.7));
+		return a;
+	}
+	if (mode == 1) return tone_hatch(frag, coverage, pitch);
+	return tone_dots(frag, coverage, pitch);
+}
+
 void main() {
 	ivec2 px = ivec2(gl_GlobalInvocationID.xy);
 	if (px.x >= int(p.size.x) || px.y >= int(p.size.y)) return;
@@ -86,11 +119,36 @@ void main() {
 
 	int band = L < p.bands.x ? 0 : (L < p.bands.y ? 1 : (L < p.bands.z ? 2 : 3));
 	float pitch = p.bands.w * res;
+	// Graded halftone inside each band (real screentone grows and shrinks): the dense band runs
+	// from heavy at the ink edge to medium, the sparse band from light to nothing at the paper edge.
+	// Bands still set the pattern; only abrupt jumps between flat fills are gone.
 	float tone_ink = 0.0;
-	if (band == 0) tone_ink = 1.0;
-	else if (band == 1) tone_ink = p.tone.z > 0.5 ? tone_hatch(frag, p.tone.x, pitch) : tone_dots(frag, p.tone.x, pitch);
-	else if (band == 2) tone_ink = tone_dots(frag, p.tone.y, pitch);
-	vec3 col = colored ? src.rgb : mix(p.paper.rgb, p.ink.rgb, tone_ink);
+	float soft = p.tone.w;
+	int mode = int(p.tone.z + 0.5);
+	if (band == 0) {
+		// Just below the ink threshold, fade from cross strokes into solid ink instead of snapping.
+		float t = smoothstep(p.bands.x - soft, p.bands.x, L);
+		tone_ink = mix(1.0, tone_pattern(frag, 0.9, pitch, mode, true), t);
+	} else if (band == 1) {
+		float t = (L - p.bands.x) / max(p.bands.y - p.bands.x, 1e-3);
+		tone_ink = tone_pattern(frag, mix(min(p.tone.x + 0.3, 0.95), p.tone.x * 0.6, t), pitch, mode, true);
+	} else if (band == 2) {
+		float t = (L - p.bands.y) / max(p.bands.z - p.bands.y, 1e-3);
+		tone_ink = tone_pattern(frag, mix(p.tone.y * 1.6, 0.02, t), pitch, mode == 1 ? 0 : mode, false);
+	}
+	// Gray-tone page: each band has its own gray fill (not pure paper/ink), blended with the real
+	// shading so gradients survive; screentone prints over the fill as darker dots, not solid ink.
+	float fill_v = band == 0 ? p.grays.x : (band == 1 ? p.grays.y : (band == 2 ? p.grays.z : 1.0));
+	fill_v = mix(fill_v, L, p.misc.w);
+	vec3 fill = mix(p.ink.rgb, p.paper.rgb, fill_v);
+	vec3 dot_col = mix(fill, p.ink.rgb, p.grays.w);
+	vec3 col = colored ? src.rgb : mix(fill, dot_col, tone_ink);
+	// Ink grit: sparse specks and flecks, more in darker areas (the scratchy texture of pen work).
+	if (!colored) {
+		vec2 cell = floor(frag / (2.2 * res));
+		float g = hash(cell + 71.0);
+		if (g > 1.0 - p.strokes.z * (1.15 - L)) col = mix(col, p.ink.rgb, 0.85);
+	}
 
 	// --- Ink lines ---------------------------------------------------------------------------
 	g_max = ivec2(p.size.xy) - 1;

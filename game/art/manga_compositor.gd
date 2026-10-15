@@ -8,15 +8,22 @@ extends CompositorEffect
 
 @export_group("Tone ramp")
 ## Luminance (perceptual, 0..1) splits between ink | dense tone | sparse tone | paper.
-@export_range(0.0, 1.0) var ink_below := 0.2
-@export_range(0.0, 1.0) var dense_below := 0.4
-@export_range(0.0, 1.0) var sparse_below := 0.64
+@export_range(0.0, 1.0) var ink_below := 0.16
+@export_range(0.0, 1.0) var dense_below := 0.5
+@export_range(0.0, 1.0) var sparse_below := 0.82
 ## Screentone pitch at 1080p in pixels (scaled with resolution).
-@export_range(2.0, 16.0) var tone_pitch := 5.0
-@export_range(0.0, 1.0) var dense_coverage := 0.55
+@export_range(2.0, 16.0) var tone_pitch := 4.5
+@export_range(0.0, 1.0) var dense_coverage := 0.45
 @export_range(0.0, 1.0) var sparse_coverage := 0.16
-## Dense band: crosshatch (true) or heavy dots (false).
-@export var dense_crosshatch := true
+## Tone texture: 0 = halftone dots, 1 = mechanical crosshatch, 2 = hand-inked pen strokes.
+@export_enum("Dots", "Crosshatch", "Pen strokes") var tone_style := 2
+## Pen strokes: direction (degrees from horizontal) and dash length in pixels at 1080p.
+@export_range(-90.0, 90.0) var stroke_angle := -22.0
+@export_range(8.0, 200.0) var stroke_length := 46.0
+## Scratchy ink specks, stronger in dark areas.
+@export_range(0.0, 0.1) var grit := 0.018
+## Luminance width over which shading eases from crosshatch into solid ink (softens harsh blacks).
+@export_range(0.0, 0.2) var ink_softness := 0.08
 
 @export_group("Ink lines")
 ## Silhouette (depth) and crease (normal) kernel offsets at 1080p, in pixels.
@@ -39,11 +46,21 @@ extends CompositorEffect
 @export_range(0.0, 0.3) var grain := 0.06
 @export_range(0.0, 1.0) var ink_bleed := 0.25
 
+@export_group("Gray tones")
+## Gray fill per band (0 = ink, 1 = paper): ink band, dense band, sparse band. Paper band is paper.
+@export_range(0.0, 1.0) var band0_gray := 0.2
+@export_range(0.0, 1.0) var band1_gray := 0.5
+@export_range(0.0, 1.0) var band2_gray := 0.78
+## How dark screentone dots print over the fill (1 = solid ink dots).
+@export_range(0.0, 1.0) var dot_strength := 0.45
+## How much of the real continuous shading shows through the band fills.
+@export_range(0.0, 1.0) var gray_blend := 0.6
+
 @export_group("Color exception")
 ## Pixels more saturated than this skip the ramp (the car's paint and lights).
 @export_range(0.0, 1.0) var car_saturation := 0.24
 
-const PARAMS_BYTES := 144
+const PARAMS_BYTES := 176
 
 var _rd: RenderingDevice
 var _shader: RID
@@ -76,7 +93,7 @@ func _initialize() -> void:
 		return
 	_shader = _rd.shader_create_from_spirv(spirv)
 	_pipeline = _rd.compute_pipeline_create(_shader)
-	# std140: 9 × vec4.
+	# std140: 11 × vec4.
 	_params = _rd.uniform_buffer_create(PARAMS_BYTES)
 	var s := RDSamplerState.new()
 	s.min_filter = RenderingDevice.SAMPLER_FILTER_NEAREST
@@ -110,12 +127,14 @@ func _render_callback(_type: int, render_data: RenderData) -> void:
 		f.append_array([
 			size.x, size.y, 1.0 / size.x, 1.0 / size.y,
 			ink_below, dense_below, sparse_below, tone_pitch,
-			dense_coverage, sparse_coverage, 1.0 if dense_crosshatch else 0.0, 0.0,
+			dense_coverage, sparse_coverage, float(tone_style), ink_softness,
 			silhouette_px, crease_px, line_far, crease_far,
 			depth_sensitivity, normal_sensitivity, jitter_px, jitter_scale,
 			paper.r, paper.g, paper.b, grain,
 			ink.r, ink.g, ink.b, ink_bleed,
-			car_saturation, 1.0 if white_lines_on_ink else 0.0, 1.0, 0.0,
+			car_saturation, 1.0 if white_lines_on_ink else 0.0, 1.0, gray_blend,
+			band0_gray, band1_gray, band2_gray, dot_strength,
+			deg_to_rad(stroke_angle), stroke_length, grit, 0.0,
 		])
 		var bytes := f.to_byte_array()
 		_rd.buffer_update(_params, 0, bytes.size(), bytes)

@@ -112,7 +112,7 @@ func _update_lamps(delta: float) -> void:
 	if reverse_mat:
 		reverse_mat.set_shader_parameter("glow", 1.0 if s.reversing else 0.0)
 	# Brake light trails: brighter at night (tail lamps are on), longer with speed.
-	_streak = move_toward(_streak, braking * lerpf(0.7, 1.2, night) + night * 0.3, delta * 8.0)
+	_streak = move_toward(_streak, braking * lerpf(0.35, 1.2, night) + night * 0.3, delta * 8.0)
 	var length := 0.3 + clampf(car.linear_velocity.length() * 0.07, 0.0, 2.2)
 	for st in _tail_streaks:
 		st.visible = _streak > 0.02
@@ -121,7 +121,7 @@ func _update_lamps(delta: float) -> void:
 		m.set_shader_parameter("trail_length", length)
 	for spot in _headlights:
 		spot.visible = night > 0.02
-		spot.light_energy = 5.0 * night
+		spot.light_energy = 3.5 * night
 
 
 func _process(delta: float) -> void:

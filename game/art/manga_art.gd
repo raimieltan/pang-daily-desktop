@@ -174,7 +174,8 @@ static func set_night(on: bool) -> void:
 static func apply_night(value: float) -> void:
 	night = value
 	RenderingServer.global_shader_parameter_set("manga_night", value)
-	RenderingServer.global_shader_parameter_set("manga_ambient", lerpf(0.32, 0.02, value))
+	# Night ambient keeps unlit faces in tone rather than flat ink; ink is for real shadows.
+	RenderingServer.global_shader_parameter_set("manga_ambient", lerpf(0.32, 0.07, value))
 	if is_instance_valid(_sun):
 		# Moonlight is just enough to separate lit slopes (dense tone) from shadow (ink).
-		_sun.light_energy = lerpf(1.0, 0.07, value)
+		_sun.light_energy = lerpf(1.0, 0.18, value)
