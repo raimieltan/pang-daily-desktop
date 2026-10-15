@@ -6,7 +6,7 @@ extends CanvasLayer
 
 const CONTROLS := [
 	["W  ↑", "THROTTLE"], ["S  ↓", "BRAKE"], ["A  D", "STEER"], ["SPACE", "HANDBRAKE"],
-	["R", "RESET TO ROAD"], ["ENTER", "RESTART RUN"], ["V", "CAMERA"], ["N", "DAY / NIGHT"],
+	["R", "RESET TO ROAD"], ["ENTER", "RESTART / REMATCH"], ["V", "CAMERA"], ["N", "DAY / NIGHT"],
 	["T", "TUNE"], ["Y", "TIRES"], ["H", "TELEMETRY"], ["ESC", "PAUSE"],
 ]
 
@@ -15,6 +15,8 @@ static var skip_title := false
 
 var session: DriveSession
 var time_attack: TimeAttack
+var vs_battle: VsBattle
+var music: MusicPlayer
 var _wash := ColorRect.new()
 var _title := Control.new()
 var _pause := Control.new()
@@ -61,7 +63,8 @@ func _build_title() -> void:
 	menu.add_theme_constant_override("separation", 6)
 	menu.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	column.add_child(menu)
-	_title_first = _button(menu, "TIME ATTACK", _start_time_attack)
+	_title_first = _button(menu, "VS BATTLE", _start_vs)
+	_button(menu, "TIME ATTACK", _start_time_attack)
 	_button(menu, "FREE DRIVE", _start_free_drive)
 	_value_button(menu, _camera_text, _cycle_camera)
 	_value_button(menu, _time_text, _toggle_time)
@@ -89,7 +92,7 @@ func _build_pause() -> void:
 	var heading := MangaType.label("PAUSE", 84)
 	left.add_child(heading)
 	_pause_first = _button(left, "RESUME", _close)
-	_restart_button = _button(left, "RESTART RUN", func(): time_attack.restart(); _close())
+	_restart_button = _button(left, "RESTART", _restart_mode)
 	_value_button(left, _camera_text, _cycle_camera)
 	_value_button(left, _time_text, _toggle_time)
 	_value_button(left, func(): return "TUNE: " + ("DRIFT" if session.car.preset.ends_with("drift") else "STOCK"),
@@ -203,11 +206,16 @@ func _toggle_time() -> void:
 func open_title() -> void:
 	_show(_title, _title_first)
 	_set_play_hud(false)
+	if music:
+		music.duck(false)
+		music.play_track(&"menu")
 
 
 func open_pause() -> void:
-	_restart_button.visible = time_attack.active
+	_restart_button.visible = time_attack.active or vs_battle.active
 	_show(_pause, _pause_first)
+	if music:
+		music.duck(true)
 
 
 func _show(screen: Control, first: Button) -> void:
@@ -216,7 +224,7 @@ func _show(screen: Control, first: Button) -> void:
 	_wash.visible = true
 	_refresh()
 	get_tree().paused = true
-	AudioServer.set_bus_mute(0, true)
+	_mute_car(true)
 	first.grab_focus.call_deferred()
 
 
@@ -227,23 +235,53 @@ func _close() -> void:
 	get_viewport().gui_release_focus()
 	_set_play_hud(true)
 	get_tree().paused = false
-	AudioServer.set_bus_mute(0, false)
+	_mute_car(false)
+	if music:
+		music.duck(false)
+
+
+## Car sounds stop while paused; the music keeps playing (ducked).
+func _mute_car(on: bool) -> void:
+	for bus in ["Engine", "EngineOff", "Tires", "Fx"]:
+		var i := AudioServer.get_bus_index(bus)
+		if i >= 0:
+			AudioServer.set_bus_mute(i, on)
 
 
 func _set_play_hud(on: bool) -> void:
 	session.hud.visible = on
 	session.day_night.visible = on
-	time_attack.hud.visible = on and time_attack.active
+	session.gauges.visible = on
+	time_attack.hud.visible = on and time_attack.active and time_attack.run != null
+	vs_battle.hud.visible = on and vs_battle.active and vs_battle.run != null
+
+
+func _start_vs() -> void:
+	time_attack.free_drive()
+	_close()
+	vs_battle.start()
 
 
 func _start_time_attack() -> void:
-	time_attack.restart()
+	vs_battle.stop()
 	_close()
+	music.play_track(&"race_alt")
+	time_attack.restart(true)
 
 
 func _start_free_drive() -> void:
+	vs_battle.stop()
 	time_attack.free_drive()
 	_close()
+	music.play_track(&"menu")
+
+
+func _restart_mode() -> void:
+	_close()
+	if vs_battle.active:
+		vs_battle.start()
+	else:
+		time_attack.restart()
 
 
 func _unhandled_input(event: InputEvent) -> void:

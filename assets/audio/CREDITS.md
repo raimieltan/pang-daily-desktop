@@ -45,6 +45,16 @@ Every file below was downloaded on 2026-10-15. Its licence was checked on the it
 | raw/impact/qubodup-crash.ogg | crash collision | qubodup | CC0 | https://opengameart.org/content/crash-collision (file: https://opengameart.org/sites/default/files/qubodup-crash.ogg) | 0.58 s. Stapler, lock and click layered into a light collision. |
 | raw/impact/bing1.wav, bong1.wav, clink1_0.wav, clink2.wav, clink3.wav, thud2.wav, thud3.wav | metal impact sounds | Brian MacIntosh (BMacZero) | CC0 ("Optionally credit Brian MacIntosh") | https://opengameart.org/content/metal-impact-sounds (files: https://opengameart.org/sites/default/files/<name>.wav) | 0.25–2.1 s, 44.1 kHz mono. Small metallic clanks. |
 
+### Music
+
+| Path | Title | Author | Licence | Source URL | Notes |
+|---|---|---|---|---|---|
+| music/race_hot_roadway.ogg | Hot Roadway | MintoDog | CC0 (page: "License(s): CC0", linked to creativecommons.org/publicdomain/zero/1.0/) | https://opengameart.org/content/hot-roadway (file: https://opengameart.org/sites/default/files/hot_roadway_bpm160_0.ogg) | 120 s, 44.1 kHz stereo Vorbis, 160 BPM. "Techno music for racing and action games … This music is loopable." Used for `&"race"` (VS battles, time attack). A faster "climax" version (175 BPM) is on the page. |
+| music/race_technomania101.ogg | Technomania101 - 2000's europop electronic dance music | Fupi | CC0 (page: "License(s): CC0", linked to creativecommons.org/publicdomain/zero/1.0/) | https://opengameart.org/content/technomania101-2000s-europop-electronic-dance-music (file: https://opengameart.org/sites/default/files/technomania101_notempochange.ogg) | 142 s, 44.1 kHz stereo Vorbis. The "no tempo changes" version. Closest thing to eurobeat found. Used for `&"race_alt"`. Stems are on the page. |
+| music/menu_midnight_drive.ogg | Midnight Drive | congusbongus | CC0 (page: "License(s): CC0", linked to creativecommons.org/publicdomain/zero/1.0/) | https://opengameart.org/content/midnight-drive (file: https://opengameart.org/sites/default/files/midnight_drive.ogg) | 204 s, 44.1 kHz stereo Vorbis. Made with MilkyTracker (source module in a zip on the page). Used for `&"menu"` (title menu, free drive). |
+
+All three music tracks are CC0, so no attribution is required. Courtesy credit: MintoDog, Fupi, congusbongus (OpenGameArt).
+
 ### Required attribution text (CC-BY files only, for the in-game credits)
 
 - "Car Engine Loop 96kHz, 4s" by Iwan 'qubodup' Gabovitch (https://opengameart.org/content/car-engine-loop-96khz-4s), licensed CC-BY 3.0 (https://creativecommons.org/licenses/by/3.0/).

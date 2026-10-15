@@ -15,6 +15,8 @@ var session: DriveSession
 var run: TimeAttackRun
 var best := {}
 var hud: RaceHud
+var intro: RaceIntro
+var _in_intro := false
 var _ghost_data := PackedFloat32Array()
 var _ghost_visual: Node3D
 var _record := PackedFloat32Array()
@@ -45,10 +47,12 @@ func _car_id() -> String:
 	return "dalagan_gsr_" + session.car.preset
 
 
-func restart() -> void:
+## With an intro, the car waits on the line (brakes on) while it plays; the countdown follows.
+func restart(with_intro := false) -> void:
 	active = true
-	hud.visible = true
-	run = TimeAttackRun.new(track.start_distance, track.finish_distance)
+	session.input_filter = _filter_input
+	session.reset_pose = _reset_pose
+	run = null
 	best = TimeAttackRecords.load_best(track_id, _car_id())
 	_ghost_data = TimeAttackRecords.load_ghost(track_id, _car_id())
 	_record = PackedFloat32Array()
@@ -58,19 +62,34 @@ func restart() -> void:
 	session.car.place(pose["position"], pose["heading"])
 	session.camera.snap.call_deferred()
 	_ghost_visual.visible = false
+	if with_intro and intro:
+		hud.visible = false
+		_in_intro = true
+		await get_tree().physics_frame
+		await get_tree().physics_frame
+		intro.play(track, [{ "node": session.car, "name": "YOU", "car": "DALAGAN GSR" }], "TIME ATTACK", "PASS 1  ·  DOWNHILL")
+		await intro.finished
+		_in_intro = false
+		if not active:
+			return
+		session.camera.snap.call_deferred()
+	hud.visible = true
+	run = TimeAttackRun.new(track.start_distance, track.finish_distance)
 	hud.show_run(best)
 
 
 ## Free drive: drop the run and its HUD; the car keeps going where it is.
 func free_drive() -> void:
 	active = false
+	if intro:
+		intro.skip()
 	run = null
 	hud.visible = false
 	_ghost_visual.visible = false
 
 
 func _filter_input(input: VehicleTypes.DriverInput) -> VehicleTypes.DriverInput:
-	if run and run.phase == TimeAttackRun.Phase.COUNTDOWN:
+	if active and (run == null or run.phase == TimeAttackRun.Phase.COUNTDOWN):
 		input.brake = 1.0
 		input.handbrake = 0.0
 	return input
@@ -86,7 +105,7 @@ func _reset_pose(_car: CarBody) -> Dictionary:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if active and event.is_action_pressed("restart_run"):
+	if active and not _in_intro and event.is_action_pressed("restart_run"):
 		restart()
 
 

@@ -22,6 +22,9 @@ const SCENARIOS := {
 	"title": [[1.5, 0, 0, 0, 0, "title"]],
 	"pause": [[2.0, 0, 0, 0, 0, ""], [6.0, 0.85, 0, 0, 0, ""], [6.3, 0, 0, 0, 0, "pause"]],
 	# Camera views, one per shot after a short run (V cycles them in game).
+	# VS battle: intro (crane, a rival card, the player card), then racing the rivals.
+	"vs": [[0.3, 0, 0, 0, 0, ""], [1.8, 0, 0, 0, 0, "vs_intro_grid"], [4.4, 0, 0, 0, 0, "vs_intro_rival"], [10.2, 0, 0, 0, 0, "vs_intro_player"],
+		[13.5, 0, 0, 0, 0, "vs_countdown"], [21.0, 0.9, 0, 0, 0, "vs_race"], [24.0, 0.9, 0, 0, 0, "vs_race_2"]],
 	"cams": [[2.0, 0, 0, 0, 0, ""], [6.0, 0.85, 0, 0, 0, "cam_chase"], [6.3, 0.85, 0, 0, 0, "cam_far"], [6.6, 0.85, 0, 0, 0, "cam_hood"], [6.9, 0.85, 0, 0, 0, "cam_bumper"]],
 }
 
@@ -100,6 +103,9 @@ func _process(delta: float) -> bool:
 	var step: Array = _steps[_step]
 	_input = VehicleTypes.DriverInput.make(step[1], step[2], step[3], step[4], "keyboard")
 	if _t >= step[0]:
+		if _scenario == "vs" and _step == 0:
+			_scene.time_attack.free_drive()
+			_scene.vs_battle.start()
 		if _scenario == "pause" and _step == 1:
 			_scene.menu.open_pause()
 		if step[5] != "":

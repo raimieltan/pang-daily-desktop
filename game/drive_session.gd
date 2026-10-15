@@ -12,6 +12,10 @@ var fx: CarFx
 var audio: CarAudio
 var day_night: DayNightSwitch
 var camera_picker: CameraPicker
+## Speedometer bottom-right, minimap top-left (the map sets `minimap.track`).
+var gauges: CanvasLayer
+var speedometer: Speedometer
+var minimap: Minimap
 ## func(car: CarBody) -> Dictionary { "position": Vector3, "heading": float }; defaults to the spawn.
 var reset_pose: Callable
 ## Optional func(DriverInput) -> DriverInput applied to the player's input (race starts, cutscenes).
@@ -62,6 +66,24 @@ func _ready() -> void:
 	hud = TelemetryHud.new()
 	hud.car = car
 	add_child(hud)
+
+	gauges = CanvasLayer.new()
+	gauges.layer = 9
+	add_child(gauges)
+	speedometer = Speedometer.new()
+	speedometer.car = car
+	speedometer.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
+	speedometer.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	speedometer.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	speedometer.offset_left = -290
+	speedometer.offset_top = -290
+	speedometer.offset_right = -30
+	speedometer.offset_bottom = -30
+	gauges.add_child(speedometer)
+	minimap = Minimap.new()
+	minimap.player = car
+	minimap.position = Vector2(24, 24)
+	gauges.add_child(minimap)
 
 
 func _read_input() -> VehicleTypes.DriverInput:

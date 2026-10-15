@@ -68,6 +68,14 @@ const PRESETS := {
 		"mechanicalOverrides": { "differential": { "lock": 0.55 } },
 	} },
 	"fwd_worn_sedan": { "config": FWD_WORN_SEDAN },
+	# Rivals' hot hatches and sedans: the worn sedan's chassis with a healthy engine and real grip.
+	"fwd_sport_hatch": { "extends": "fwd_worn_sedan", "overrides": {
+		"chassis": { "massKg": 1060.0, "frontWeight": 0.6 },
+		"drive": { "accelerationMps2": 5.6, "topSpeedKmh": 215.0 },
+		"brakes": { "decelerationMps2": 9.0 },
+		"tires": { "frontGrip": 1.0, "rearGrip": 1.0 },
+		"balance": { "understeer": 0.38 },
+	} },
 	"fwd_worn_sedan_drift": { "extends": "fwd_worn_sedan", "overrides": {
 		"tires": { "rearGrip": 0.94 },
 		"balance": { "understeer": 0.36, "rearSlideFalloff": 0.2, "liftOffRotation": 0.2 },

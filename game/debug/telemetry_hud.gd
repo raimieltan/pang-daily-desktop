@@ -4,9 +4,8 @@ extends CanvasLayer
 
 var car: CarBody
 var _label: Label
-var _speedo: Label
 var _panel: PanelContainer
-## The debug panel is a tool: hidden until H. The speedometer always shows.
+## The debug panel is a tool: hidden until H. Speed lives on the Speedometer gauge.
 var debug_visible := false:
 	set(value):
 		debug_visible = value
@@ -32,15 +31,6 @@ func _ready() -> void:
 	_label.add_theme_font_size_override("font_size", 13)
 	panel.add_child(_label)
 
-	_speedo = Label.new()
-	MangaType.pop(_speedo, 38)
-	_speedo.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
-	_speedo.grow_horizontal = Control.GROW_DIRECTION_BEGIN
-	_speedo.grow_vertical = Control.GROW_DIRECTION_BEGIN
-	_speedo.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	_speedo.position = Vector2(-24, -24)
-	add_child(_speedo)
-
 
 func _process(_delta: float) -> void:
 	if car == null or car.model == null:
@@ -50,8 +40,6 @@ func _process(_delta: float) -> void:
 	var d := m.diagnostics
 	var s := m.state
 	var a := mech.assistance
-	var gear := "R" if s.reversing else ("N" if s.neutral else str(mech.gear))
-	_speedo.text = "%d km/h  %s\n%d rpm" % [absf(car.speed_kmh()), gear, mech.engine_rpm]
 	if not debug_visible:
 		return
 	var lines: PackedStringArray = []

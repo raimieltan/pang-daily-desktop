@@ -10,6 +10,9 @@ var car: CarBody:
 	get: return session.car if session else null
 var track: TrackData = TRACK
 var time_attack: TimeAttack
+var vs_battle: VsBattle
+var intro: RaceIntro
+var music: MusicPlayer
 var menu: GameMenu
 var _progress_index := 0
 
@@ -21,13 +24,28 @@ func _ready() -> void:
 	session = DriveSession.new(spawn["position"], spawn["heading"])
 	session.reset_pose = _reset_pose
 	add_child(session)
+	session.minimap.track = track
+	music = MusicPlayer.new()
+	add_child(music)
+	intro = RaceIntro.new()
+	intro.hud_nodes = [session.gauges, session.day_night]
+	add_child(intro)
 	time_attack = TimeAttack.new()
 	time_attack.track = track
 	time_attack.session = session
+	time_attack.intro = intro
 	add_child(time_attack)
+	vs_battle = VsBattle.new()
+	vs_battle.track = track
+	vs_battle.session = session
+	vs_battle.intro = intro
+	vs_battle.music = music
+	add_child(vs_battle)
 	menu = GameMenu.new()
 	menu.session = session
 	menu.time_attack = time_attack
+	menu.vs_battle = vs_battle
+	menu.music = music
 	add_child(menu)
 
 

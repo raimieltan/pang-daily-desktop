@@ -12,6 +12,8 @@ var _split: Label
 var _countdown: Label
 var _goal: PanelContainer
 var _goal_text: Label
+var _place: Label
+var _place_of: Label
 var _split_timer := 0.0
 var _count_value := -1
 
@@ -22,6 +24,13 @@ func _ready() -> void:
 	_best = _label(24, Control.PRESET_CENTER_TOP, Vector2(0, 84), MangaType.caption())
 	_split = _label(28, Control.PRESET_CENTER_TOP, Vector2(0, 112))
 	_countdown = _label(150, Control.PRESET_CENTER, Vector2(0, -60))
+	# Battle position, big on the left like a panel number: "2" over "/4".
+	_place = _label(120, Control.PRESET_CENTER_LEFT, Vector2(46, -40))
+	_place.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	_place.grow_horizontal = Control.GROW_DIRECTION_END
+	_place_of = _label(34, Control.PRESET_CENTER_LEFT, Vector2(52, 90), MangaType.caption())
+	_place_of.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	_place_of.grow_horizontal = Control.GROW_DIRECTION_END
 	_goal = PanelContainer.new()
 	var style := StyleBoxFlat.new()
 	style.bg_color = PAPER
@@ -56,6 +65,8 @@ func _label(size: int, preset: int, offset: Vector2, font: Font = null) -> Label
 
 func show_run(best: Dictionary) -> void:
 	_goal.visible = false
+	_place.text = ""
+	_place_of.text = ""
 	_split.text = ""
 	_best.text = "BEST  " + (TimeAttackRun.format_time(float(best["time"])) if best.has("time") else "--:--.---")
 	_count_value = -1
@@ -107,3 +118,26 @@ func update_run(run: TimeAttackRun) -> void:
 	_split_timer = maxf(0.0, _split_timer - get_process_delta_time())
 	if _split_timer == 0.0:
 		_split.text = ""
+
+
+## A battle instead of a time attack: the rivals' names where the best time goes.
+func show_versus(names: Array) -> void:
+	_goal.visible = false
+	_split.text = ""
+	_best.text = "VS  " + "  ·  ".join(names)
+	_count_value = -1
+	_place.text = ""
+	_place_of.text = ""
+
+
+func set_place(place: int, of: int) -> void:
+	_place.text = str(place)
+	_place_of.text = ["", "ST", "ND", "RD"][place] + "  /  %d" % of if place <= 3 else "TH  /  %d" % of
+
+
+func versus_result(place: int, time: float, standings: String) -> void:
+	var head := "WIN!!" if place == 1 else ("%d%s PLACE" % [place, ["", "ST", "ND", "RD", "TH"][mini(place, 4)]])
+	_goal_text.text = "\n".join([head, "", TimeAttackRun.format_time(time), "", standings, "", "[ENTER] REMATCH"])
+	_goal.visible = true
+	_place.text = ""
+	_place_of.text = ""
