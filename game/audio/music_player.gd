@@ -3,6 +3,9 @@ extends Node
 ## Background music: one looping track at a time on the "Music" bus, crossfaded between tracks.
 ## Ids: &"race" (VS battles, time attack), &"race_alt", &"menu" (title menu, free drive).
 ## Missing ids fall back to the race track. duck() lowers the music for cutscenes and pause.
+## Race ids first shuffle through any .ogg/.mp3 dropped into RACE_PLAYLIST (your own tracks).
+
+const RACE_PLAYLIST := "res://assets/audio/music/race/"
 
 const BUS := &"Music"
 const BUS_DB := -8.0
@@ -40,6 +43,9 @@ func _ready() -> void:
 ## Crossfade to the track with this id. Does nothing if it is already playing.
 func play_track(id: StringName) -> void:
 	var path: String = TRACKS.get(id, TRACKS[&"race"])
+	var mine := _playlist()
+	if id != &"menu" and not mine.is_empty():
+		path = mine[randi() % mine.size()]
 	if not ResourceLoader.exists(path):
 		path = TRACKS[&"race"]
 	if id == current and _players[_active].playing:
@@ -89,6 +95,16 @@ func _fade(i: int, to_db: float, time: float, stop_after: bool) -> void:
 	if stop_after:
 		t.tween_callback(p.stop)
 	_tweens[i] = t
+
+
+func _playlist() -> PackedStringArray:
+	var out := PackedStringArray()
+	if not DirAccess.dir_exists_absolute(RACE_PLAYLIST):
+		return out
+	for f in ResourceLoader.list_directory(RACE_PLAYLIST):
+		if f.get_extension().to_lower() in ["ogg", "mp3", "wav"]:
+			out.append(RACE_PLAYLIST + f)
+	return out
 
 
 func _ensure_bus() -> void:

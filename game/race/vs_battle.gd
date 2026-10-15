@@ -122,8 +122,12 @@ func _spawn_rival(spec: Dictionary, pose: Dictionary, k: int) -> void:
 	drivers.append(driver)
 
 
+## Out of the tree now, not at frame end: a queued car would still step physics once more and
+## call its driver, which is released with `drivers`.
 func _clear_rivals() -> void:
 	for car in rivals:
+		car.input_source = func() -> VehicleTypes.DriverInput: return VehicleTypes.DriverInput.new()
+		remove_child(car)
 		car.queue_free()
 	rivals.clear()
 	drivers.clear()
