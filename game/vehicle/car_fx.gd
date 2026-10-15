@@ -46,8 +46,8 @@ func _ready() -> void:
 	add_child(_skid_instance)
 	for i in 4:
 		_smoke.append(_make_smoke())
-	_sparks = _make_sparks(90, 0.1)
-	_burst = _make_sparks(48, 0.95)
+	_sparks = _make_sparks(36, 0.1)
+	_burst = _make_sparks(18, 0.95)
 	_burst.one_shot = true
 	if car:
 		car.wall_contact.connect(_on_wall_contact)
@@ -163,12 +163,12 @@ func _make_smoke() -> CPUParticles3D:
 func _make_sparks(amount: int, explosiveness: float) -> CPUParticles3D:
 	var p := CPUParticles3D.new()
 	p.amount = amount
-	p.lifetime = 0.35
+	p.lifetime = 0.22
 	p.explosiveness = explosiveness
 	p.local_coords = false
 	p.emitting = false
 	var streak := QuadMesh.new()
-	streak.size = Vector2(0.045, 0.5)
+	streak.size = Vector2(0.018, 0.16)
 	var m := StandardMaterial3D.new()
 	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	m.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
@@ -178,9 +178,9 @@ func _make_sparks(amount: int, explosiveness: float) -> CPUParticles3D:
 	streak.material = m
 	p.mesh = streak
 	p.particle_flag_align_y = true
-	p.spread = 40.0
-	p.initial_velocity_min = 5.0
-	p.initial_velocity_max = 11.0
+	p.spread = 30.0
+	p.initial_velocity_min = 2.5
+	p.initial_velocity_max = 6.0
 	p.gravity = Vector3(0, -9.8, 0)
 	var ramp := Gradient.new()
 	ramp.set_color(0, Color(1.0, 0.92, 0.55))
