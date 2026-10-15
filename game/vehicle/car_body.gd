@@ -299,4 +299,3 @@ func _apply_place(state: PhysicsDirectBodyState3D) -> void:
 	_previous_velocities = [0.0, 0.0, 0.0, 0.0]
 	_hold_anchor = null
 	_parked = true
-
