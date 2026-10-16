@@ -224,6 +224,7 @@ func _shot(name: String) -> void:
 	if OS.has_environment("PANG_NO_PAGE"):
 		_scene.session.camera.manga.enabled = false
 	if _scenario == "pop":
+		print("  pipe (car space, +x right) ", _scene.session.fx._pipe)
 		print("  rpm %.0f throttle %.2f flame %s" % [_scene.session.car.model.mechanics.engine_rpm,
 			_scene.session.car.model.state.throttle, _scene.session.fx._flame.visible])
 	var life: Node = _scene.get_node_or_null("RoadsideLife")

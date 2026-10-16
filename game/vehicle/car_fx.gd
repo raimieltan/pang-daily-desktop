@@ -115,7 +115,8 @@ func _physics_process(delta: float) -> void:
 	_update_steam(delta)
 
 
-## Tailpipe and hood spots from the car's visible bounds (models have no exhaust node).
+## Tailpipe and hood spots. The tailpipe is the car's own exhaust tip: the `chrome` faces at the
+## low rear of the body (every car model has one); the visible bounds are the fallback.
 func _fit_spots() -> void:
 	var box := AABB()
 	var first := true
@@ -129,9 +130,40 @@ func _fit_spots() -> void:
 		first = false
 	if first:
 		return
-	# Left-hand tailpipe (where the Dalagan's is).
-	_pipe = Vector3(box.position.x + box.size.x * 0.28, box.position.y + box.size.y * 0.22, box.end.z - 0.05)
+	_pipe = Vector3(box.position.x + box.size.x * 0.72, box.position.y + box.size.y * 0.22, box.end.z - 0.05)
+	var tip := _chrome_tip(box)
+	if tip != Vector3.INF:
+		_pipe = tip
 	_hood = Vector3(0.0, box.position.y + box.size.y * 0.68, box.position.z + box.size.z * 0.2)
+
+
+## Centre of the chrome vertices in the rear 12% and lower 40% of `box` (car space, +Z behind),
+## nudged to the rearmost of them; INF if the model has none there.
+func _chrome_tip(box: AABB) -> Vector3:
+	var inv := car.global_transform.affine_inverse()
+	var acc := Vector3.ZERO
+	var n := 0
+	var rear := -INF
+	for m in car.find_children("*", "MeshInstance3D", true, false):
+		var vi := m as MeshInstance3D
+		if vi.mesh == null or not vi.is_visible_in_tree():
+			continue
+		var xf := inv * vi.global_transform
+		for i in vi.mesh.get_surface_count():
+			var mat := vi.mesh.surface_get_material(i)
+			if mat == null or mat.resource_name != "chrome":
+				continue
+			for v in vi.mesh.surface_get_arrays(i)[Mesh.ARRAY_VERTEX]:
+				var p: Vector3 = xf * v
+				if p.z > box.end.z - box.size.z * 0.12 and p.y < box.position.y + box.size.y * 0.4:
+					acc += p
+					n += 1
+					rear = maxf(rear, p.z)
+	if n == 0:
+		return Vector3.INF
+	var tip := acc / n
+	tip.z = rear
+	return tip
 
 
 func _update_exhaust(delta: float, speed: float) -> void:

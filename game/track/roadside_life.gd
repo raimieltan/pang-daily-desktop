@@ -7,6 +7,11 @@ extends Node3D
 ## The dog has no collision.
 
 ## Tricycle shuttle span (metres after the start line) and the dog's patrol by the store.
+const TRICYCLE := preload("res://assets/vehicles/traffic/tricycle.glb")
+const MOTORCYCLE := preload("res://assets/vehicles/traffic/motorcycle.glb")
+## Nothing may stick out past this far from the road centre (the paved shoulder ends at 3.3 m;
+## rails and the gutter start just beyond).
+const ROAD_EDGE := 3.25
 const TRIKE_SPAN := Vector2(45.0, 330.0)
 const DOG_SPAN := Vector2(48.0, 62.0)
 const YIELD_RANGE := 55.0
@@ -27,25 +32,25 @@ func _ready() -> void:
 	trike.track = track
 	trike.span = Vector2(s + TRIKE_SPAN.x, s + TRIKE_SPAN.y)
 	trike.speed = 7.0
-	trike.lane = 2.2
-	trike.shoulder = 3.4
+	trike.lane = 2.8
+	trike.shoulder = ROAD_EDGE
 	trike.distance = s + 150.0
 	trike.dir = -1
 	trike.ping_pong = true
+	trike.setup(TRICYCLE, Color(0.1, 0.32, 0.75), 0.32)
 	add_child(trike)
-	_build_tricycle(trike)
 	_movers.append(trike)
 	var moto := Mover.new()
 	moto.name = "Motorcycle"
 	moto.track = track
 	moto.span = Vector2(s + 340.0, track.finish_distance - 30.0)
 	moto.speed = 12.0
-	moto.lane = 1.8
+	moto.lane = 2.2
 	moto.shoulder = 3.0
 	moto.distance = s + 900.0
 	moto.dir = -1
+	moto.setup(MOTORCYCLE, Color(0.85, 0.55, 0.05), 0.39)
 	add_child(moto)
-	_build_motorcycle(moto)
 	_movers.append(moto)
 	_dog = Dog.new()
 	_dog.name = "Askal"
@@ -68,15 +73,16 @@ func _physics_process(delta: float) -> void:
 
 # --- Movers ------------------------------------------------------------------------------------
 
-## A vehicle following the road at a lateral offset on the side of its travel (PH drives on the
-## right), at walking-pace-to-moped speeds. One-way movers loop back out of sight; ping-pong
-## movers turn around at the ends of their span.
+## A vehicle following the road on the side of its travel (PH drives on the right), at walking-
+## pace-to-moped speeds. One-way movers loop back out of sight; ping-pong movers U-turn at the
+## ends of their span. `lane` / `shoulder` are where its outer (right-hand) edge runs, normally
+## and when yielding; whatever its pose, no part of it leaves the paved road (ROAD_EDGE).
 class Mover extends AnimatableBody3D:
 	var track: TrackData
 	var span := Vector2.ZERO
 	var speed := 8.0
-	var lane := 2.0
-	var shoulder := 3.3
+	var lane := 2.8
+	var shoulder := 3.25
 	var distance := 0.0
 	## +1 downhill (with the race), -1 uphill (oncoming).
 	var dir := -1
@@ -84,15 +90,57 @@ class Mover extends AnimatableBody3D:
 	var wheels: Array[Node3D] = []
 	var lamps: Array[SpotLight3D] = []
 	var lamp_faces: Array[ShaderMaterial] = []
+	var wheel_radius := 0.3
 	var _lateral := 2.0
 	var _speed := 0.0
 	var _turn := 0.0   # 0..1 while turning around
+	## The body's footprint in mover space (x right, z back), for keeping it on the road.
+	var _footprint := AABB()
+
+	## Builds the vehicle from a traffic GLB (tools/vehicle_builders/build-roadside-traffic.py):
+	## manga materials with `paint` in the given colour, spinning `wheel_*` nodes, a head lamp
+	## (beam at night), and a box collider over the body.
+	func setup(scene: PackedScene, paint: Color, radius: float) -> void:
+		wheel_radius = radius
+		var model: Node3D = scene.instantiate()
+		# The GLB faces +Z; movers drive toward -Z.
+		model.rotation.y = PI
+		add_child(model)
+		var mats := MangaArt.apply_car(model, paint)
+		for key in ["headlight", "taillight"]:
+			if mats.has(key):
+				lamp_faces.append(mats[key])
+		for n in model.find_children("wheel_*", "Node3D", true, false):
+			wheels.append(n as Node3D)
+		var body := model.find_child("body", true, false) as MeshInstance3D
+		var to_mover := model.transform * body.transform
+		_footprint = to_mover * body.get_aabb()
+		var shape := CollisionShape3D.new()
+		var bs := BoxShape3D.new()
+		bs.size = _footprint.size
+		shape.shape = bs
+		shape.position = _footprint.get_center()
+		add_child(shape)
+		var head := model.find_child("headlight", true, false) as Node3D
+		var at := model.transform * head.position if head else Vector3(_footprint.get_center().x, _footprint.position.y + _footprint.size.y * 0.55, _footprint.position.z)
+		var spot := SpotLight3D.new()
+		spot.light_color = Color(1.0, 0.92, 0.8)
+		spot.spot_range = 22.0
+		spot.spot_angle = 24.0
+		spot.spot_attenuation = 0.5
+		spot.spot_angle_attenuation = 0.05
+		spot.shadow_enabled = false
+		spot.visible = false
+		spot.position = at + Vector3(0, 0, -0.1)
+		spot.rotation = Vector3(-0.16, 0.0, 0.0)
+		add_child(spot)
+		lamps.append(spot)
 
 	func _ready() -> void:
 		sync_to_physics = false
 		collision_layer = CarBody.STATIC_LAYER
 		collision_mask = 0
-		_lateral = lane
+		_lateral = lane - _footprint.end.x
 		_speed = speed
 		_place()
 
@@ -115,7 +163,8 @@ class Mover extends AnimatableBody3D:
 			var along := rel.dot(ahead)
 			if along > -4.0 and along < RoadsideLife.YIELD_RANGE and absf(rel.dot(global_basis.x)) < 12.0 and absf(rel.y) < 6.0:
 				yield_to = true
-		_lateral = move_toward(_lateral, shoulder if yield_to else lane, delta * 1.4)
+		# Centre so the right-hand edge runs at lane (or shoulder when yielding).
+		_lateral = move_toward(_lateral, (shoulder if yield_to else lane) - _footprint.end.x, delta * 1.4)
 		_speed = move_toward(_speed, speed * (0.35 if yield_to else 1.0), delta * 4.0)
 		distance += dir * _speed * delta
 		if distance < span.x or distance > span.y:
@@ -129,7 +178,8 @@ class Mover extends AnimatableBody3D:
 				distance = clampf(distance, span.x, span.y)
 				_speed = 0.0
 		for w in wheels:
-			w.rotate_x(-_speed * delta / 0.28)
+			# The model is turned around, so the wheel's +X is our -X: positive rolls forward.
+			w.rotate_object_local(Vector3.RIGHT, _speed * delta / wheel_radius)
 		_place()
 
 	func _out_of_sight(cars: Array) -> bool:
@@ -155,7 +205,21 @@ class Mover extends AnimatableBody3D:
 			var a := PI * (1.0 - _turn)
 			face = (-f).rotated(Vector3.UP, a * (1.0 if dir > 0 else -1.0))
 			pos = p + r * _lateral * dir * cos(a)
-		global_transform = Transform3D(Basis.looking_at(Vector3(face.x, 0.0, face.z).normalized(), Vector3.UP), pos)
+		var basis := Basis.looking_at(Vector3(face.x, 0.0, face.z).normalized(), Vector3.UP)
+		# Keep every corner of the footprint on the paved road.
+		var r_flat := Vector3(r.x, 0.0, r.z).normalized()
+		var lo := INF
+		var hi := -INF
+		for k in 4:
+			var corner := Vector3(_footprint.position.x if k % 2 == 0 else _footprint.end.x, 0.0, _footprint.position.z if k < 2 else _footprint.end.z)
+			var lat := (pos + basis * corner - p).dot(r_flat)
+			lo = minf(lo, lat)
+			hi = maxf(hi, lat)
+		if hi > RoadsideLife.ROAD_EDGE:
+			pos -= r_flat * (hi - RoadsideLife.ROAD_EDGE)
+		elif lo < -RoadsideLife.ROAD_EDGE:
+			pos += r_flat * (-RoadsideLife.ROAD_EDGE - lo)
+		global_transform = Transform3D(basis, pos)
 
 
 # --- Models ------------------------------------------------------------------------------------
@@ -174,111 +238,6 @@ static func _box(parent: Node3D, size: Vector3, pos: Vector3, mat: Material) -> 
 	var bm := BoxMesh.new()
 	bm.size = size
 	return _part(parent, bm, pos, mat)
-
-
-static func _wheel(parent: Node3D, pos: Vector3, radius := 0.28) -> Node3D:
-	var hub := Node3D.new()
-	hub.position = pos
-	parent.add_child(hub)
-	var cm := CylinderMesh.new()
-	cm.top_radius = radius
-	cm.bottom_radius = radius
-	cm.height = 0.1
-	cm.radial_segments = 10
-	_part(hub, cm, Vector3.ZERO, MangaArt.world_preset("post"), Vector3(0, 0, PI / 2.0))
-	# A spoke bar so the spin reads.
-	_box(hub, Vector3(0.11, radius * 1.6, 0.05), Vector3.ZERO, MangaArt.world_preset("board"))
-	return hub
-
-
-static func _rider(parent: Node3D, at: Vector3, shirt: Color) -> void:
-	_box(parent, Vector3(0.42, 0.6, 0.28), at + Vector3(0, 0.3, 0.05), MangaArt.accent(shirt))
-	var head := SphereMesh.new()
-	head.radius = 0.15
-	head.height = 0.3
-	_part(parent, head, at + Vector3(0, 0.75, 0.0), MangaArt.world_preset("post"))
-	# Arms forward to the bars.
-	_box(parent, Vector3(0.08, 0.08, 0.5), at + Vector3(-0.22, 0.42, -0.25), MangaArt.accent(shirt))
-	_box(parent, Vector3(0.08, 0.08, 0.5), at + Vector3(0.22, 0.42, -0.25), MangaArt.accent(shirt))
-	# Legs down to the pegs.
-	_box(parent, Vector3(0.14, 0.45, 0.14), at + Vector3(-0.16, -0.15, -0.15), MangaArt.world_preset("post"))
-	_box(parent, Vector3(0.14, 0.45, 0.14), at + Vector3(0.16, -0.15, -0.15), MangaArt.world_preset("post"))
-
-
-## Motorcycle body in mover space (-Z forward), with a headlight and tail lamp.
-static func _bike(m: Mover, shirt: Color, paint: Color) -> void:
-	var dark := MangaArt.world_preset("post")
-	_box(m, Vector3(0.28, 0.35, 1.2), Vector3(0, 0.55, 0.0), MangaArt.accent(paint))
-	_box(m, Vector3(0.3, 0.12, 0.6), Vector3(0, 0.78, 0.2), dark)
-	_box(m, Vector3(0.06, 0.6, 0.06), Vector3(0, 0.75, -0.62), dark)
-	_box(m, Vector3(0.7, 0.05, 0.05), Vector3(0, 1.05, -0.6), dark)
-	m.wheels.append(_wheel(m, Vector3(0, 0.28, -0.72)))
-	m.wheels.append(_wheel(m, Vector3(0, 0.28, 0.62)))
-	_rider(m, Vector3(0, 0.92, 0.15), shirt)
-	var head := MangaArt.lamp(MangaArt.PAPER, 0.3)
-	var lens := SphereMesh.new()
-	lens.radius = 0.08
-	lens.height = 0.16
-	_part(m, lens, Vector3(0, 0.95, -0.72), head)
-	m.lamp_faces.append(head)
-	_box(m, Vector3(0.14, 0.06, 0.04), Vector3(0, 0.82, 0.55), MangaArt.lamp(MangaArt.SIGN_RED, 0.9))
-	var spot := SpotLight3D.new()
-	spot.light_color = Color(1.0, 0.92, 0.8)
-	spot.spot_range = 22.0
-	spot.spot_angle = 24.0
-	spot.spot_attenuation = 0.5
-	spot.spot_angle_attenuation = 0.05
-	spot.shadow_enabled = false
-	spot.visible = false
-	spot.position = Vector3(0, 0.95, -0.8)
-	spot.rotation = Vector3(-0.16, 0.0, 0.0)
-	m.add_child(spot)
-	m.lamps.append(spot)
-
-
-static func _collider(m: Mover, size: Vector3, center: Vector3) -> void:
-	var shape := CollisionShape3D.new()
-	var bs := BoxShape3D.new()
-	bs.size = size
-	shape.shape = bs
-	shape.position = center
-	m.add_child(shape)
-
-
-## Tricycle: a motorcycle with a roofed sidecar on its right, painted loud, the TODA name on the
-## roof board.
-func _build_tricycle(m: Mover) -> void:
-	_bike(m, Color(0.95, 0.72, 0.1), Color(0.1, 0.25, 0.7))
-	var body := MangaArt.accent(Color(0.1, 0.35, 0.8))
-	var trim := MangaArt.accent(MangaArt.SIGN_RED)
-	var dark := MangaArt.world_preset("post")
-	var sx := 0.95
-	_box(m, Vector3(1.05, 0.75, 1.7), Vector3(sx, 0.7, 0.05), body)
-	_box(m, Vector3(1.07, 0.1, 1.72), Vector3(sx, 0.95, 0.05), trim)
-	# Front cowl, roof posts, roof and the roof board.
-	_box(m, Vector3(1.05, 0.5, 0.06), Vector3(sx, 1.3, -0.82), MangaArt.world_preset("board"))
-	for p in [Vector3(sx - 0.5, 1.45, -0.8), Vector3(sx + 0.5, 1.45, -0.8), Vector3(sx - 0.5, 1.45, 0.85), Vector3(sx + 0.5, 1.45, 0.85)]:
-		_box(m, Vector3(0.05, 0.9, 0.05), p, dark)
-	_box(m, Vector3(2.0, 0.06, 2.2), Vector3(sx * 0.5, 1.92, 0.05), body)
-	_box(m, Vector3(1.6, 0.3, 0.05), Vector3(sx * 0.5, 2.1, -1.0), MangaArt.world_preset("board"))
-	var label := Label3D.new()
-	label.text = "SAN ISIDRO TODA"
-	label.font_size = 48
-	label.pixel_size = 0.0045
-	label.modulate = MangaArt.SIGN_RED
-	label.outline_size = 0
-	label.shaded = false
-	label.double_sided = false
-	label.position = Vector3(sx * 0.5, 2.1, -1.03)
-	label.rotation.y = PI
-	m.add_child(label)
-	m.wheels.append(_wheel(m, Vector3(sx + 0.45, 0.25, 0.15), 0.25))
-	_collider(m, Vector3(2.1, 2.0, 2.3), Vector3(sx * 0.45, 1.0, 0.0))
-
-
-func _build_motorcycle(m: Mover) -> void:
-	_bike(m, Color(0.8, 0.07, 0.05), Color(0.12, 0.12, 0.12))
-	_collider(m, Vector3(0.7, 1.6, 2.0), Vector3(0, 0.8, 0.0))
 
 
 # --- Dog ---------------------------------------------------------------------------------------
