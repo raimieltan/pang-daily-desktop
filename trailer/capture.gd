@@ -30,6 +30,12 @@ const SHOTS := {
 	"daynight": { "stage": "_daynight", "seconds": 12.0 },
 	"cars": { "stage": "_cars", "seconds": 20.0 },
 	"garage": { "stage": "_garage", "seconds": 9.0 },
+	# Trailer v2 (docs/superpowers/specs/2026-10-16-trailer-v2-design.md): the EG's 2am run.
+	"open": { "stage": "_open", "seconds": 13.0 },
+	"eg_battle": { "stage": "_eg_battle", "seconds": 72.0 },
+	"ta_best": { "stage": "_ta_best", "seconds": 110.0 },
+	"ta": { "stage": "_ta", "seconds": 96.0 },
+	"viewdeck": { "stage": "_viewdeck", "seconds": 9.0 },
 }
 
 var scene
@@ -46,6 +52,9 @@ var _still_cam: Camera3D
 ## --car=<roster id> and --pilot=<field>:<value>,… override a shot's car and drift pilot.
 var car_override := ""
 var pilot_overrides := {}
+## --skill=<x> and --rival-pace=<x> override the v2 shots' autopilot skill and rival pace.
+var skill_override := 0.0
+var rival_pace_override := 0.0
 var _length := 10.0
 var _done := false
 # Camera rig: the shot in use, the car it frames and which side it stands on.
@@ -54,6 +63,7 @@ var _cam_car: CarBody
 var _cam_side := 1.0
 var _cam_snap := false
 var _side_pos := Vector3.ZERO
+var _fixed := {}
 
 
 func _initialize() -> void:
@@ -62,6 +72,8 @@ func _initialize() -> void:
 		elif a.begins_with("--out="): out_dir = a.get_slice("=", 1)
 		elif a == "--probe": probe = true
 		elif a.begins_with("--car="): car_override = a.get_slice("=", 1)
+		elif a.begins_with("--skill="): skill_override = float(a.get_slice("=", 1))
+		elif a.begins_with("--rival-pace="): rival_pace_override = float(a.get_slice("=", 1))
 		elif a.begins_with("--pilot="):
 			for kv in a.get_slice("=", 1).split(","):
 				pilot_overrides[kv.get_slice(":", 0)] = float(kv.get_slice(":", 1))
@@ -159,6 +171,17 @@ func _drive_camera(delta: float) -> void:
 				dir._find_anchor(car)
 		dir._place(c, car, delta, _cam_snap)
 		c._effects(delta, speed if dir.speed_lines() else 0.0)
+	elif _cam == "fixed":
+		# A locked-off camera: placed once from _fixed["at"], aimed every frame at _fixed["look"]
+		# (a world point, or a Node3D such as the car or the dog to pan with).
+		var at: Vector3 = _fixed["at"]
+		var look = _fixed["look"]
+		var aim: Vector3 = (look as Node3D).get_global_transform_interpolated().origin + Vector3.UP * float(_fixed.get("look_up", 0.5)) \
+			if look is Node3D else look
+		c.global_position = at
+		c.fov = _fixed.get("fov", 50.0)
+		c.look_at(aim)
+		c._effects(delta, 0.0)
 	elif _cam == "side":
 		var xf := car.get_global_transform_interpolated()
 		var p := xf.origin + Vector3.UP * 0.5
@@ -215,6 +238,8 @@ func _sync_still_view() -> void:
 func _autopilot(skill: float, drift := false) -> void:
 	session.set_autopilot(true)
 	session.autopilot.skill = skill
+	if shot in HAIRPIN_ASSIST_SHOTS:
+		_hairpin_assist()
 	if drift:
 		var pilot := DriftPilot.new(session.car, session.autopilot, scene.track)
 		for k in pilot_overrides:
@@ -223,6 +248,35 @@ func _autopilot(skill: float, drift := false) -> void:
 		session.input_filter = func(i: VehicleTypes.DriverInput) -> VehicleTypes.DriverInput:
 			i = pilot.filter(i)
 			return before.call(i) if before.is_valid() else i
+
+
+## The autopilot brakes too late for the last hairpin (r 20 m at ~1348–1380 m) and stops dead
+## against its outside at ~1359 m. For the v2 shots, cap the entry speed there so the run is
+## clean; the physics is untouched, it is only an earlier brake.
+const HAIRPIN_ASSIST_SHOTS := ["ta_best", "ta", "eg_battle"]
+const HAIRPIN_ASSIST := { "from": 1280.0, "to": 1356.0, "kmh": 34.0 }
+
+
+func _hairpin_assist() -> void:
+	var tr: TrackData = scene.track
+	var car := session.car
+	var hint := [0]
+	var before: Callable = session.input_filter
+	session.input_filter = func(i: VehicleTypes.DriverInput) -> VehicleTypes.DriverInput:
+		if before.is_valid():
+			i = before.call(i)
+		hint[0] = tr.nearest_index(car.global_position, hint[0])
+		var d: float = hint[0] * tr.spacing
+		var kmh := car.linear_velocity.length() * 3.6
+		if d > HAIRPIN_ASSIST["from"] and d < HAIRPIN_ASSIST["to"]:
+			# Braking distance to the cap at ~0.8 g, measured to the corner entry.
+			var v := kmh / 3.6
+			var cap: float = HAIRPIN_ASSIST["kmh"] / 3.6
+			var need := (v * v - cap * cap) / (2.0 * 7.8)
+			if v > cap and need >= HAIRPIN_ASSIST["to"] - 12.0 - d:
+				i.throttle = 0.0
+				i.brake = maxf(i.brake, 0.85)
+		return i
 
 
 func _free_drive(car_id: String, night: bool, at_m: float, drift_tune := false) -> void:
@@ -355,3 +409,234 @@ func _garage() -> void:
 		await _until(2.0 + k * 1.6)
 		menu._car_buttons[ids[k]].grab_focus()
 		ev.mark(t, ids[k])
+
+
+# ---------------------------------------------------------------- trailer v2 shots
+
+const HERO_CAR := "eg_hatch"
+
+
+## A point `lat` metres off the road centre (positive is the sari-sari store's side) and `h` up.
+func road(d: float, lat := 0.0, h := 0.0) -> Vector3:
+	var tr: TrackData = scene.track
+	var p: Vector3 = tr.pose_at(d)["position"]
+	var fwd: Vector3 = tr.pose_at(d + 1.0)["position"] - p
+	fwd.y = 0.0
+	return p + Vector3.UP.cross(fwd.normalized()) * lat + Vector3.UP * h
+
+
+## The car heading that faces world direction `dir`. CarBody.place's heading convention is read
+## off the car itself: which way the body turns for a positive heading, and which axis is its nose.
+func heading_toward(dir: Vector3) -> float:
+	var car := session.car
+	var tr: TrackData = scene.track
+	var at := car.global_position
+	var flat := func(v: Vector3) -> Vector3: return Vector3(v.x, 0.0, v.z).normalized()
+	car.place(at, 0.0)
+	var a0: Vector3 = flat.call(car.global_basis.z)
+	car.place(at, 0.5)
+	var turn := signf(a0.cross(flat.call(car.global_basis.z)).y)
+	var pose: Dictionary = tr.pose_at(200.0)
+	car.place(at, pose["heading"])
+	var nose := signf(flat.call(car.global_basis.z).dot(flat.call(tr.pose_at(201.0)["position"] - pose["position"])))
+	var want: Vector3 = flat.call(dir) * nose
+	return turn * atan2(a0.cross(want).y, a0.dot(want))
+
+
+## A locked-off camera at `at`, aimed at a point or panning with a node.
+func fixed(at: Vector3, look, fov := 50.0, look_up := 0.5) -> void:
+	_fixed = { "at": at, "look": look, "fov": fov, "look_up": look_up }
+	cam("fixed")
+
+
+func _node_with_text(fragment: String) -> Node3D:
+	for n in scene.find_children("*", "Label3D", true, false):
+		if (n as Label3D).text.contains(fragment):
+			return n
+	return null
+
+
+## 2am at the sari-sari store: the EG idling on the shoulder, the askal doing its rounds, the
+## BAWAL ANG UTANG sign. Locked-off low cameras only; the engine blips at the end (the turn).
+func _open() -> void:
+	MangaArt.set_night(true)
+	scene.menu._start_free_drive()
+	session.set_car(HERO_CAR)
+	var at := road(OPEN_PARK_M, 2.4)
+	session.car.place(at, heading_toward(road(OPEN_PARK_M + 1.0, 2.4) - at))
+	ev.watch([session.car], ["YOU"])
+	session.input_filter = func(i: VehicleTypes.DriverInput) -> VehicleTypes.DriverInput:
+		i.steer = 0.0
+		i.brake = 1.0
+		i.handbrake = 1.0
+		i.throttle = 0.0
+		for blip in OPEN_BLIPS:
+			if t >= blip[0] and t < blip[1]:
+				i.throttle = blip[2]
+		return i
+	await _physics_wait(2)
+	# Engine off until the starter (a sample laid in the edit) catches at OPEN_CATCH.
+	for bus in ["Engine", "EngineOff"]:
+		AudioServer.set_bus_mute(AudioServer.get_bus_index(bus), true)
+	_unmute_engine_at(OPEN_CATCH)
+	ev.mark(OPEN_CATCH, "engine catches")
+	var dog: Node3D = scene.find_child("Askal", true, false)
+	var sign := _node_with_text("UTANG")
+	for b in OPEN_BLIPS:
+		ev.mark(b[0], "blip %.1f" % b[2])
+	await _until(0.05)
+	fixed(road(OPEN_PARK_M - 13.0, -3.4, 0.6), road(OPEN_PARK_M + 4.0, 3.6, 1.5), 50.0)
+	await _until(3.2)
+	fixed(road(OPEN_PARK_M + 17.0, 2.0, 0.3), dog, 24.0, 0.3)
+	await _until(6.2)
+	fixed(road(OPEN_PARK_M + 4.6, 1.2, 0.45), session.car, 44.0, 0.45)
+	await _until(8.6)
+	fixed(road(OPEN_PARK_M + 2.0, 1.0, 1.45), sign, 26.0, 0.0)
+	await _until(10.4)
+	fixed(road(OPEN_PARK_M - 6.0, 0.6, 0.35), session.car, 46.0, 0.4)
+
+
+func _unmute_engine_at(seconds: float) -> void:
+	await _until(seconds)
+	for bus in ["Engine", "EngineOff"]:
+		AudioServer.set_bus_mute(AudioServer.get_bus_index(bus), false)
+
+
+## The source time the edit's starter sample catches (trailer 7.0 s on the idle shot).
+const OPEN_CATCH := 7.8
+## Where the EG parks (metres from the track origin; the store front is at ~80 m) and its
+## throttle blips: [from s, to s, throttle].
+const OPEN_PARK_M := 76.0
+const OPEN_BLIPS := [[10.9, 11.25, 0.55], [11.55, 12.3, 1.0]]
+
+
+## Night VS battle in the EG: the player gridded last behind three rivals. Low, close cameras.
+func _eg_battle() -> void:
+	MangaArt.set_night(true)
+	scene.time_attack.free_drive()
+	session.set_car(car_override if car_override else HERO_CAR)
+	var vs: VsBattle = scene.vs_battle
+	vs.opponents = 3
+	vs.start()
+	# With three rivals the game already grids the player on the second row.
+	var cars: Array = [session.car]
+	cars.append_array(vs.rivals)
+	ev.watch(cars, ["YOU"] + VsBattle.RIVALS.slice(0, 3).map(func(r): return r["name"]))
+	while vs.run == null:
+		if vs._in_intro:
+			scene.intro.skip()
+		await process_frame
+	await _physics_wait(2)
+	_autopilot(skill_override if skill_override > 0.0 else EG_SKILL)
+	for d in vs.drivers:
+		d.skill *= rival_pace_override if rival_pace_override > 0.0 else EG_RIVAL_PACE
+	ev.mark(t, "countdown")
+	for step in EG_BATTLE_CAMS:
+		await _until(step[0])
+		var who: CarBody = session.car if step.size() < 3 or step[2] == null else vs.rivals[step[2]]
+		cam(step[1], who, step[3] if step.size() > 3 else 1.0)
+
+
+const EG_SKILL := 1.06
+const EG_RIVAL_PACE := 0.90
+## [time, shot, rival index or omitted for the player, side]. Close rigs only: in the v2 runs
+## chase_low and trackside lose the car and bumper faces backwards out of the grid, so they are
+## left out. The heli covers the two passes (JUNJUN ~21.1 s, ATE LIZA ~53.5 s).
+const EG_BATTLE_CAMS := [
+	[0.0, "chase"], [8.0, "lead"], [11.0, "side"], [14.0, "chase", 1], [17.5, "chase"], [19.8, "heli"],
+	[22.5, "chase"], [26.0, "side", 1, -1.0], [29.2, "side"], [32.0, "lead"], [38.0, "chase"], [41.0, "chase", 0],
+	[44.0, "chase"], [47.0, "heli"], [55.0, "chase"], [58.0, "side", 2], [61.0, "lead"], [65.0, "chase"],
+]
+
+
+## Time attack in the EG. `_ta_best` lays down the ghost (a slower lap, probe only); `_ta` races it.
+## capture.sh points user:// at a trailer-only folder, so the player's own records are untouched.
+func _ta_best() -> void:
+	# Start from no record, so the ghost is this lap and never an earlier hero run.
+	session.set_car(HERO_CAR)
+	var key := TimeAttackRecords._key((scene.time_attack as TimeAttack).track_id, (scene.time_attack as TimeAttack)._car_id())
+	for ext in [".json", ".ghost"]:
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(TimeAttackRecords.DIR + key + ext))
+	await _time_attack(skill_override if skill_override > 0.0 else TA_GHOST_SKILL, [])
+
+
+func _ta() -> void:
+	await _time_attack(EG_SKILL, TA_CAMS)
+
+
+const TA_GHOST_SKILL := 0.97
+## [time, shot, side]; "@sign" is a locked-off roadside camera at the BAWAL MAG-OVERTAKE board
+## (~1294 m). Splits at ~25.5, 43.6 and 67.9 s, finish at ~87.6 s (met head-on by the lead rig).
+const TA_CAMS := [
+	[0.0, "chase"], [8.0, "lead"], [14.0, "side"], [20.0, "chase"], [28.0, "side"], [33.0, "lead"],
+	[38.0, "side", -1.0], [42.0, "chase"], [46.0, "lead"], [52.0, "wheel"], [58.0, "side", -1.0], [63.0, "lead"],
+	[66.5, "chase"], [70.0, "lead"], [74.6, "@sign"], [78.0, "heli"], [82.6, "side"], [85.6, "lead", -1.0],
+]
+
+
+func _time_attack(skill: float, cams: Array) -> void:
+	MangaArt.set_night(true)
+	var ta: TimeAttack = scene.time_attack
+	session.set_car(HERO_CAR)
+	ta.restart(false)
+	ev.watch([session.car], ["YOU"])
+	await _physics_wait(2)
+	_autopilot(skill)
+	var best: Dictionary = ta.best
+	ev.mark(t, "best %s" % JSON.stringify(best))
+	_watch_splits(ta, best)
+	var sign := _node_with_text("MAG-OVERTAKE")
+	for step in cams:
+		await _until(step[0])
+		match step[1]:
+			"@sign":
+				fixed(road(1286.0, 3.6, 0.5), sign, 34.0, 0.0)
+			_:
+				cam(step[1], null, step[2] if step.size() > 2 else 1.0)
+
+
+## Marks every sector split and the finish against the stored best, for the edit's numbers.
+func _watch_splits(ta: TimeAttack, best: Dictionary) -> void:
+	var seen := 0
+	var ref: Array = best.get("splits", [])
+	while ta.run == null or ta.run.phase != TimeAttackRun.Phase.FINISHED:
+		if ta.run and ta.run.phase == TimeAttackRun.Phase.RUNNING and ev.marks.filter(func(m): return m["what"] == "go").is_empty():
+			ev.mark(t, "go")
+		if ta.run and ta.run.splits.size() > seen:
+			var s: float = ta.run.splits[seen]
+			var r: float = float(ref[seen]) if seen < ref.size() else -1.0
+			ev.marks.append({ "t": snappedf(t, 0.001), "what": "split", "k": seen, "time": snappedf(s, 0.001),
+				"ref": snappedf(r, 0.001), "delta": snappedf(s - r, 0.001) if r >= 0.0 else null })
+			seen += 1
+		await process_frame
+	var bt := float(best.get("time", -1.0))
+	ev.marks.append({ "t": snappedf(t, 0.001), "what": "finish", "time": snappedf(ta.run.time, 0.001),
+		"ref": snappedf(bt, 0.001), "delta": snappedf(ta.run.time - bt, 0.001) if bt >= 0.0 else null })
+
+
+## The EG pulled onto the View Deck pad after the run, city lights below.
+func _viewdeck() -> void:
+	MangaArt.set_night(true)
+	scene.menu._start_free_drive()
+	session.set_car(HERO_CAR)
+	var deck: Node3D = scene.find_child("Deck", true, false)
+	var out := -deck.global_basis.z
+	out.y = 0.0
+	out = out.normalized()
+	var side := Vector3.UP.cross(out)
+	var at := deck.global_position + deck.global_basis.z * VIEWDECK_BACK
+	session.car.place(at, heading_toward(out))
+	ev.watch([session.car], ["YOU"])
+	session.input_filter = func(i: VehicleTypes.DriverInput) -> VehicleTypes.DriverInput:
+		i.steer = 0.0
+		i.brake = 1.0
+		i.handbrake = 1.0
+		i.throttle = 0.0
+		return i
+	await _physics_wait(2)
+	await _until(0.05)
+	fixed(at - out * 6.0 + side * 1.0 + Vector3.UP * 2.2, at + out * 400.0 - Vector3.UP * 70.0, 48.0)
+
+
+## How far back from the deck's lip (toward the road) the EG parks.
+const VIEWDECK_BACK := 4.0

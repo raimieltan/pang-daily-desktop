@@ -5,7 +5,9 @@
   "scripts": {
     "studio": "remotion studio",
     "render": "remotion render Vertical ../renders/pang_daily_vertical.mp4 --codec=h264 --audio-codec=aac --crf=16",
-    "still": "remotion still Vertical"
+    "render:v2": "remotion render V2 ../renders/pang_daily_v2_vertical.mp4 --codec=h264 --audio-codec=aac --crf=16",
+    "still": "remotion still Vertical",
+    "brand": "for c in Icon IconDark IconMark CoverTrailer CoverBattle YouTubeBanner; do remotion still $c ../renders/tiktok/brand/$c.png || exit 1; done"
   },
   "dependencies": {
     "@remotion/cli": "4.0.530",

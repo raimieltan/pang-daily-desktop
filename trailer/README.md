@@ -64,3 +64,36 @@ npm run render          # -> trailer/renders/pang_daily_vertical.mp4
 - `Clip` `zoom` crops a source (`cx`, `cy`, `w` in source pixels); the intro cards use it to drop the
   game's letterbox bars and the garage to fill the vertical frame with the car card.
 - Captions sit in the platform safe area (`SAFE` in `theme.ts`); render `VerticalSafeZones` to check.
+
+## v2: the broke guy's 2am run (60 s)
+
+Design: `docs/superpowers/specs/2026-10-16-trailer-v2-design.md`. Composition `V2` in the same
+Remotion project; the edit is `edit/src/v2/edit.ts`, the manga pieces (slanted tier pages, the
+ink freeze splash, two-line cards, split readouts, screentone burst, ink wipe) are
+`edit/src/v2/components.tsx`.
+
+```sh
+MOVIE= HEADLESS=1 trailer/capture.sh ta_best --probe   # the ghost lap (no movie; run before `ta`)
+for s in open viewdeck eg_battle ta; do trailer/capture.sh $s; done
+cd trailer/edit && npm run render:v2   # -> trailer/renders/pang_daily_v2_vertical.mp4
+```
+
+| Shot | What |
+|---|---|
+| `open` | 2am at the sari-sari store: the EG idling, the askal, BAWAL ANG UTANG; revs at 10.9 and 11.6 s |
+| `eg_battle` | Night VS battle in the EG, gridded second row behind JUNJUN, ATE LIZA and KAPITAN |
+| `ta_best` | Probe only: a slower EG lap (skill 0.97) saved as the time-attack ghost |
+| `ta` | The EG's time attack against that ghost; `split` / `finish` marks carry the real numbers |
+| `viewdeck` | The EG on the View Deck pad, city lights below |
+
+- `capture.sh` points `user://` at a trailer-only folder (`pang_daily_trailer`), so the staged
+  ghost never touches the player's own records or settings. `ta_best` clears that record first;
+  a `ta` capture saves its lap as the new best, so re-run `ta_best` before re-capturing `ta`.
+- Every number in the edit is copied from `ta.events.json` and only appears in a panel showing
+  the time-attack run (the design's "numbers stay with their run" rule).
+- The autopilot runs wide at the last hairpin (~1359 m) and wedges against the chevron board; the
+  v2 shots cap the entry speed there (`HAIRPIN_ASSIST` in `capture.gd`). The AI itself still
+  does this in the game.
+- Music: "Live on JP (Eurobeat)" by ZTMusic (Pixabay licence), 147 BPM, drop at 127.74 s placed
+  on trailer 0:12. Nothing plays under the open.
+- `--skill=` and `--rival-pace=` override the v2 shots' autopilot skill and rival pace for probing.
