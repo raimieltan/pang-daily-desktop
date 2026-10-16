@@ -49,6 +49,10 @@ func _physics_process(delta: float) -> bool:
 		for back in [360, 240, 120, 60]:
 			if _hist.size() > back: print("   ", _hist[-back])
 	_backwards = v < -2.0
+	# Slow stretches after the launch: where the car crawls (under 12 km/h), once per second.
+	if _t - _start_t > 6.0 and absf(v) < 3.3 and fmod(_t, 1.0) < 1.0 / 120.0:
+		print("SLOW t=%.0f at %.0f m lat %.1f  %s" % [_t - _start_t, _ai.distance,
+			_scene.track.lateral_offset(_scene.car.global_position, _ai._index), _hist[-1]])
 	if _ai.distance >= _scene.track.finish_distance:
 		print("%s %s  time %.1f s  spins %d" % [_args[0], " ".join(_args.slice(1)), _t - _start_t, _spins])
 		quit(0)

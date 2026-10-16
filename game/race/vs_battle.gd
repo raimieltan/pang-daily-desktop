@@ -86,6 +86,8 @@ func start() -> void:
 	_index_hint = track.index_at(track.start_distance)
 	for k in field.size():
 		_spawn_rival(field[k], grid[k + 1], k)
+	for d in drivers:
+		d.others = field_cars()
 	hud.visible = true
 	if sp_rival >= 0:
 		hud.show_sp(field[0]["name"])
@@ -228,6 +230,9 @@ func _physics_process(delta: float) -> void:
 	if not active or run == null:
 		return
 	_index_hint = track.nearest_index(session.car.global_position, _index_hint)
+	# Spectating: the player's autopilot sees the field too.
+	if session.autopilot and session.autopilot.others.size() != rivals.size() + 1:
+		session.autopilot.others = field_cars()
 	var events := run.update(delta, _index_hint * track.spacing)
 	var racing := run.phase != TimeAttackRun.Phase.COUNTDOWN
 	if racing:
@@ -296,6 +301,13 @@ func _standings_text() -> String:
 func _on_wall_contact(_point: Vector3, _normal: Vector3, dv: float, _slide: float, i: int) -> void:
 	if active and sp and i <= 1:
 		sp.hit(i, dv)
+
+
+## Every car on the road this race, the player first.
+func field_cars() -> Array:
+	var cars: Array = [session.car]
+	cars.append_array(rivals)
+	return cars
 
 
 func player_place() -> int:
