@@ -13,6 +13,8 @@ const PAPER := Color("#F3EDE1")
 const INK := Color("#111111")
 ## Spot colors allowed in the world (sparingly): sodium street lamps and red sign lettering.
 const SODIUM := Color(1.0, 0.6, 0.2)
+## Halogen headlamps: soft yellow, not a white cut-out.
+const HEADLAMP := Color(1.0, 0.84, 0.55)
 const SIGN_RED := Color(0.8, 0.07, 0.05)
 
 enum Kind { PAINT, GLASS, LAMP, RUBBER, METAL }
@@ -190,8 +192,8 @@ static func apply_night(value: float) -> void:
 	night = value
 	RenderingServer.global_shader_parameter_set("manga_night", value)
 	# Night ambient keeps unlit faces in tone rather than flat ink; ink is for real shadows.
-	RenderingServer.global_shader_parameter_set("manga_ambient", lerpf(0.3, 0.07, value))
+	RenderingServer.global_shader_parameter_set("manga_ambient", lerpf(0.3, 0.03, value))
 	if is_instance_valid(_sun):
-		# Moonlight is just enough to separate lit slopes (dense tone) from shadow (ink).
+		# Faint moonlight: lit slopes barely separate from shadow (ink); the street lamps carry the night.
 		# Day sun kept moderate: lit surfaces sit in the gray bands so their detail survives.
-		_sun.light_energy = lerpf(0.62, 0.18, value)
+		_sun.light_energy = lerpf(0.62, 0.07, value)

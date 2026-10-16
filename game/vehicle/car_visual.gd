@@ -58,7 +58,8 @@ func _ready() -> void:
 
 
 ## Lamps from the GLB's light meshes: a red reflection streak on the road behind each taillight
-## while braking (faint at night), warm headlight spots at night. Selective color on the page.
+## while braking (faint at night), soft yellow headlight spots at night (off by day; flash() blinks
+## them). Selective color on the page.
 func _build_lamps(model: Node) -> void:
 	for name in ["taillight_l", "taillight_r"]:
 		var node := model.find_child(name, true, false) as Node3D
@@ -84,12 +85,14 @@ func _build_lamps(model: Node) -> void:
 		if node == null:
 			continue
 		var spot := SpotLight3D.new()
-		spot.light_color = Color.WHITE
-		spot.spot_range = 48.0
-		spot.spot_angle = 26.0
+		spot.light_color = MangaArt.HEADLAMP
+		spot.spot_range = 30.0
+		spot.spot_angle = 24.0
 		spot.spot_attenuation = 0.5
-		# Near-flat across the cone, then a hard drop at its edge: a cut-out white beam.
-		spot.spot_angle_attenuation = 0.05
+		# Near-flat across the cone, then a soft drop at its edge.
+		spot.spot_angle_attenuation = 0.3
+		# Dim core (see manga_world.gdshader): a pack of cars must not white out the road.
+		spot.light_specular = 0.22
 		spot.light_energy = 0.0
 		spot.shadow_enabled = false
 		spot.light_cull_mask = 1
@@ -132,7 +135,7 @@ func _update_lamps(delta: float) -> void:
 		m.set_shader_parameter("trail_length", length)
 	for spot in _headlights:
 		spot.visible = night > 0.02 or blink > 0.0
-		spot.light_energy = maxf(3.5 * night, 7.0 * blink)
+		spot.light_energy = maxf(1.6 * night, 3.0 * blink)
 
 
 func _process(delta: float) -> void:

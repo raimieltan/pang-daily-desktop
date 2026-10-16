@@ -124,11 +124,12 @@ class Mover extends AnimatableBody3D:
 		var head := model.find_child("headlight", true, false) as Node3D
 		var at := model.transform * head.position if head else Vector3(_footprint.get_center().x, _footprint.position.y + _footprint.size.y * 0.55, _footprint.position.z)
 		var spot := SpotLight3D.new()
-		spot.light_color = Color(1.0, 0.92, 0.8)
+		spot.light_color = MangaArt.HEADLAMP
 		spot.spot_range = 22.0
 		spot.spot_angle = 24.0
 		spot.spot_attenuation = 0.5
-		spot.spot_angle_attenuation = 0.05
+		spot.spot_angle_attenuation = 0.3
+		spot.light_specular = 0.22
 		spot.shadow_enabled = false
 		spot.visible = false
 		spot.position = at + Vector3(0, 0, -0.1)
@@ -148,9 +149,9 @@ class Mover extends AnimatableBody3D:
 		var night := MangaArt.night
 		for l in lamps:
 			l.visible = night > 0.02
-			l.light_energy = 2.2 * night
+			l.light_energy = 1.4 * night
 		for f in lamp_faces:
-			f.set_shader_parameter("glow", 0.3 + night * 1.2)
+			f.set_shader_parameter("glow", night * 1.2)
 		if _turn > 0.0:
 			_turn = maxf(_turn - delta / 2.5, 0.0)
 			_place()

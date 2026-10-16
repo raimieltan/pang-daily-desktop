@@ -168,6 +168,7 @@ void light() {
 		vec3 hue = mix(vec3(1.0), LIGHT_COLOR / max(peak, 1e-4), lamp_tint);
 		// Paper (or the lamp's hue) inside the cone whatever the albedo; outside, a falloff for the
 		// ramp to band.
-		DIFFUSE_LIGHT += core * 1.1 * hue + vec3((1.0 - core) * i * v_albedo * lamp_falloff * 2.0);
+		// The light's specular (default 0.5 → 1.0) sets how bright its core is: headlights are dimmer.
+		DIFFUSE_LIGHT += core * 1.1 * SPECULAR_AMOUNT * hue + vec3((1.0 - core) * i * v_albedo * lamp_falloff * 2.0);
 	}
 }
