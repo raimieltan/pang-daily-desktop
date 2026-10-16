@@ -8,7 +8,7 @@ const CONTROLS := [
 	["W  ↑", "THROTTLE"], ["S  ↓", "BRAKE"], ["A  D", "STEER"], ["SPACE", "HANDBRAKE"],
 	["R", "RESET TO ROAD"], ["ENTER", "RESTART / REMATCH"], ["V", "CAMERA"], ["N", "DAY / NIGHT"],
 	["T", "TUNE"], ["Y", "TIRES"], ["H", "TELEMETRY"], ["P", "AUTOPILOT"],
-	["F", "REPLAY"], ["U", "CLEAN FEED (NO HUD)"], ["ESC", "PAUSE"],
+	["F", "REPLAY"], ["U", "CLEAN FEED (NO HUD)"], ["L", "FLASH (CHALLENGE)"], ["ESC", "PAUSE"],
 ]
 
 ## Set by tools (screenshots) to start straight on the road.
@@ -17,6 +17,7 @@ static var skip_title := false
 var session: DriveSession
 var time_attack: TimeAttack
 var vs_battle: VsBattle
+var road_challenge: RoadChallenge
 var music: MusicPlayer
 var _replay_button: Button
 var _wash := ColorRect.new()
@@ -499,6 +500,7 @@ func _rival_text() -> String:
 
 func _start_vs() -> void:
 	_leave_watch()
+	road_challenge.enabled = false
 	vs_battle.sp_rival = -1
 	vs_battle.opponents = GameSettings.value("opponents")
 	time_attack.free_drive()
@@ -508,6 +510,7 @@ func _start_vs() -> void:
 
 func _start_sp() -> void:
 	_leave_watch()
+	road_challenge.enabled = false
 	vs_battle.sp_rival = GameSettings.value("sp_rival")
 	time_attack.free_drive()
 	_close()
@@ -523,6 +526,7 @@ func _start_barangay() -> void:
 
 func _start_time_attack() -> void:
 	_leave_watch()
+	road_challenge.enabled = false
 	vs_battle.stop()
 	_close()
 	time_attack.restart(true)
@@ -530,6 +534,8 @@ func _start_time_attack() -> void:
 
 func _start_free_drive() -> void:
 	_leave_watch()
+	# Rivals cruise the road in free drive, to be challenged with a headlight flash.
+	road_challenge.enabled = true
 	vs_battle.stop()
 	time_attack.free_drive()
 	_close()

@@ -20,6 +20,8 @@ const SP_ROLL_GAP := 5.0
 const SP_ROLL_CATCH_KMH := 15.0
 ## The rival's pace once the battle is decided, as a share of its skill.
 const SP_CRUISE := 0.75
+## A challenge on the road: metres past the leading car before the gauges arm.
+const CHALLENGE_RUN_UP := 40.0
 ## Each rival: who, which body, what tune, and how hard they push.
 const RIVALS := [
 	{ "name": "JUNJUN", "car": "EG HATCH", "model": "res://assets/vehicles/civic_eg/civic_eg_modular.glb",
@@ -57,6 +59,9 @@ var _clock := 0.0
 var _index_hint := 0
 var _in_intro := false
 var _player_hit: Callable
+## SP battles from the grid pace both cars through a rolling run-up; a challenge on the road
+## starts already rolling and skips it.
+var _rolling_start := true
 
 
 func _ready() -> void:
@@ -69,6 +74,7 @@ func _ready() -> void:
 
 func start() -> void:
 	_clear_rivals()
+	_rolling_start = true
 	active = true
 	session.input_filter = _filter_input
 	session.reset_pose = _reset_pose
@@ -159,13 +165,20 @@ func _grid(rival_count: int) -> Array:
 
 
 func _spawn_rival(spec: Dictionary, pose: Dictionary, k: int) -> void:
+	# The lane of its grid slot, so a rival beside the player keeps to its own side.
+	var side := signf(track.lateral_offset(pose["position"], track.nearest_index(pose["position"])))
+	var made := make_rival(spec, GRID_LANE * (side if side != 0.0 else 1.0), pose)
+	_adopt(made[0], made[1], k)
+
+
+## A rival's car (with its visual) and driver, in the tree under this node and placed at `pose`,
+## but not in the race: RoadChallenge also uses it for the car cruising in free drive.
+func make_rival(spec: Dictionary, lane: float, pose: Dictionary) -> Array:
 	var car := CarBody.new()
 	car.name = "Rival_%s" % spec["name"].replace(" ", "_")
 	car.preset = spec["preset"]
 	car.tire_product = "street"
-	# The lane of its grid slot, so a rival beside the player keeps to its own side.
-	var side := signf(track.lateral_offset(pose["position"], track.nearest_index(pose["position"])))
-	var driver := AiDriver.new(car, track, spec["skill"], GRID_LANE * (side if side != 0.0 else 1.0))
+	var driver := AiDriver.new(car, track, spec["skill"], lane)
 	car.input_source = func() -> VehicleTypes.DriverInput: return _roll_cap(driver.input(), car, driver.distance - run.progress if run else 0.0)
 	add_child(car)
 	car.global_position = pose["position"]
@@ -176,6 +189,10 @@ func _spawn_rival(spec: Dictionary, pose: Dictionary, k: int) -> void:
 	visual.car = car
 	car.add_child(visual)
 	car.place(pose["position"], pose["heading"])
+	return [car, driver]
+
+
+func _adopt(car: CarBody, driver: AiDriver, k: int) -> void:
 	car.wall_contact.connect(_on_wall_contact.bind(k + 1))
 	rivals.append(car)
 	drivers.append(driver)
@@ -203,7 +220,7 @@ func _filter_input(input: VehicleTypes.DriverInput) -> VehicleTypes.DriverInput:
 ## Before the SP line both cars are held to the rolling speed and to each other: `ahead` (m) is how
 ## far this car leads the other. Off throttle above the speed or in front; light brake further out.
 func _roll_cap(input: VehicleTypes.DriverInput, car: CarBody, ahead: float) -> VehicleTypes.DriverInput:
-	if sp == null or sp.phase != SpBattleRules.Phase.ROLLING:
+	if sp == null or sp.phase != SpBattleRules.Phase.ROLLING or not _rolling_start:
 		return input
 	var kmh := car.speed_kmh()
 	var cap := SP_ROLL_KMH + (SP_ROLL_CATCH_KMH if ahead < -SP_ROLL_GAP else 0.0)
@@ -277,7 +294,7 @@ func _process(_delta: float) -> void:
 	# The clock stops when an SP battle is decided, though the road goes on.
 	hud.update_run(run, sp.time if sp and sp.phase == SpBattleRules.Phase.OVER else -1.0)
 	if sp:
-		hud.update_sp(sp, maxf(run.progress, drivers[0].distance))
+		hud.update_sp(sp, maxf(run.progress, drivers[0].distance), _rolling_start)
 	elif run.phase == TimeAttackRun.Phase.RUNNING:
 		hud.set_place(_live_place(), rivals.size() + 1)
 
@@ -308,6 +325,47 @@ func _standings_text() -> String:
 func _on_wall_contact(_point: Vector3, _normal: Vector3, dv: float, _slide: float, i: int) -> void:
 	if active and sp and i <= 1:
 		sp.hit(i, dv)
+
+
+## An SP battle against RIVALS[k] that starts where the cars are: `car` and `driver` (from
+## make_rival, cruising in free drive) join the race at speed. The gauges arm after a short
+## run-up; Enter rematches from the start line as usual.
+func challenge(k: int, car: CarBody, driver: AiDriver) -> void:
+	_clear_rivals()
+	active = true
+	_rolling_start = false
+	_in_intro = false
+	session.input_filter = _filter_input
+	session.reset_pose = _reset_pose
+	sp_rival = k
+	field = [RIVALS[k]]
+	_finish_times.clear()
+	_player_place = 0
+	_clock = 0.0
+	driver.skill = RIVALS[k]["skill"]
+	driver.racing = true
+	_adopt(car, driver, 0)
+	driver.others = field_cars()
+	# A whole-road search: the hint is from the last race, wherever that left off.
+	_index_hint = track.nearest_index(session.car.global_position)
+	var here := _index_hint * track.spacing
+	run = TimeAttackRun.new(here, track.finish_distance)
+	run.phase = TimeAttackRun.Phase.RUNNING
+	run.countdown = 0.0
+	sp = SpBattleRules.new(maxf(here, driver.distance) + CHALLENGE_RUN_UP, track.finish_distance)
+	if not session.car.wall_contact.is_connected(_player_hit):
+		session.car.wall_contact.connect(_player_hit)
+	hud.visible = true
+	hud.show_sp(RIVALS[k]["name"])
+	hud.shout("CHALLENGE!!")
+	if music:
+		music.play_track(&"race")
+	if session.minimap:
+		session.minimap.rivals.assign(rivals)
+	var names: Array[String] = ["YOU", RIVALS[k]["name"]]
+	var cars: Array[CarBody] = [session.car, car]
+	session.replay.begin(cars, names)
+	session.camera.director.set_cars(cars, names)
 
 
 ## Every car on the road this race, the player first.

@@ -86,11 +86,15 @@ func show_run(best: Dictionary) -> void:
 
 
 func go() -> void:
-	_shout("GO!!")
+	shout("GO!!")
 
 
-func _shout(text: String) -> void:
+## A burst in the countdown spot: GO!!, BATTLE!!, CHALLENGE!!
+func shout(text: String) -> void:
 	_countdown.text = text
+	# Countdown digits at full size; longer words shrink to stay on screen.
+	_countdown.add_theme_font_size_override("font_size", 150 if text.length() <= 4 else int(150 * 5.5 / text.length()))
+	_countdown.pivot_offset = _countdown.size / 2.0
 	_countdown.scale = Vector2.ONE * 1.3
 	_count_value = 0
 	var tween := create_tween()
@@ -130,6 +134,7 @@ func update_run(run: TimeAttackRun, frozen := -1.0) -> void:
 		if n != _count_value:
 			_count_value = n
 			_countdown.text = str(n)
+			_countdown.add_theme_font_size_override("font_size", 150)
 			_countdown.pivot_offset = _countdown.size / 2.0
 			_countdown.scale = Vector2.ONE * 1.4
 			create_tween().tween_property(_countdown, "scale", Vector2.ONE, 0.2)
@@ -176,10 +181,12 @@ func _show_sp(on: bool) -> void:
 		g.visible = on
 
 
-## `lead` is the leading car's distance, for the run-up countdown to the SP line.
-func update_sp(rules: SpBattleRules, lead: float) -> void:
+## `lead` is the leading car's distance, for the run-up countdown to the SP line; `rolling` is a
+## paced start from the grid (a challenge on the road just counts down to the line).
+func update_sp(rules: SpBattleRules, lead: float, rolling := true) -> void:
 	if rules.phase == SpBattleRules.Phase.ROLLING and _count_value == 0:
-		_split.text = "ROLLING START  ·  SP LINE %d m" % maxi(0, ceili(rules.arm_distance - lead))
+		var line := "SP LINE %d m" % maxi(0, ceili(rules.arm_distance - lead))
+		_split.text = ("ROLLING START  ·  " + line) if rolling else line
 		_split_timer = 0.2
 	for i in 2:
 		_sp[i].set_state(rules.sp[i], rules.phase == SpBattleRules.Phase.BATTLE and rules.trailing == i)
@@ -187,7 +194,7 @@ func update_sp(rules: SpBattleRules, lead: float) -> void:
 
 ## The gauge arms after the rolling run-up.
 func sp_armed() -> void:
-	_shout("BATTLE!!")
+	shout("BATTLE!!")
 
 
 func sp_result(rules: SpBattleRules, rival: String, time: float) -> void:

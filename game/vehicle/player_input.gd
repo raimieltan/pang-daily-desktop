@@ -14,6 +14,7 @@ const ACTIONS := {
 	"toggle_tires": [KEY_Y],
 	"toggle_hud": [KEY_H],
 	"toggle_night": [KEY_N],
+	"flash_lights": [KEY_L],
 }
 
 var _last_device := "keyboard"
@@ -32,7 +33,7 @@ static func register_actions() -> void:
 	_add_axis("brake", JOY_AXIS_TRIGGER_LEFT, 1.0)
 	_add_axis("steer_left", JOY_AXIS_LEFT_X, -1.0)
 	_add_axis("steer_right", JOY_AXIS_LEFT_X, 1.0)
-	for pair in [["handbrake", JOY_BUTTON_A], ["handbrake", JOY_BUTTON_B], ["reset_car", JOY_BUTTON_BACK]]:
+	for pair in [["handbrake", JOY_BUTTON_A], ["handbrake", JOY_BUTTON_B], ["reset_car", JOY_BUTTON_BACK], ["flash_lights", JOY_BUTTON_Y]]:
 		var b := InputEventJoypadButton.new()
 		b.button_index = pair[1]
 		InputMap.action_add_event(pair[0], b)

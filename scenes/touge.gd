@@ -11,6 +11,7 @@ var car: CarBody:
 var track: TrackData = TRACK
 var time_attack: TimeAttack
 var vs_battle: VsBattle
+var road_challenge: RoadChallenge
 var intro: RaceIntro
 var music: MusicPlayer
 var menu: GameMenu
@@ -44,12 +45,18 @@ func _ready() -> void:
 	vs_battle.intro = intro
 	vs_battle.music = music
 	add_child(vs_battle)
+	road_challenge = RoadChallenge.new()
+	road_challenge.track = track
+	road_challenge.session = session
+	road_challenge.vs_battle = vs_battle
+	road_challenge.time_attack = time_attack
+	add_child(road_challenge)
 	var life := RoadsideLife.new()
 	life.name = "RoadsideLife"
 	life.track = track
 	life.racing = func() -> bool: return time_attack.active or vs_battle.active
 	add_child(life)
-	session.replay.frozen_nodes.assign([time_attack, vs_battle, life])
+	session.replay.frozen_nodes.assign([time_attack, vs_battle, road_challenge, life])
 	var ambience := Ambience.new()
 	ambience.name = "Ambience"
 	ambience.listener = session.camera
@@ -58,6 +65,7 @@ func _ready() -> void:
 	menu.session = session
 	menu.time_attack = time_attack
 	menu.vs_battle = vs_battle
+	menu.road_challenge = road_challenge
 	menu.music = music
 	# Arriving from the barangay: straight onto the road, no title.
 	var from_hub := HubChallenge.rival >= 0 or HubChallenge.free_drive

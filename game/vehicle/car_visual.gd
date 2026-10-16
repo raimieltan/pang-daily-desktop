@@ -18,6 +18,9 @@ var _materials := {}
 var _tail_streaks: Array[MeshInstance3D] = []
 var _streak := 0.0
 var _headlights: Array[SpotLight3D] = []
+## Headlight flash time left (s): two blinks, by day or night (flash()).
+var _flash := 0.0
+const FLASH_SECONDS := 0.6
 var _hubs: Array[Node3D] = []
 var _wheels: Array[Node3D] = []
 var _rest_y: PackedFloat64Array = []
@@ -98,17 +101,24 @@ func _build_lamps(model: Node) -> void:
 		_headlights.append(spot)
 
 
+## Flash the headlights twice: a challenge on the road, or the answer to one.
+func flash() -> void:
+	_flash = FLASH_SECONDS
+
+
 func _update_lamps(delta: float) -> void:
 	var s := car.model.state
 	var braking := s.brake if not s.reversing else 0.0
 	var night := MangaArt.night
+	_flash = maxf(0.0, _flash - delta)
+	var blink := 1.0 if _flash > 0.0 and fmod(_flash, 0.3) > 0.12 else 0.0
 	var tail := clampf(braking * 1.4 + night * 0.35, 0.0, 1.6)
 	var tail_mat: ShaderMaterial = _materials.get("taillight")
 	if tail_mat:
 		tail_mat.set_shader_parameter("glow", tail)
 	var head_mat: ShaderMaterial = _materials.get("headlight")
 	if head_mat:
-		head_mat.set_shader_parameter("glow", night * 1.2)
+		head_mat.set_shader_parameter("glow", maxf(night * 1.2, blink * 3.0))
 	var reverse_mat: ShaderMaterial = _materials.get("reverse")
 	if reverse_mat:
 		reverse_mat.set_shader_parameter("glow", 1.0 if s.reversing else 0.0)
@@ -121,8 +131,8 @@ func _update_lamps(delta: float) -> void:
 		m.set_shader_parameter("intensity", _streak)
 		m.set_shader_parameter("trail_length", length)
 	for spot in _headlights:
-		spot.visible = night > 0.02
-		spot.light_energy = 3.5 * night
+		spot.visible = night > 0.02 or blink > 0.0
+		spot.light_energy = maxf(3.5 * night, 7.0 * blink)
 
 
 func _process(delta: float) -> void:

@@ -67,6 +67,8 @@ var _fixed := {}
 
 
 func _initialize() -> void:
+	# Shots are staged: no rival cruising into frame in free drive.
+	RoadChallenge.allowed = false
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--trailer-shot="): shot = a.get_slice("=", 1)
 		elif a.begins_with("--out="): out_dir = a.get_slice("=", 1)

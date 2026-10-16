@@ -1,7 +1,7 @@
 extends SceneTree
 ## Scripted visual checks (needs a window, not --headless):
 ## `godot --path . -s res://tools/screenshot.gd -- <scene> <out_dir> <scenario>`
-## Scenarios: day, brake, drift, scrape, night, overview, sp (SP battle), spectate (autopilot VS, every cinematic
+## Scenarios: day, brake, drift, scrape, night, overview, sp (SP battle), road (road challenge), spectate (autopilot VS, every cinematic
 ## shot, then the replay at full and quarter speed). Each scripts the pedals, saves PNGs at
 ## the interesting moments and prints frame-time stats (vsync off) for the driving part.
 
@@ -44,6 +44,10 @@ const SCENARIOS := {
 	"sp": [[0.5, 0, 0, 0, 0, ""], [1.5, 0, 0, 0, 0, "garage_sp"], [1.8, 0, 0, 0, 0, ""], [2.2, 0, 0, 0, 0, ""],
 		[8.0, 0, 0, 0, 0, "sp_rolling"], [18.0, 0, 0, 0, 0, "sp_battle"], [24.0, 0, 0, 0, 0, "sp_battle_2"],
 		[24.2, 0, 0, 0, 0, ""], [25.5, 0, 0, 0, 0, "sp_result"], [28.5, 0, 0, 0, 0, "sp_after"]],
+	# Road challenge: free drive from the menu, the player dropped 14 m behind the cruising rival,
+	# the prompt, the headlight flash (both cars) with the CHALLENGE!! shout, then the battle.
+	"road": [[0.5, 0, 0, 0, 0, ""], [4.0, 0, 0, 0, 0, ""], [4.4, 0.8, 0, 0, 0, "road_prompt"], [4.45, 0.8, 0, 0, 0, ""],
+		[4.6, 0.8, 0, 0, 0, "road_flash"], [4.8, 0.8, 0, 0, 0, "road_flash_2"], [8.5, 0.9, 0, 0, 0, "road_battle"]],
 	"cams": [[2.0, 0, 0, 0, 0, ""], [6.0, 0.85, 0, 0, 0, "cam_chase"], [6.3, 0.85, 0, 0, 0, "cam_far"], [6.6, 0.85, 0, 0, 0, "cam_hood"], [6.9, 0.85, 0, 0, 0, "cam_bumper"]],
 }
 
@@ -67,6 +71,8 @@ func _initialize() -> void:
 	var scene_path: String = args[0] if args.size() > 0 else "res://scenes/touge.tscn"
 	if args.size() > 1: _out = args[1]
 	if args.size() > 2: _scenario = args[2]
+	# Only the road scenario wants a rival cruising in free drive.
+	RoadChallenge.allowed = _scenario == "road"
 	_steps = SCENARIOS[_scenario] if SCENARIOS.has(_scenario) else []
 	if _scenario == "spectate":
 		_steps = [[0.5, 0, 0, 0, 0, ""], [14.0, 0, 0, 0, 0, "spec_live"]]
@@ -168,6 +174,21 @@ func _process(delta: float) -> bool:
 					menu._start_sp()
 				3: session.set_autopilot(true)
 				7: _scene.vs_battle.sp.sp[0] = 0.0
+		if _scenario == "road":
+			match _step:
+				0: _scene.menu._start_free_drive()
+				1:
+					var rc: RoadChallenge = _scene.road_challenge
+					var d: float = rc._driver.distance - 10.0
+					var pose: Dictionary = _scene.track.pose_at(d, -1.5)
+					session.car.place(pose["position"], pose["heading"])
+					session.camera.snap.call_deferred()
+				2:
+					session.camera.mode = ChaseCamera.Mode.BUMPER
+					var cr: CarBody = _scene.road_challenge.cruiser()
+					print("road: rival in view %s, %.0f m ahead" % [session.camera.is_position_in_frustum(cr.global_position),
+						cr.global_position.distance_to(session.car.global_position)])
+				3: _scene.road_challenge.flash()
 		if _scenario == "pause" and _step == 1:
 			_scene.menu.open_pause()
 		if _scenario == "settings":

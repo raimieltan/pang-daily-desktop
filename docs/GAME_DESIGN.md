@@ -141,7 +141,7 @@ Time attack is the backbone; SP battles are the signature rival mode; the VS pac
 | Mode | Format | Win condition | Role in the grind | MVP | Built |
 | --- | --- | --- | --- | --- | --- |
 | Time attack | Solo run against your PB ghost | Beat a target time | Core grind; feeds leaderboards and rival unlocks | Yes | Yes (downhill) |
-| SP battle | 1v1, rolling start, Tokyo Xtreme Racer style | Trailing car's SP gauge drains by gap; empty gauge loses | Rival fights; quick "sige, try lang" challenges | Yes | Yes (from the title; no road / KYO challenges) |
+| SP battle | 1v1, rolling start, Tokyo Xtreme Racer style | Trailing car's SP gauge drains by gap; empty gauge loses | Rival fights; quick "sige, try lang" challenges | Yes | Yes (from the title, and on the road by headlight flash; no KYO challenges) |
 | VS battle | Pack race vs 1–5 AI rivals from a grid | Finishing position | Free play, spectate, trailer footage | Yes | Yes |
 | Touge 1v1 (cat and mouse) | Two legs: lead, then chase, roles swap | Leader pulls a gap, or chaser stays within it | Late-game rivals, Initial D-style duels | Post-MVP | No |
 | Point-to-point | Start to finish line with traffic | First to the finish | Street races, traffic as hazard | Post-MVP | No |
@@ -155,7 +155,8 @@ Time attack is the backbone; SP battles are the signature rival mode; the VS pac
 - The battle ends when one car hits 0 SP or the road ends; at road end, higher SP wins.
 - Rivals can be challenged by flashing headlights on the road or from KYO Coffee.
 - Built (Oct 16, 2026) on the VS battle: drain is 0.5 SP/s plus 0.2 per metre of gap beyond 3 m (capped at 25/s); a hit above 1.5 m/s of impulse costs 4 SP per m/s (max 15, once per 0.5 s); at road end a tie goes to the car ahead. The run-up holds both cars to 70 km/h and to each other until the gauges arm 150 m past the line. Tuning lives in `SpBattleRules`; verify with `tests/probe_sp_battle.gd`.
-- Not built: flashing headlights to challenge on the road, KYO Coffee challenges, rewards.
+- Road challenges (built): in free drive one rival at a time cruises down the road (slower the further ahead it is, so it can always be caught). Close up within 35 m and flash the headlights (L / pad Y): it flashes back and the battle starts there, gauges armed 40 m on. Enter rematches from the line. `game/race/road_challenge.gd`, `tests/probe_road_challenge.gd`.
+- Not built: KYO Coffee challenges and SP rewards (they need the hubs and the wallet).
 
 **Traffic rule:** traffic in races creates readable situations (a tricycle visible a corner ahead), never unavoidable crashes.
 
