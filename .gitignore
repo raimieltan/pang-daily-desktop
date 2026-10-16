@@ -8,3 +8,8 @@ assets/audio/raw/
 # Local tooling caches
 __pycache__/
 .serena/
+
+# Trailer captures and renders (re-create with trailer/capture_all.sh and the Remotion project)
+trailer/out/
+trailer/renders/
+trailer/edit/node_modules/
