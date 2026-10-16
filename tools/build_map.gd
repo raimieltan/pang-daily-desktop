@@ -66,6 +66,7 @@ func _initialize() -> void:
 	terrain_body.owner = root
 	terrain_shape.owner = root
 
+	b.plan_village(data.start_distance, data.finish_distance)
 	b.build_guardrails(root, root)
 	b.build_trees(root, root, bounds, grid)
 	b.build_backdrop(root, root, bounds)

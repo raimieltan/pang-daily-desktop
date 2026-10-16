@@ -17,7 +17,8 @@ const SCENARIOS := {
 	# Flips the on-screen day/night switch after the first shot.
 	"switch": [[2.5, 0, 0, 0, 0, "switch_day"], [2.8, 0, 0, 0, 0, "switch_mid"], [3.6, 0, 0, 0, 0, "switch_night"]],
 	"overview": [[2.0, 0, 0, 0, 0, ""], [9.0, 0.85, 0, 0, 0, "overview"]],
-	# Standing shot (pair with PANG_DIST) to check roadside props by day.
+	# Standing shot (pair with PANG_DIST) to check roadside props by day. PANG_EYE="d,lat,h,d2,lat2,h2"
+	# frames it from a fixed eye at road distance d, lateral lat (right +), height h, aimed at d2.
 	"props": [[1.5, 0, 0, 0, 0, "props_day"]],
 	# Menus: the title on launch; the pause menu over a run.
 	"title": [[1.5, 0, 0, 0, 0, "title"]],
@@ -96,6 +97,8 @@ func _process(delta: float) -> bool:
 			var pose: Dictionary = _scene.track.pose_at(d)
 			session.car.place(pose["position"], pose["heading"])
 			session.camera.snap.call_deferred()
+		if OS.has_environment("PANG_EYE"):
+			_eye_camera(session)
 		if OS.has_environment("PANG_MANGA_OFF"):
 			session.camera.manga.enabled = false
 		if OS.has_environment("PANG_SCALE"):
@@ -187,6 +190,20 @@ func _overview_camera(session: DriveSession) -> void:
 	cam.look_at(p + Vector3(0, -40, -160))
 	cam.far = 4000
 	cam.compositor = _scene.session.camera.compositor
+	cam.current = true
+
+
+func _eye_camera(session: DriveSession) -> void:
+	var v := OS.get_environment("PANG_EYE").split_floats(",")
+	var track: TrackData = _scene.track
+	var at := func(d: float, lateral: float, h: float) -> Vector3:
+		var i := track.index_at(d)
+		return track.points[i] + track.rights[i] * lateral + Vector3.UP * h
+	var cam := Camera3D.new()
+	_scene.add_child(cam)
+	cam.global_position = at.call(v[0], v[1], v[2])
+	cam.look_at(at.call(v[3], v[4], v[5]))
+	cam.compositor = session.camera.compositor
 	cam.current = true
 
 
