@@ -598,8 +598,13 @@ func build_guardrails(parent: Node3D, owner: Node) -> void:
 func build_trees(parent: Node3D, owner: Node, bounds: Rect2, grid: Dictionary) -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = seed_ * 31 + 5
-	# Three cedar variants so the forest doesn't repeat one silhouette.
-	var variants: Array = [[], [], []]
+	# Three cedar (Benguet pine) variants so the forest doesn't repeat one silhouette, then two
+	# coconut palm variants that take over below the pine line, on the lower slopes.
+	var variants: Array = [[], [], [], [], []]
+	var low := INF
+	for p in pts:
+		low = minf(low, p.y)
+	var palm_line := low + 30.0
 	var attempts := int(bounds.get_area() / 90.0)
 	for n in attempts:
 		var x := rng.randf_range(bounds.position.x, bounds.end.x)
@@ -614,24 +619,96 @@ func build_trees(parent: Node3D, owner: Node, bounds: Rect2, grid: Dictionary) -
 		var h := _grid_height(bounds, grid, x, z)
 		var scale := rng.randf_range(0.8, 1.3)
 		var basis := Basis(Vector3.UP, rng.randf() * TAU).scaled(Vector3(scale, scale * rng.randf_range(0.9, 1.2), scale))
-		(variants[n % 3] as Array).append(Transform3D(basis, Vector3(x, h - 0.2, z)))
+		var palm_odds := clampf((palm_line - h) / 40.0, 0.0, 0.7)
+		var v := 3 + n % 2 if rng.randf() < palm_odds else n % 3
+		(variants[v] as Array).append(Transform3D(basis, Vector3(x, h - 0.2, z)))
 	var trees := Node3D.new()
 	trees.name = "Trees"
 	parent.add_child(trees)
 	trees.owner = owner
 	var total := 0
-	for v in 3:
+	for v in 5:
 		var xforms: Array[Transform3D] = []
 		xforms.assign(variants[v])
 		total += xforms.size()
-		var chunked := Scatter.make_chunked("Cedar%d" % v, TrackMaterials.cedar_mesh(v), xforms)
+		var mesh := TrackMaterials.cedar_mesh(v) if v < 3 else TrackMaterials.palm_mesh(v - 3)
+		var chunked := Scatter.make_chunked(("Cedar%d" % v) if v < 3 else ("Palm%d" % (v - 3)), mesh, xforms)
 		trees.add_child(chunked)
 		chunked.owner = owner
 		for part in chunked.get_children():
 			(part as GeometryInstance3D).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 			part.owner = owner
-	print("trees: %d" % total)
+	print("trees: %d (palms %d)" % [total, variants[3].size() + variants[4].size()])
 	_build_undergrowth(parent, owner, bounds, grid, rng)
+	_build_tropics(parent, owner, bounds, grid)
+
+
+## Lowland plants close to the road: banana groves by every house and barrio, bamboo clumps along
+## the verges, and patches of tall cogon grass on the drop side.
+func _build_tropics(parent: Node3D, owner: Node, bounds: Rect2, grid: Dictionary) -> void:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = seed_ * 41 + 9
+	var bananas: Array = [[], []]
+	var bamboo: Array = [[], []]
+	var cogon: Array[Transform3D] = []
+	var first_bamboo := -1
+	var place := func(list: Array, x: float, z: float, scale: float) -> void:
+		var h := _grid_height(bounds, grid, x, z)
+		list.append(Transform3D(Basis(Vector3.UP, rng.randf() * TAU).scaled(Vector3.ONE * scale), Vector3(x, h - 0.1, z)))
+	# Bananas: beside and below each roadside lot, and around the barrio clearings.
+	for lot in lots:
+		if lot["kind"] == "viewpoint":
+			continue
+		var xf: Transform3D = lot["xform"]
+		var half := float(lot["frontage"]) * 0.5
+		for k in rng.randi_range(3, 5):
+			var local := Vector3(rng.randf_range(-half - 4.0, half + 4.0), 0.0, -float(lot["depth"]) - rng.randf_range(3.0, 7.0))
+			if k < 2:
+				local = Vector3((half + rng.randf_range(2.5, 4.0)) * (1.0 if k == 0 else -1.0), 0.0, rng.randf_range(-3.0, -1.0))
+			var p := xf * local
+			if _road_distance(p.x, p.z) > 5.5:
+				place.call(bananas[k % 2], p.x, p.z, rng.randf_range(0.9, 1.2))
+	for b in barrios:
+		for k in int(b.z * 0.4):
+			var a := rng.randf() * TAU
+			var r := b.z * rng.randf_range(0.6, 1.0)
+			place.call(bananas[k % 2], b.x + cos(a) * r, b.y + sin(a) * r, rng.randf_range(0.9, 1.3))
+	# Bamboo and cogon along the verges, just past the road's own geometry.
+	for i in range(0, pts.size(), 4):
+		for side in 2:
+			var s := 1.0 if side == 1 else -1.0
+			var beyond := skirt[i][side]
+			if rng.randf() < 0.1:
+				var p := pts[i] + rgt[i] * s * (beyond + rng.randf_range(1.5, 6.0))
+				if not _in_lot(p) and _road_distance(p.x, p.z) > beyond:
+					place.call(bamboo[rng.randi() % 2], p.x, p.z, rng.randf_range(0.8, 1.15))
+					if first_bamboo < 0:
+						first_bamboo = i
+			if side_type[i][side] == Side.FILL and (i / 40) % 2 == 0:
+				for k in 2:
+					var p := pts[i] + rgt[i] * s * (beyond + rng.randf_range(0.3, 5.0)) + fwd[i] * rng.randf_range(-2.0, 2.0)
+					if not _in_lot(p) and _road_distance(p.x, p.z) > 4.5:
+						place.call(cogon, p.x, p.z, rng.randf_range(1.8, 2.6))
+	var root := Node3D.new()
+	root.name = "Tropics"
+	parent.add_child(root)
+	root.owner = owner
+	var sets := [
+		["Banana0", TrackMaterials.banana_mesh(0), bananas[0]], ["Banana1", TrackMaterials.banana_mesh(1), bananas[1]],
+		["Bamboo0", TrackMaterials.bamboo_mesh(0), bamboo[0]], ["Bamboo1", TrackMaterials.bamboo_mesh(1), bamboo[1]],
+		["Cogon", TrackMaterials.grass_mesh(7), cogon],
+	]
+	for spec in sets:
+		var xforms: Array[Transform3D] = []
+		xforms.assign(spec[2])
+		var chunked := Scatter.make_chunked(spec[0], spec[1], xforms, 100.0, 300.0)
+		root.add_child(chunked)
+		chunked.owner = owner
+		for part in chunked.get_children():
+			(part as GeometryInstance3D).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			part.owner = owner
+	print("bananas %d, bamboo %d (first at %d m), cogon %d" % [bananas[0].size() + bananas[1].size(),
+		bamboo[0].size() + bamboo[1].size(), first_bamboo, cogon.size()])
 
 
 ## Bushes and grass along the verges and the forest edge, close to the road where it is seen.
