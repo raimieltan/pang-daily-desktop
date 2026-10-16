@@ -9,6 +9,8 @@ render_mode diffuse_lambert, specular_disabled, ambient_light_disabled;
 
 global uniform float manga_night;
 global uniform float manga_ambient;
+// Rain: 0 dry .. 1 soaked (Weather). The road darkens and catches broken sheen streaks.
+global uniform float manga_wet;
 
 group_uniforms surface;
 /// Albedo gray (0 = ink, 1 = paper).
@@ -138,6 +140,14 @@ void fragment() {
 		if (finish_line > 0.0 && abs(p.y - finish_line) < 1.2 && abs(p.x) < lane_half_width) {
 			a = mod(floor(p.x / 0.6) + floor(p.y / 0.6), 2.0) > 0.5 ? 0.02 : 0.95;
 		}
+	}
+	if (road_markings && manga_wet > 0.0) {
+		// Wet tar goes dark; standing water in the wheel ruts throws back long broken sheen streaks.
+		vec2 p = v_uv;
+		float rut = 1.0 - smoothstep(0.2, 0.55, abs(abs(p.x) - 1.5));
+		float sheen = smoothstep(0.62, 0.8, vn(vec2(p.x * 1.6, p.y * 0.12))) * rut;
+		a = mix(a, a * 0.55, manga_wet);
+		a = mix(a, 0.9, sheen * manga_wet * 0.55);
 	}
 	if (pattern_mode == 1) {
 		// Chevron: white board, black arrowheads pointing +U.
