@@ -114,7 +114,8 @@ func _ready() -> void:
 	_auto_chip = MangaType.label("AUTOPILOT  [P]", 26)
 	_auto_chip.set_anchors_preset(Control.PRESET_TOP_RIGHT)
 	_auto_chip.grow_horizontal = Control.GROW_DIRECTION_BEGIN
-	_auto_chip.position = Vector2(-300, 96)
+	# Under the day/night switch and clear of the centre HUD (timer, run-up line, SP gauges).
+	_auto_chip.position = Vector2(-300, 236)
 	_auto_chip.visible = false
 	gauges.add_child(_auto_chip)
 	for pair in [["autopilot", KEY_P], ["clean_feed", KEY_U]]:

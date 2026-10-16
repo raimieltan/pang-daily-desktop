@@ -18,6 +18,8 @@ const SP_ROLL_KMH := 70.0
 ## the car behind may run this much over the rolling speed to close up (km/h).
 const SP_ROLL_GAP := 5.0
 const SP_ROLL_CATCH_KMH := 15.0
+## The rival's pace once the battle is decided, as a share of its skill.
+const SP_CRUISE := 0.75
 ## Each rival: who, which body, what tune, and how hard they push.
 const RIVALS := [
 	{ "name": "JUNJUN", "car": "EG HATCH", "model": "res://assets/vehicles/civic_eg/civic_eg_modular.glb",
@@ -241,7 +243,7 @@ func _physics_process(delta: float) -> void:
 		var d := drivers[k]
 		d.racing = racing and not _finish_times.has(k)
 		d.cooldown = _finish_times.has(k)
-		d.rival_distance = run.progress
+		d.rival_distance = -1.0 if sp and sp.phase == SpBattleRules.Phase.OVER else run.progress
 		if racing and not _finish_times.has(k) and d.distance >= track.finish_distance:
 			_finish_times[k] = _clock
 			if _player_place > 0 and sp == null:
@@ -261,14 +263,19 @@ func _physics_process(delta: float) -> void:
 				"armed":
 					hud.sp_armed()
 				"over":
-					hud.sp_result(sp, field[0]["name"], run.time if run.phase == TimeAttackRun.Phase.FINISHED else _clock)
+					sp.time = run.time
+					hud.sp_result(sp, field[0]["name"], sp.time)
+					# Decided: the rival eases off and cruises on down (stopping here would park it
+					# in the road ahead of a player who is still coming).
+					drivers[0].skill *= SP_CRUISE
 					finished.emit(1 if sp.winner == 0 else 2)
 
 
 func _process(_delta: float) -> void:
 	if not active or run == null:
 		return
-	hud.update_run(run)
+	# The clock stops when an SP battle is decided, though the road goes on.
+	hud.update_run(run, sp.time if sp and sp.phase == SpBattleRules.Phase.OVER else -1.0)
 	if sp:
 		hud.update_sp(sp, maxf(run.progress, drivers[0].distance))
 	elif run.phase == TimeAttackRun.Phase.RUNNING:

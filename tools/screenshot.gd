@@ -43,7 +43,7 @@ const SCENARIOS := {
 	# skipped): the rolling run-up, the armed gauges, then the player's gauge emptied for the result.
 	"sp": [[0.5, 0, 0, 0, 0, ""], [1.5, 0, 0, 0, 0, "garage_sp"], [1.8, 0, 0, 0, 0, ""], [2.2, 0, 0, 0, 0, ""],
 		[8.0, 0, 0, 0, 0, "sp_rolling"], [18.0, 0, 0, 0, 0, "sp_battle"], [24.0, 0, 0, 0, 0, "sp_battle_2"],
-		[24.2, 0, 0, 0, 0, ""], [25.5, 0, 0, 0, 0, "sp_result"]],
+		[24.2, 0, 0, 0, 0, ""], [25.5, 0, 0, 0, 0, "sp_result"], [28.5, 0, 0, 0, 0, "sp_after"]],
 	"cams": [[2.0, 0, 0, 0, 0, ""], [6.0, 0.85, 0, 0, 0, "cam_chase"], [6.3, 0.85, 0, 0, 0, "cam_far"], [6.6, 0.85, 0, 0, 0, "cam_hood"], [6.9, 0.85, 0, 0, 0, "cam_bumper"]],
 }
 

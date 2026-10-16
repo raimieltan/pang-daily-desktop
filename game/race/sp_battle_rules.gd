@@ -32,6 +32,8 @@ var finish_distance := 0.0
 ## Index of the winner once OVER, and why: "sp" (a gauge emptied) or "road" (the road ended).
 var winner := -1
 var reason := ""
+## Race time when it was decided (set by the race; the rules have no clock of their own).
+var time := -1.0
 ## The latest gap (m, ≥ 0) and which car trails (-1 when level).
 var gap := 0.0
 var trailing := -1

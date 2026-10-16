@@ -122,8 +122,9 @@ func finish(time: float, previous_best: float, record: bool) -> void:
 	_goal.visible = true
 
 
-func update_run(run: TimeAttackRun) -> void:
-	_timer.text = TimeAttackRun.format_time(run.time)
+## `frozen` ≥ 0 holds the timer at that time (a decided SP battle).
+func update_run(run: TimeAttackRun, frozen := -1.0) -> void:
+	_timer.text = TimeAttackRun.format_time(frozen if frozen >= 0.0 else run.time)
 	if run.phase == TimeAttackRun.Phase.COUNTDOWN:
 		var n := int(ceil(run.countdown))
 		if n != _count_value:
