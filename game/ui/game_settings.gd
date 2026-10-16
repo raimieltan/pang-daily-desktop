@@ -9,7 +9,7 @@ const DEFAULTS := {
 	"fullscreen": false, "vsync": true, "opponents": 3,
 }
 ## The buses each volume slider drives (Music is handled by MusicPlayer, which also ducks it).
-const BUSES := { "master": ["Master"], "engine": ["Engine", "EngineOff"], "effects": ["Tires", "Fx"] }
+const BUSES := { "master": ["Master"], "engine": ["Engine", "EngineOff"], "effects": ["Tires", "Fx", "Ambience"] }
 const MAX_OPPONENTS := 5
 
 static var _values := {}

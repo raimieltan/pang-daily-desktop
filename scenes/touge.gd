@@ -49,6 +49,10 @@ func _ready() -> void:
 	life.racing = func() -> bool: return time_attack.active or vs_battle.active
 	add_child(life)
 	session.replay.frozen_nodes.assign([time_attack, vs_battle, life])
+	var ambience := Ambience.new()
+	ambience.name = "Ambience"
+	ambience.listener = session.camera
+	add_child(ambience)
 	menu = GameMenu.new()
 	menu.session = session
 	menu.time_attack = time_attack

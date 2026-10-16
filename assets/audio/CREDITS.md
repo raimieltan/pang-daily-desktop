@@ -106,6 +106,7 @@ Licences were taken from Freesound pages or search snippets. Re-check each page 
 | engine/i4_loop.wav | raw/engine-loop/engine-loop-1-normalized.wav | mono, 44.1 kHz 16-bit | **CC-BY 3.0**: "Car Engine Loop" by Iwan 'qubodup' Gabovitch, https://opengameart.org/content/car-engine-loop-96khz-4s |
 | tire/squeal_loop.wav | raw/tire/tires_squal_loop.wav | mono, 44.1 kHz 16-bit | **CC-BY 3.0**: see the tire row above for the exact attribution line |
 | impact/*.ogg | raw/kenney_impact-sounds/ | copied | CC0, Kenney (kenney.nl) |
+| ambience/crickets_loop.wav, wind_loop.wav, dog_bark_far.wav | nothing: synthesised by `tools/audio/synth_ambience.py` (2026-10-16) | mono, 44.1 kHz 16-bit | Ours, CC0 |
 
 The CC-BY credits must appear in the game's credits screen.
 

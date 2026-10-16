@@ -2,8 +2,10 @@ class_name CarFx
 extends Node3D
 ## World-space driving effects, all driven by the sim (docs/ART_DIRECTION.md §4):
 ## ink skid marks and manga cloud smoke from per-wheel slip, yellow-orange sparks from wall
-## scrapes, and impact frames + camera trauma from hard hits. Lives outside the car so marks and
-## particles stay in the world.
+## scrapes, and impact frames + camera trauma from hard hits. Exhaust puffs on throttle and a
+## pop with a flame lick on lift-off from high revs; a burst radiator hose (steam gushing from
+## the hood) after a hard frontal hit, or on demand (`burst_steam`). Lives outside the car so
+## marks and particles stay in the world.
 
 const SMOKE_SHADER := preload("res://game/art/manga_smoke.gdshader")
 const MAX_SEGMENTS := 2400
@@ -27,6 +29,15 @@ var _smoke: Array[CPUParticles3D] = []
 var _sparks: CPUParticles3D
 var _burst: CPUParticles3D
 var _scrape_timer := 0.0
+var _exhaust: CPUParticles3D
+var _flame: MeshInstance3D
+var _flame_time := 0.0
+var _steam: CPUParticles3D
+var _steam_time := 0.0
+var _floored := 0.0
+## Car-space spots (body faces -Z): tailpipe tip and the front of the hood.
+var _pipe := Vector3(0.45, 0.3, 2.2)
+var _hood := Vector3(0.0, 0.9, -1.4)
 
 
 func _ready() -> void:
@@ -49,8 +60,28 @@ func _ready() -> void:
 	_sparks = _make_sparks(36, 0.1)
 	_burst = _make_sparks(18, 0.95)
 	_burst.one_shot = true
+	_exhaust = _make_puffs(10, 0.7, 0.25, 0.45)
+	_steam = _make_puffs(90, 1.2, 0.4, 1.1)
+	_steam.initial_velocity_min = 1.2
+	_steam.initial_velocity_max = 2.6
+	_steam.damping_min = 1.5
+	_steam.damping_max = 2.5
+	_steam.spread = 35.0
+	_steam.emission_shape = CPUParticles3D.EMISSION_SHAPE_BOX
+	_steam.emission_box_extents = Vector3(0.35, 0.05, 0.25)
+	_flame = MeshInstance3D.new()
+	var cone := CylinderMesh.new()
+	cone.top_radius = 0.0
+	cone.bottom_radius = 0.12
+	cone.height = 0.6
+	cone.radial_segments = 8
+	cone.material = MangaArt.lamp(Color(1.0, 0.55, 0.1), 1.6)
+	_flame.mesh = cone
+	_flame.visible = false
+	add_child(_flame)
 	if car:
 		car.wall_contact.connect(_on_wall_contact)
+		_fit_spots.call_deferred()
 
 
 func _physics_process(delta: float) -> void:
@@ -80,6 +111,64 @@ func _physics_process(delta: float) -> void:
 		smoke.emitting = sliding and amount > 0.6 and speed > 6.0 and (i >= 2 or w.is_spinning)
 	_scrape_timer = maxf(0.0, _scrape_timer - delta)
 	_sparks.emitting = _scrape_timer > 0.0
+	_update_exhaust(delta, speed)
+	_update_steam(delta)
+
+
+## Tailpipe and hood spots from the car's visible bounds (models have no exhaust node).
+func _fit_spots() -> void:
+	var box := AABB()
+	var first := true
+	var inv := car.global_transform.affine_inverse()
+	for m in car.find_children("*", "MeshInstance3D", true, false):
+		var vi := m as MeshInstance3D
+		if vi.mesh == null or not vi.is_visible_in_tree():
+			continue
+		var b := inv * vi.global_transform * vi.get_aabb()
+		box = b if first else box.merge(b)
+		first = false
+	if first:
+		return
+	# Left-hand tailpipe (where the Dalagan's is).
+	_pipe = Vector3(box.position.x + box.size.x * 0.28, box.position.y + box.size.y * 0.22, box.end.z - 0.05)
+	_hood = Vector3(0.0, box.position.y + box.size.y * 0.68, box.position.z + box.size.z * 0.2)
+
+
+func _update_exhaust(delta: float, speed: float) -> void:
+	var s := car.model.state
+	var rpm := car.model.mechanics.engine_rpm
+	var xf := car.global_transform
+	_exhaust.global_position = xf * _pipe
+	# Puffs blow back out of the pipe and get left behind.
+	_exhaust.direction = xf.basis.z.normalized()
+	_exhaust.emitting = s.throttle > 0.3 and speed < 25.0
+	# Lift-off from high revs: a pop and a flame lick (the pedal ramps, so: was floored lately).
+	_floored = 0.4 if s.throttle > 0.7 else maxf(_floored - delta, 0.0)
+	if _floored > 0.0 and s.throttle < 0.15 and rpm > 4800.0:
+		_floored = 0.0
+		_flame_time = 0.12
+		_exhaust.restart()
+		_exhaust.emitting = true
+	_flame_time = maxf(_flame_time - delta, 0.0)
+	_flame.visible = _flame_time > 0.0
+	if _flame.visible:
+		# Cone tip out the back (+Z is behind the car).
+		_flame.global_transform = Transform3D(xf.basis * Basis(Vector3.RIGHT, PI / 2.0), xf * (_pipe + Vector3(0, 0, 0.3)))
+
+
+## Steam from a burst radiator hose, for `seconds`.
+func burst_steam(seconds := 6.0) -> void:
+	_steam_time = seconds
+
+
+func _update_steam(delta: float) -> void:
+	_steam_time = maxf(_steam_time - delta, 0.0)
+	_steam.emitting = _steam_time > 0.0
+	if _steam.emitting:
+		var xf := car.global_transform
+		_steam.global_position = xf * _hood
+		# Up out of the hood seam, swept back by the car's motion.
+		_steam.direction = (Vector3.UP * 2.0 + xf.basis.z * clampf(car.linear_velocity.length() / 10.0, 0.0, 1.5)).normalized()
 
 
 func _process(_delta: float) -> void:
@@ -165,6 +254,24 @@ func _make_smoke() -> CPUParticles3D:
 	return p
 
 
+## Manga cloud puffs (the smoke shader), `size` to `grow` × size over their life.
+func _make_puffs(amount: int, lifetime: float, size: float, grow: float) -> CPUParticles3D:
+	var p := _make_smoke()
+	p.amount = amount
+	p.lifetime = lifetime
+	p.spread = 15.0
+	p.initial_velocity_min = 0.8
+	p.initial_velocity_max = 1.6
+	p.gravity = Vector3(0, 0.8, 0)
+	p.scale_amount_min = size
+	p.scale_amount_max = size * 1.3
+	var curve := Curve.new()
+	curve.add_point(Vector2(0, 0.4))
+	curve.add_point(Vector2(1, grow * 2.0))
+	p.scale_amount_curve = curve
+	return p
+
+
 func _make_sparks(amount: int, explosiveness: float) -> CPUParticles3D:
 	var p := CPUParticles3D.new()
 	p.amount = amount
@@ -205,6 +312,9 @@ func _on_wall_contact(point: Vector3, normal: Vector3, dv: float, slide: float) 
 		var along := car.linear_velocity - normal * car.linear_velocity.dot(normal)
 		_sparks.direction = (along.normalized() * -0.6 + normal * 0.5 + Vector3.UP * 0.6).normalized()
 	# Hits: a spark burst, an impact frame and camera trauma, scaled by the impulse.
+	# A hard hit to the nose bursts a radiator hose.
+	if dv > 9.0 and normal.dot(car.global_basis.z) > 0.5:
+		burst_steam(8.0)
 	if dv > 3.0:
 		var severity := clampf((dv - 3.0) / 7.0, 0.25, 1.0) * fx
 		_burst.global_position = point

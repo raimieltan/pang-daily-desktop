@@ -21,6 +21,11 @@ const SCENARIOS := {
 	# frames it from a fixed eye at road distance d, lateral lat (right +), height h, aimed at d2.
 	# PANG_FREE=1 starts in free drive (the roadside traffic only rides there).
 	"props": [[1.5, 0, 0, 0, 0, "props_day"]],
+	# A burst radiator hose (steam from the hood) while rolling, then parked; and an exhaust pop on
+	# lifting off at high revs (the flame lasts ~0.1 s, so a burst of shots just after the lift).
+	"steam": [[2.0, 0, 0, 0, 0, ""], [5.0, 0.7, 0, 0, 0, ""], [6.2, 0.4, 0, 0, 0, "steam_rolling"], [9.0, 0, 1, 0, 0, "steam_stopped"]],
+	"pop": [[2.0, 0, 0, 0, 0, ""], [7.5, 1, 0, 0, 0, ""], [7.58, 0, 0, 0, 0, "pop_a"], [7.64, 0, 0, 0, 0, "pop_b"],
+		[7.7, 0, 0, 0, 0, "pop_c"], [7.76, 0, 0, 0, 0, "pop_d"], [8.2, 0, 0, 0, 0, "pop_puffs"]],
 	# Menus: the title on launch; the pause menu over a run.
 	"title": [[1.5, 0, 0, 0, 0, "title"]],
 	"pause": [[2.0, 0, 0, 0, 0, ""], [6.0, 0.85, 0, 0, 0, ""], [6.3, 0, 0, 0, 0, "pause"]],
@@ -170,6 +175,8 @@ func _process(delta: float) -> bool:
 			_shot(step[5])
 		if _scenario == "cams" and _step >= 1:
 			session.camera.mode = (_step % ChaseCamera.Mode.size()) as ChaseCamera.Mode
+		if _scenario == "steam" and _step == 1:
+			session.fx.burst_steam(10.0)
 		if _scenario == "switch" and _step == 0:
 			session.day_night.toggle()
 		_step += 1
@@ -216,6 +223,9 @@ func _shot(name: String) -> void:
 		RenderingServer.force_draw()
 	if OS.has_environment("PANG_NO_PAGE"):
 		_scene.session.camera.manga.enabled = false
+	if _scenario == "pop":
+		print("  rpm %.0f throttle %.2f flame %s" % [_scene.session.car.model.mechanics.engine_rpm,
+			_scene.session.car.model.state.throttle, _scene.session.fx._flame.visible])
 	var life: Node = _scene.get_node_or_null("RoadsideLife")
 	if life:
 		for n in life.get_children():

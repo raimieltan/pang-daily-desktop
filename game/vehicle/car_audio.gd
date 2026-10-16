@@ -49,6 +49,17 @@ static func ensure_buses() -> void:
 	var lowpass := AudioEffectLowPassFilter.new()
 	lowpass.cutoff_hz = 1100.0
 	AudioServer.add_bus_effect(AudioServer.get_bus_index("EngineOff"), lowpass)
+	# Engine echo off the mountainside: a large, dark room, mostly dry.
+	for bus in ["Engine", "EngineOff"]:
+		var echo := AudioEffectReverb.new()
+		echo.predelay_msec = 110.0
+		echo.predelay_feedback = 0.25
+		echo.room_size = 0.85
+		echo.damping = 0.6
+		echo.spread = 0.8
+		echo.wet = 0.12
+		echo.dry = 1.0
+		AudioServer.add_bus_effect(AudioServer.get_bus_index(bus), echo)
 	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Master"), -4.0)
 
 
