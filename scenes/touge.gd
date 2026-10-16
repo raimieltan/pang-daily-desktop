@@ -24,6 +24,9 @@ func _ready() -> void:
 	add_child(MAP.instantiate())
 	var spawn := track.pose_at(track.start_distance - 12.0, 0.0)
 	session = DriveSession.new(spawn["position"], spawn["heading"])
+	if StoryMode.active:
+		session.car_spec = CarRoster.get_car(StoryMode.CAR_ID)
+		session.paint = StoryMode.CAR_PAINT
 	session.reset_pose = _reset_pose
 	session.track = track
 	add_child(session)
@@ -70,11 +73,27 @@ func _ready() -> void:
 	# Arriving from the barangay: straight onto the road, no title.
 	var from_hub := HubChallenge.rival >= 0 or HubChallenge.free_drive
 	var skip := GameMenu.skip_title
-	GameMenu.skip_title = skip or from_hub
+	GameMenu.skip_title = skip or from_hub or StoryMode.active
 	add_child(menu)
 	GameMenu.skip_title = skip
-	if from_hub:
+	if StoryMode.active:
+		_start_story.call_deferred()
+	elif from_hub:
 		_start_from_hub.call_deferred()
+
+
+## Story mode (StoryMode): the director plays its beats on this road.
+func _start_story() -> void:
+	time_attack.free_drive()
+	music.stop_music()
+	var director := StoryDirector.new()
+	director.name = "StoryDirector"
+	director.stage = "pass"
+	director.session = session
+	director.time_attack = time_attack
+	director.vs_battle = vs_battle
+	director.music = music
+	add_child(director)
 
 
 ## A challenge made in the barangay: the SP battle against that rival (or free drive from the

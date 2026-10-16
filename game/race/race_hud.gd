@@ -75,14 +75,19 @@ func _label(size: int, preset: int, offset: Vector2, font: Font = null) -> Label
 	return l
 
 
-func show_run(best: Dictionary) -> void:
+func show_run(best: Dictionary, label := "BEST") -> void:
 	_goal.visible = false
 	_show_sp(false)
 	_place.text = ""
 	_place_of.text = ""
 	_split.text = ""
-	_best.text = "BEST  " + (TimeAttackRun.format_time(float(best["time"])) if best.has("time") else "--:--.---")
+	best_text(label + "  " + (TimeAttackRun.format_time(float(best["time"])) if best.has("time") else "--:--.---"))
 	_count_value = -1
+
+
+## The line under the timer: what the run is measured against.
+func best_text(text: String) -> void:
+	_best.text = text
 
 
 func go() -> void:
@@ -112,14 +117,14 @@ func split(sector: int, time: float, reference: float) -> void:
 	_split_timer = 3.0
 
 
-func finish(time: float, previous_best: float, record: bool) -> void:
+func finish(time: float, previous_best: float, record: bool, label := "BEST") -> void:
 	var lines := ["G O A L", "", TimeAttackRun.format_time(time)]
 	if record:
 		lines.append("NEW RECORD!" if previous_best > 0.0 else "FIRST RECORD")
 		if previous_best > 0.0:
 			lines.append("−%.3f" % (previous_best - time))
 	else:
-		lines.append("BEST  " + TimeAttackRun.format_time(previous_best))
+		lines.append(label + "  " + TimeAttackRun.format_time(previous_best))
 	lines.append("")
 	lines.append("[ENTER] RUN AGAIN")
 	_goal_text.text = "\n".join(lines)

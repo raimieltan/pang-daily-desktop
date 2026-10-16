@@ -25,6 +25,9 @@ var _title := Control.new()
 var _pause := Control.new()
 var _garage := Control.new()
 var _settings := Control.new()
+var _story := Control.new()
+var _story_first: Button
+var _story_list: VBoxContainer
 var _settings_first: Button
 ## Where BACK on the settings page goes: the title or the pause menu.
 var _settings_return: Callable
@@ -68,6 +71,7 @@ func _ready() -> void:
 	_build_pause()
 	_build_garage()
 	_build_settings()
+	_build_story()
 	GameSettings.apply_audio()
 	if music:
 		music.set_user_volume(GameSettings.value("music"))
@@ -87,11 +91,15 @@ func _build_title() -> void:
 	var art := TitleArt.new()
 	art.custom_minimum_size = Vector2(640, 220)
 	column.add_child(art)
-	var menu := VBoxContainer.new()
-	menu.add_theme_constant_override("separation", 6)
+	# Two columns: nine entries in one would run off a 648 px page.
+	var menu := GridContainer.new()
+	menu.columns = 2
+	menu.add_theme_constant_override("h_separation", 24)
+	menu.add_theme_constant_override("v_separation", 6)
 	menu.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	column.add_child(menu)
-	_title_first = _button(menu, "BARANGAY", func(): _open_garage("BARANGAY", _start_barangay))
+	_title_first = _button(menu, "STORY", _open_story)
+	_button(menu, "BARANGAY", func(): _open_garage("BARANGAY", _start_barangay))
 	_button(menu, "VS BATTLE", func(): _open_garage("VS BATTLE", _start_vs))
 	_button(menu, "SP BATTLE", func(): _open_garage("SP BATTLE", _start_sp))
 	_button(menu, "SPECTATE", func(): _open_garage("SPECTATE", _start_spectate))
@@ -99,7 +107,7 @@ func _build_title() -> void:
 	_button(menu, "FREE DRIVE", func(): _open_garage("FREE DRIVE", _start_free_drive))
 	_button(menu, "SETTINGS", func(): _open_settings(open_title))
 	_button(menu, "QUIT", get_tree().quit)
-	var hint := MangaType.label("↑ ↓  SELECT     ENTER  GO", 20, MangaType.caption())
+	var hint := MangaType.label("↑ ↓ ← →  SELECT     ENTER  GO", 20, MangaType.caption())
 	hint.add_theme_color_override("font_color", MangaType.INK)
 	hint.remove_theme_constant_override("outline_size")
 	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -129,7 +137,7 @@ func _build_pause() -> void:
 	_value_button(left, func(): return "TIRES: " + session.car.tire_product.to_upper(),
 		func(): session.car.set_tire_product("street" if session.car.tire_product == "stock" else "stock"))
 	_button(left, "SETTINGS", func(): _open_settings(open_pause))
-	_button(left, "MAIN MENU", open_title)
+	_button(left, "MAIN MENU", _main_menu)
 	_button(left, "QUIT", get_tree().quit)
 
 	# Controls card: a paper panel with an ink border, captions in Bangers.
@@ -296,6 +304,51 @@ func _build_settings() -> void:
 	column.add_child(hint)
 
 
+## Story mode: "The Ghost Line" (docs/story/STORY_MODE.md). Continue, start over, or replay an act
+## already reached.
+func _build_story() -> void:
+	_story.set_anchors_preset(Control.PRESET_FULL_RECT)
+	add_child(_story)
+	var column := _column(_story)
+	column.add_child(MangaType.label("THE GHOST LINE", 84))
+	column.add_child(_slab("STORY", MangaType.RED))
+	_story_list = VBoxContainer.new()
+	_story_list.add_theme_constant_override("separation", 6)
+	column.add_child(_story_list)
+	var hint := MangaType.label("↑ ↓  SELECT     ENTER  GO     ESC  BACK", 20, MangaType.caption())
+	hint.add_theme_color_override("font_color", MangaType.INK)
+	hint.remove_theme_constant_override("outline_size")
+	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	column.add_child(hint)
+
+
+func _open_story() -> void:
+	StoryMode.load_save()
+	for c in _story_list.get_children():
+		c.queue_free()
+	var saved := StoryMode.has_save() and (StoryMode.beat > 0 or StoryMode.completed)
+	var first: Button = null
+	if saved and not StoryMode.completed:
+		first = _button(_story_list, "CONTINUE", func(): StoryMode.resume(get_tree()))
+	var fresh := _button(_story_list, "NEW STORY", func(): StoryMode.start_new(get_tree()))
+	first = first if first else fresh
+	for act in StoryScript.acts():
+		if saved and int(act[1]) <= StoryMode.reached:
+			var b := _button(_story_list, act[0], StoryMode.play_from.bind(get_tree(), int(act[1])))
+			b.custom_minimum_size.x = 640
+	_button(_story_list, "BACK", open_title)
+	_story_first = first
+	_show(_story, first)
+
+
+## Pause → main menu: out of the story (saved) back to the title, or the title here.
+func _main_menu() -> void:
+	if StoryMode.active:
+		StoryMode.quit_to_title(get_tree())
+	else:
+		open_title()
+
+
 func _open_settings(back_to: Callable) -> void:
 	_settings_return = back_to
 	_show(_settings, _settings_first)
@@ -456,6 +509,7 @@ func _show(screen: Control, first: Button) -> void:
 	_pause.visible = screen == _pause
 	_garage.visible = screen == _garage
 	_settings.visible = screen == _settings
+	_story.visible = screen == _story
 	_wash.visible = true
 	_refresh()
 	get_tree().paused = true
@@ -468,6 +522,7 @@ func _close() -> void:
 	_pause.visible = false
 	_garage.visible = false
 	_settings.visible = false
+	_story.visible = false
 	_wash.visible = false
 	get_viewport().gui_release_focus()
 	_set_play_hud(true)
@@ -583,7 +638,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	get_viewport().set_input_as_handled()
 	if _pause.visible:
 		_close()
-	elif _garage.visible:
+	elif _garage.visible or _story.visible:
 		open_title()
 	elif _settings.visible:
 		_settings_return.call()

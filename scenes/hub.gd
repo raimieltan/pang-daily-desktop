@@ -2,7 +2,7 @@ extends Node3D
 ## The barangay hub: drive the neighbourhood, hang out at Kyo Coffee, challenge rivals.
 ## Rivals parked at Kyo: pull up beside one and press E. Rivals cruising the loop: get behind one
 ## and flash your lights (L). Either way the SP battle runs on Pass 1, then E brings you back here.
-## The talyer's bays swap your car (Tito Jun); the east end of the main road heads up to Pass 1.
+## The talyer's bays swap your car (Ruel); the east end of the main road heads up to Pass 1.
 ## Esc: the title menu. R: back onto the loop.
 
 const CHALLENGE_REACH := 7.5
@@ -47,7 +47,10 @@ func _ready() -> void:
 	session.reset_pose = func(car: CarBody) -> Dictionary:
 		return loop.pose_at(loop.nearest_index(car.global_position) * loop.spacing, 2.0)
 	session.track = loop
-	if HubChallenge.car_id != "":
+	if StoryMode.active:
+		session.car_spec = CarRoster.get_car(StoryMode.CAR_ID)
+		session.paint = StoryMode.CAR_PAINT
+	elif HubChallenge.car_id != "":
 		session.car_spec = CarRoster.get_car(HubChallenge.car_id)
 	add_child(session)
 	session.minimap.track = loop
@@ -62,8 +65,10 @@ func _ready() -> void:
 		parked.append(car)
 		parked_rivals.append(spot[0])
 	_park_lights_off.call_deferred()
-	for k in HubLayout.CRUISERS.size():
-		_spawn_cruiser(HubLayout.CRUISERS[k], 260.0 + k * _ring * 0.5)
+	# In the story the loop is the meet's course: nobody cruising it.
+	if not StoryMode.active:
+		for k in HubLayout.CRUISERS.size():
+			_spawn_cruiser(HubLayout.CRUISERS[k], 260.0 + k * _ring * 0.5)
 	var others: Array = [session.car]
 	others.append_array(cruisers)
 	for d in cruiser_drivers:
@@ -71,6 +76,14 @@ func _ready() -> void:
 	session.minimap.rivals.assign(cruisers)
 	_build_hud()
 	HubChallenge.return_to = "kyo"
+	if StoryMode.active:
+		_hud.visible = false
+		var director := StoryDirector.new()
+		director.name = "StoryDirector"
+		director.stage = "hub"
+		director.session = session
+		director.loop = loop
+		add_child(director)
 
 
 ## Parked cars keep their lamps dark: nosed in at Kyo, their beams would white out the glass.
@@ -165,6 +178,8 @@ func _process(delta: float) -> void:
 
 
 func _update_prompt(at: Vector2) -> void:
+	if StoryMode.active:
+		return
 	var speed := session.car.linear_velocity.length()
 	_action = Callable()
 	var text := ""
@@ -185,7 +200,7 @@ func _update_prompt(at: Vector2) -> void:
 		elif Rect2(8.5, 151, 31, 16.5).has_point(at):
 			var next := _next_car()
 			text = "E   SWAP TO THE %s" % next["name"]
-			line = "TITO JUN:  \"%s\"" % HubLayout.TITO_JUN
+			line = "RUEL:  \"%s\"" % HubLayout.RUEL
 			_action = _swap_car.bind(next["id"])
 	if text == "" and _place == "exit":
 		text = "E   HEAD UP TO PASS 1"
@@ -198,6 +213,11 @@ func _update_prompt(at: Vector2) -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if _leaving:
+		return
+	if StoryMode.active:
+		if event.is_action_pressed("hub_menu"):
+			_leaving = true
+			StoryMode.quit_to_title(get_tree())
 		return
 	if event.is_action_pressed("interact") and _action.is_valid():
 		_action.call()

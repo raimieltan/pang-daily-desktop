@@ -21,11 +21,21 @@ var _in_intro := false
 var _ghost_data := PackedFloat32Array()
 var _ghost_visual: Node3D
 var _ghost_model := ""
+var _ghost_material: ShaderMaterial
 var _record := PackedFloat32Array()
 var _sample_clock := 0.0
 var _index_hint := 0
 ## False in free drive: no timer, ghost or countdown.
 var active := true
+## False: a run outside the records (story mode): `reference` is the target ({ time, splits }),
+## `ghost_override` its ghost (GhostLine frames), and nothing is saved.
+var records := true
+var reference := {}
+var ghost_override := PackedFloat32Array()
+## The HUD's name for the target ("BEST", "GHOST TIME", ...).
+var best_label := "BEST"
+## Ghost opacity for this run; below 0, the shader's own.
+var ghost_opacity := -1.0
 
 
 func _ready() -> void:
@@ -56,8 +66,8 @@ func restart(with_intro := false) -> void:
 	session.input_filter = _filter_input
 	session.reset_pose = _reset_pose
 	run = null
-	best = TimeAttackRecords.load_best(track_id, _car_id())
-	_ghost_data = TimeAttackRecords.load_ghost(track_id, _car_id())
+	best = TimeAttackRecords.load_best(track_id, _car_id()) if records else reference
+	_ghost_data = TimeAttackRecords.load_ghost(track_id, _car_id()) if records else ghost_override
 	_record = PackedFloat32Array()
 	_sample_clock = 0.0
 	_index_hint = track.index_at(track.start_distance)
@@ -68,6 +78,7 @@ func restart(with_intro := false) -> void:
 		_ghost_visual.queue_free()
 		_ghost_visual = _make_ghost()
 		add_child(_ghost_visual)
+	_ghost_material.set_shader_parameter("opacity", ghost_opacity if ghost_opacity >= 0.0 else 0.35)
 	_ghost_visual.visible = false
 	if with_intro and intro:
 		if music:
@@ -86,7 +97,7 @@ func restart(with_intro := false) -> void:
 		music.play_track(&"race_alt")
 	hud.visible = true
 	run = TimeAttackRun.new(track.start_distance, track.finish_distance)
-	hud.show_run(best)
+	hud.show_run(best, best_label)
 	session.replay.begin([session.car] as Array[CarBody], ["YOU"] as Array[String])
 
 
@@ -138,8 +149,8 @@ func _physics_process(delta: float) -> void:
 				var ref: Array = best.get("splits", [])
 				hud.split(k, run.splits[k], float(ref[k]) if k < ref.size() else -1.0)
 			"finish":
-				var record := TimeAttackRecords.submit(track_id, _car_id(), run.time, run.splits, _record)
-				hud.finish(run.time, float(best.get("time", -1.0)), record)
+				var record := records and TimeAttackRecords.submit(track_id, _car_id(), run.time, run.splits, _record)
+				hud.finish(run.time, float(best.get("time", -1.0)), record, best_label)
 				finished.emit(run.time, record)
 	if run.phase == TimeAttackRun.Phase.RUNNING:
 		_sample_clock += delta
@@ -154,7 +165,9 @@ func _process(_delta: float) -> void:
 	if run == null:
 		return
 	hud.update_run(run)
-	var pose := TimeAttackRecords.ghost_pose(_ghost_data, run.time) if run.phase == TimeAttackRun.Phase.RUNNING else {}
+	var pose := {}
+	if run.phase == TimeAttackRun.Phase.RUNNING:
+		pose = TimeAttackRecords.ghost_pose(_ghost_data, run.time) if records else GhostLine.pose_in(_ghost_data, run.time)
 	_ghost_visual.visible = not pose.is_empty()
 	if not pose.is_empty():
 		_ghost_visual.global_transform = Transform3D(Basis(pose["rotation"]), pose["position"])
@@ -170,6 +183,7 @@ func _make_ghost() -> Node3D:
 	root.add_child(model)
 	var m := ShaderMaterial.new()
 	m.shader = GHOST_SHADER
+	_ghost_material = m
 	for node in model.find_children("*", "MeshInstance3D", true, false):
 		var mi := node as MeshInstance3D
 		mi.material_override = m

@@ -28,7 +28,7 @@ const TALYER_ORIGIN := Vector2(24.0, 150.0)
 ## Places: name, area (x0, z0, w, d), and where you start when you come back to them.
 const PLACES := {
 	"kyo": { "name": "KYO COFFEE", "area": Rect2(124, 84, 41, 30), "spawn": Vector3(130.0, 102.3, 90) },
-	"talyer": { "name": "TALYER NI TITO JUN", "area": Rect2(5, 144, 45, 25), "spawn": Vector3(24, 146.5, 180) },
+	"talyer": { "name": "TALYER NI RUEL", "area": Rect2(5, 144, 45, 25), "spawn": Vector3(24, 146.5, 180) },
 	"home": { "name": "HOME", "area": Rect2(-90, 145, 24, 27), "spawn": Vector3(-78, 150, 180) },
 	"gas": { "name": "BAHANDI FUELS", "area": Rect2(-6, 6, 64, 40), "spawn": Vector3(25, 24, 90) },
 	"suki": { "name": "SUKI 24", "area": Rect2(-86, 6, 36, 32), "spawn": Vector3(-71, 13, 180) },
@@ -55,7 +55,8 @@ const LINES := {
 	"BUKO": "Basta indi ka maghibi ha.",
 	"TISOY": "Ano, bilisan ta? Tara sa bukid.",
 }
-const TITO_JUN := "Unahon ta anay ang preno mo."
+## Ruel, the mechanic (docs/story: he runs the talyer).
+const RUEL := "Unahon ta anay ang preno mo."
 
 ## Houses: centre (x, z), footprint (w, d), wall tone, roof tone, facing (deg, 0 north).
 const HOUSES := [

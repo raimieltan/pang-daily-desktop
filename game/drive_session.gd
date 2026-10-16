@@ -9,6 +9,8 @@ signal car_changed
 var car: CarBody
 ## The roster entry being driven (CarRoster.CARS).
 var car_spec: Dictionary = CarRoster.CARS[0]
+## The body colour on screen (story mode drives Pang's own faded hatch).
+var paint := CarVisual.PLAYER_PAINT
 var visual: CarVisual
 var camera: ChaseCamera
 var hud: TelemetryHud
@@ -129,6 +131,7 @@ func _ready() -> void:
 func _add_visual() -> void:
 	visual = CarVisual.new()
 	visual.model_scene = load(car_spec["model"])
+	visual.paint_color = paint
 	visual.car = car
 	car.add_child(visual)
 

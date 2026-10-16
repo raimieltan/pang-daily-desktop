@@ -72,6 +72,11 @@ func _init(car_: CarBody, track_: TrackData, skill_: float, lane_: float) -> voi
 	lane = lane_
 	_lane_now = lane_
 	_plan = speed_plan(track_)
+	# Wherever the car is now (a whole-road search): a driver can take over mid-road.
+	if car_.is_inside_tree():
+		_index = track_.nearest_index(car_.global_position)
+		distance = _index * track_.spacing
+		_mark_distance = distance
 
 
 ## Highest speed (m/s) at each sample for μ = plan_mu: corner limit from curvature, then a

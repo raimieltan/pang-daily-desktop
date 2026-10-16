@@ -1,4 +1,4 @@
-"""Talyer ni Tito Jun, for the hub: Tito Jun's open-front shed on the barangay street.
+"""Talyer ni Ruel, for the hub: Ruel's open-front shed on the barangay street.
 
 Run headless: Blender --background --factory-startup --python tools/world_builders/build-talyer.py
 Add `-- --preview <dir>` to render check images. Output: assets/world/talyer.glb.
@@ -9,7 +9,7 @@ steel posts overhanging the apron. Left bay: a budget spray booth (washable pane
 bright strips). Right bay: a two-post lift with a drive-in gap. Along the back: workbenches, a tool
 cabinet, calendars, spare bumpers, an engine block, drums, tyre stacks, a stand fan, a welder.
 East of the shed: the tambay corner (plastic chairs, a table, a cooler, beer crates) behind bollards,
-and Tito Jun's errand corkboard on the bay wall. Tarp sign on posts at the street.
+and Ruel's errand corkboard on the bay wall. Tarp sign on posts at the street.
 Layout units as in the Babylon hub (x east, y up, z north). GLB origin: (24, 0, 150), the middle of
 the shed's open front.
 """
@@ -65,7 +65,7 @@ k.box((24, ROOF_Y - 0.1, 150.4), (33, 0.22, 0.2), *POST, group='building')
 k.box((24, 0.5, 164), (0.4, 1.0, 8), *BLOCK, group='building', collide=True)
 
 # The shed name painted across the front beam.
-k.text('TALYER NI TITO JUN', (24, ROOF_Y - 0.1, 150.27), 0.17, 'accent_sign_red', '#b8322a', facing='-y',
+k.text('TALYER NI RUEL', (24, ROOF_Y - 0.1, 150.27), 0.17, 'accent_sign_red', '#b8322a', facing='-y',
        depth=0.02)
 
 # ---------------------------------------------------------------- left bay: budget spray booth
@@ -194,7 +194,7 @@ for x in (41, 44, 47):
     k.cyl((x, 0, 149.2), 0.12, 0.7, 'bollard', '#d8d6ce', verts=8)
     k.cyl((x, 0.55, 149.2), 0.125, 0.08, 'accent_sign_red', '#b8322a', verts=8)
     k.collider((x, 0.35, 149.2), (0.24, 0.7, 0.24))
-# Tito Jun's errand corkboard on the bay's east wall, facing the waiting corner.
+# Ruel's errand corkboard on the bay's east wall, facing the waiting corner.
 k.box((40.38, 1.55, 154), (0.06, 0.8, 1.1), 'cork', '#9a6b3f', group='props')
 for (z, y) in ((153.75, 1.65), (154.25, 1.5)):
     k.box((40.42, y, z), (0.02, 0.3, 0.24), 'paper', '#f1ece0', group='props')

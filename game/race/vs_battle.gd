@@ -45,6 +45,8 @@ var music: MusicPlayer
 var opponents := 3
 ## SP battle against RIVALS[sp_rival]; -1 is the pack race. The menu sets it.
 var sp_rival := -1
+## A field of RIVALS-shaped entries to race instead of the cast (story mode's meets).
+var field_override: Array = []
 var sp: SpBattleRules
 var run: TimeAttackRun
 var active := false
@@ -87,6 +89,8 @@ func start() -> void:
 		field = [RIVALS[clampi(sp_rival, 0, RIVALS.size() - 1)]]
 	else:
 		field = RIVALS.slice(0, clampi(opponents, 1, RIVALS.size()))
+	if not field_override.is_empty():
+		field = field_override
 	var grid := _grid(field.size())
 	var pose: Dictionary = grid[0]
 	session.car.place(pose["position"], pose["heading"])

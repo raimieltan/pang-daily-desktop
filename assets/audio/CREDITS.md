@@ -107,6 +107,7 @@ Licences were taken from Freesound pages or search snippets. Re-check each page 
 | tire/squeal_loop.wav | raw/tire/tires_squal_loop.wav | mono, 44.1 kHz 16-bit | **CC-BY 3.0**: see the tire row above for the exact attribution line |
 | impact/*.ogg | raw/kenney_impact-sounds/ | copied | CC0, Kenney (kenney.nl) |
 | ambience/crickets_loop.wav, wind_loop.wav, dog_bark_far.wav | nothing: synthesised by `tools/audio/synth_ambience.py` (2026-10-16) | mono, 44.1 kHz 16-bit | Ours, CC0 |
+| ambience/rain_loop.wav, story/wrench.wav, shutter.wav, phone_buzz.wav, pulse.wav, wiper.wav | nothing: synthesised by `tools/audio/make_story_sfx.py` (2026-10-17, story mode) | mono, 44.1 kHz 16-bit | Ours, CC0 |
 
 The CC-BY credits must appear in the game's credits screen.
 
