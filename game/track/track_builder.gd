@@ -356,6 +356,7 @@ func build_road_mesh() -> ArrayMesh:
 	for i in pts.size():
 		rings.append(_ring(i))
 	var center: int = (rings[0]["positions"] as PackedVector3Array).size() / 2
+	var flags := surface_flags()
 	for i in pts.size() - 1:
 		var a: Dictionary = rings[i]
 		var b: Dictionary = rings[i + 1]
@@ -371,11 +372,14 @@ func build_road_mesh() -> ArrayMesh:
 			var mat: int = ma[k] if k < center else ma[k + 1]
 			var st := tools[mat]
 			var uv_scale := 1.0 if mat == Mat.ASPHALT else 0.5
+			var ca := flags[i]
+			var cb := flags[i + 1]
 			var quad := [
-				[pa[k], Vector2(la[k], va)], [pb[k], Vector2(lb[k], vb)], [pb[k + 1], Vector2(lb[k + 1], vb)],
-				[pa[k], Vector2(la[k], va)], [pb[k + 1], Vector2(lb[k + 1], vb)], [pa[k + 1], Vector2(la[k + 1], va)],
+				[pa[k], Vector2(la[k], va), ca], [pb[k], Vector2(lb[k], vb), cb], [pb[k + 1], Vector2(lb[k + 1], vb), cb],
+				[pa[k], Vector2(la[k], va), ca], [pb[k + 1], Vector2(lb[k + 1], vb), cb], [pa[k + 1], Vector2(la[k + 1], va), ca],
 			]
 			for v in quad:
+				st.set_color(v[2])
 				st.set_uv((v[1] as Vector2) * uv_scale)
 				st.add_vertex(v[0])
 	var mesh := ArrayMesh.new()
@@ -387,6 +391,30 @@ func build_road_mesh() -> ArrayMesh:
 		st.set_material(materials[m])
 		st.commit(mesh)
 	return mesh
+
+
+## Per-sample road surface flags for the road shader, as vertex color: r = concrete (steep
+## stretches and hairpins are poured concrete, as on many PH mountain roads), g = no overtaking
+## (double solid center line through corners; dashed on the straights).
+func surface_flags() -> PackedColorArray:
+	var n := pts.size()
+	var steep := PackedFloat64Array()
+	var bends := PackedFloat64Array()
+	for i in n:
+		var grade := 0.0
+		if i > 0:
+			grade = (pts[i].y - pts[i - 1].y) / SPACING
+		steep.append(1.0 if absf(grade) >= 0.075 or absf(curvature[i]) > 1.0 / 25.0 else 0.0)
+		bends.append(absf(curvature[i]))
+	# Concrete only in runs long enough to have been poured as a section (40 m+), with a margin.
+	var concrete := _smooth(steep, 20)
+	var corner := _smooth(bends, 50)
+	var out := PackedColorArray()
+	for i in n:
+		var c := 1.0 if concrete[i] > 0.5 else 0.0
+		var no_pass := 1.0 if corner[i] > 1.0 / 220.0 else 0.0
+		out.append(Color(c, no_pass, 0.0, 1.0))
+	return out
 
 
 # --- Terrain ------------------------------------------------------------------------------------

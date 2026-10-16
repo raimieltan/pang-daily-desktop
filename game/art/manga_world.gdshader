@@ -52,6 +52,7 @@ varying float v_albedo;
 varying float v_dist;
 varying vec3 v_world_normal;
 varying vec2 v_uv;
+varying vec4 v_flags;
 
 float h21(vec2 q) { return fract(sin(dot(q, vec2(127.1, 311.7))) * 43758.5453); }
 float vn(vec2 q) {
@@ -73,12 +74,39 @@ float band(float x, float center, float half_w) {
 void vertex() {
 	v_world_normal = normalize((MODEL_MATRIX * vec4(NORMAL, 0.0)).xyz);
 	v_uv = UV;
+	v_flags = COLOR;
 }
 
 void fragment() {
 	float a = lit_value;
 	a *= 1.0 - slope_darken * smoothstep(0.5, 0.85, 1.0 - v_world_normal.y);
-	if (road_markings) {
+	if (road_markings && v_flags.r > 0.5) {
+		vec2 p = v_uv;
+		// --- Poured concrete section: pale slabs, a sawn joint every 4.5 m, spalled joints,
+		// the odd cracked slab and oil drips down the middle of each lane. ---
+		a = 0.64;
+		a *= 0.93 + 0.08 * vn(p * 0.5) + 0.04 * vn(p * 4.0);
+		a *= 1.0 - step(0.95, h21(floor(p * 11.0))) * 0.2;
+		float slab = floor(p.y / 4.5);
+		float jy = abs(fract(p.y / 4.5 + 0.5) - 0.5) * 4.5;
+		float joint = 1.0 - smoothstep(0.012, 0.012 + fwidth(p.y) + 0.002, jy);
+		float spall = (1.0 - smoothstep(0.05, 0.12, jy)) * step(0.7, vn(vec2(p.x * 3.0, slab * 7.0)));
+		// Diagonal corner crack across some slabs.
+		float side = sign(p.x + 0.001);
+		vec2 q = vec2(abs(p.x), fract(p.y / 4.5) * 4.5);
+		float crack_on = step(0.72, h21(vec2(slab, side)));
+		float crack = wavy_line(vec2(q.x - q.y * 0.6, q.y), 1.2, 0.25, 0.9, 0.012, slab) * crack_on * step(q.x, lane_half_width);
+		// Oil drip line down each lane's middle.
+		float oil = (1.0 - smoothstep(0.15, 0.45, abs(abs(p.x) - 1.5))) * (0.55 + 0.45 * vn(vec2(p.x * 2.0, p.y * 0.3)));
+		a *= 1.0 - oil * 0.14;
+		a = mix(a, 0.1, max(joint * 0.85, max(spall * 0.5, crack * 0.75)));
+		a *= 1.0 - 0.06 * (1.0 - smoothstep(0.0, 0.4, abs(abs(p.x) - lane_half_width)));
+		float edge = band(p.x, -lane_half_width + 0.15, 0.075) + band(p.x, lane_half_width - 0.15, 0.075);
+		float dash = step(fract(p.y / 8.0), 0.4);
+		float centre = v_flags.g > 0.5 ? band(p.x, -0.1, 0.06) + band(p.x, 0.1, 0.06) : band(p.x, 0.0, 0.065) * dash;
+		float wear = smoothstep(0.35, 0.6, vn(p * vec2(4.0, 0.7))) * 0.75;
+		a = mix(a, 0.97, clamp(edge + centre, 0.0, 1.0) * (1.0 - wear * 0.6));
+	} else if (road_markings) {
 		vec2 p = v_uv;
 		// --- Worn asphalt (all in albedo; the compositor turns it into ink and wash) ---
 		// Large repair patches: darker rectangles of newer tar.
@@ -102,7 +130,8 @@ void fragment() {
 		a = mix(a, 0.05, max(tar * 0.9, cracks * 0.75));
 		// Markings: worn paint, broken where tires run over it.
 		float edge = band(p.x, -lane_half_width + 0.15, 0.075) + band(p.x, lane_half_width - 0.15, 0.075);
-		float centre = band(p.x, -0.1, 0.06) + band(p.x, 0.1, 0.06);
+		float dash = step(fract(p.y / 8.0), 0.4);
+		float centre = v_flags.g > 0.5 ? band(p.x, -0.1, 0.06) + band(p.x, 0.1, 0.06) : band(p.x, 0.0, 0.065) * dash;
 		float start = start_line > 0.0 ? band(p.y, start_line, 0.25) * step(abs(p.x), lane_half_width) : 0.0;
 		float wear = smoothstep(0.35, 0.6, vn(p * vec2(4.0, 0.7))) * 0.75;
 		a = mix(a, 0.95, clamp(edge + centre + start, 0.0, 1.0) * (1.0 - wear * 0.6));
