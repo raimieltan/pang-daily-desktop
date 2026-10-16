@@ -1,12 +1,12 @@
 class_name GameSettings
 extends RefCounted
-## Player settings, saved to user://settings.cfg: volumes in 0–10 steps, display, VS opponents.
+## Player settings, saved to user://settings.cfg: volumes in 0–10 steps, display, VS opponents, SP rival.
 ## Volume steps scale each bus from the level the game set it up at, so the mix stays balanced.
 
 const PATH := "user://settings.cfg"
 const DEFAULTS := {
 	"master": 10, "music": 8, "engine": 10, "effects": 10,
-	"fullscreen": false, "vsync": true, "opponents": 3,
+	"fullscreen": false, "vsync": true, "opponents": 3, "sp_rival": 0,
 }
 ## The buses each volume slider drives (Music is handled by MusicPlayer, which also ducks it).
 const BUSES := { "master": ["Master"], "engine": ["Engine", "EngineOff"], "effects": ["Tires", "Fx", "Ambience"] }

@@ -14,6 +14,8 @@ var _goal: PanelContainer
 var _goal_text: Label
 var _place: Label
 var _place_of: Label
+## SP battle gauges, [0] the player (left), [1] the rival (right).
+var _sp: Array[SpGauge] = []
 var _split_timer := 0.0
 var _count_value := -1
 
@@ -31,6 +33,16 @@ func _ready() -> void:
 	_place_of = _label(34, Control.PRESET_CENTER_LEFT, Vector2(52, 90), MangaType.caption())
 	_place_of.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	_place_of.grow_horizontal = Control.GROW_DIRECTION_END
+	for i in 2:
+		var g := SpGauge.new()
+		g.mirrored = i == 0
+		g.fill = INK if i == 0 else MangaType.RED
+		g.set_anchors_preset(Control.PRESET_CENTER_TOP)
+		g.position = Vector2(-g.custom_minimum_size.x - 18 if i == 0 else 18, 150)
+		g.size = g.custom_minimum_size
+		g.visible = false
+		add_child(g)
+		_sp.append(g)
 	_goal = PanelContainer.new()
 	var style := StyleBoxFlat.new()
 	style.bg_color = PAPER
@@ -65,6 +77,7 @@ func _label(size: int, preset: int, offset: Vector2, font: Font = null) -> Label
 
 func show_run(best: Dictionary) -> void:
 	_goal.visible = false
+	_show_sp(false)
 	_place.text = ""
 	_place_of.text = ""
 	_split.text = ""
@@ -73,7 +86,11 @@ func show_run(best: Dictionary) -> void:
 
 
 func go() -> void:
-	_countdown.text = "GO!!"
+	_shout("GO!!")
+
+
+func _shout(text: String) -> void:
+	_countdown.text = text
 	_countdown.scale = Vector2.ONE * 1.3
 	_count_value = 0
 	var tween := create_tween()
@@ -126,6 +143,7 @@ func show_versus(names: Array) -> void:
 	_split.text = ""
 	_best.text = "VS  " + "  ·  ".join(names)
 	_count_value = -1
+	_show_sp(false)
 	_place.text = ""
 	_place_of.text = ""
 
@@ -141,3 +159,45 @@ func versus_result(place: int, time: float, standings: String) -> void:
 	_goal.visible = true
 	_place.text = ""
 	_place_of.text = ""
+
+
+## An SP battle: the two gauges under the timer, full, the rival's name on the right one.
+func show_sp(rival: String) -> void:
+	_best.text = "SP BATTLE  ·  VS  " + rival
+	_sp[1].label = rival
+	for g in _sp:
+		g.set_state(SpBattleRules.FULL, false)
+	_show_sp(true)
+
+
+func _show_sp(on: bool) -> void:
+	for g in _sp:
+		g.visible = on
+
+
+## `lead` is the leading car's distance, for the run-up countdown to the SP line.
+func update_sp(rules: SpBattleRules, lead: float) -> void:
+	if rules.phase == SpBattleRules.Phase.ROLLING and _count_value == 0:
+		_split.text = "ROLLING START  ·  SP LINE %d m" % maxi(0, ceili(rules.arm_distance - lead))
+		_split_timer = 0.2
+	for i in 2:
+		_sp[i].set_state(rules.sp[i], rules.phase == SpBattleRules.Phase.BATTLE and rules.trailing == i)
+
+
+## The gauge arms after the rolling run-up.
+func sp_armed() -> void:
+	_shout("BATTLE!!")
+
+
+func sp_result(rules: SpBattleRules, rival: String, time: float) -> void:
+	var win := rules.winner == 0
+	var why := ""
+	if rules.reason == "sp":
+		why = ("%s IS OUT OF SP" % rival) if win else "OUT OF SP"
+	else:
+		why = "ROAD END  ·  MORE SP WINS"
+	_goal_text.text = "\n".join([
+		"WIN!!" if win else "LOSE...", why, "",
+		"YOU  %d     %s  %d" % [ceili(rules.sp[0]), rival, ceili(rules.sp[1])],
+		TimeAttackRun.format_time(time), "", "[ENTER] REMATCH"])
+	_goal.visible = true

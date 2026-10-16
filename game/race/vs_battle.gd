@@ -3,11 +3,21 @@ extends Node
 ## A downhill battle: the player against AI rivals from a two-wide grid. Intro, countdown with
 ## everyone on the brakes, live positions, the finishing order, and a result page.
 ## Reset (R) puts the player back at the last checkpoint; Enter restarts.
+## With `sp_rival` set it is an SP battle instead: 1v1 side by side, and the SP gauges decide it
+## (SpBattleRules) after a rolling run-up.
 
 signal finished(place: int)
 
 const GRID_ROW := 7.5
 const GRID_LANE := 1.7
+## SP battles: metres past the start line before the gauges arm, and the speed both cars are held
+## to until then, so they reach the SP line together (a rolling start).
+const SP_RUN_UP := 150.0
+const SP_ROLL_KMH := 70.0
+## Run-up pacing: the car ahead by more than this lifts, and brakes lightly past twice this (m);
+## the car behind may run this much over the rolling speed to close up (km/h).
+const SP_ROLL_GAP := 5.0
+const SP_ROLL_CATCH_KMH := 15.0
 ## Each rival: who, which body, what tune, and how hard they push.
 const RIVALS := [
 	{ "name": "JUNJUN", "car": "EG HATCH", "model": "res://assets/vehicles/civic_eg/civic_eg_modular.glb",
@@ -29,19 +39,26 @@ var intro: RaceIntro
 var music: MusicPlayer
 ## How many of RIVALS line up (1…RIVALS.size()); the menu sets it from GameSettings.
 var opponents := 3
+## SP battle against RIVALS[sp_rival]; -1 is the pack race. The menu sets it.
+var sp_rival := -1
+var sp: SpBattleRules
 var run: TimeAttackRun
 var active := false
 var rivals: Array[CarBody] = []
 var drivers: Array[AiDriver] = []
+## The RIVALS entries on the road this race, in `rivals` order.
+var field: Array = []
 var _finish_times := {}   # driver index -> time
 var _player_place := 0
 ## Race time that keeps running after the player finishes, for rivals still on the road.
 var _clock := 0.0
 var _index_hint := 0
 var _in_intro := false
+var _player_hit: Callable
 
 
 func _ready() -> void:
+	_player_hit = _on_wall_contact.bind(0)
 	hud = RaceHud.new()
 	hud.visible = false
 	hud.add_to_group(&"play_hud")
@@ -57,7 +74,11 @@ func start() -> void:
 	_finish_times.clear()
 	_player_place = 0
 	_clock = 0.0
-	var field := RIVALS.slice(0, clampi(opponents, 1, RIVALS.size()))
+	sp = null
+	if sp_rival >= 0:
+		field = [RIVALS[clampi(sp_rival, 0, RIVALS.size() - 1)]]
+	else:
+		field = RIVALS.slice(0, clampi(opponents, 1, RIVALS.size()))
 	var grid := _grid(field.size())
 	var pose: Dictionary = grid[0]
 	session.car.place(pose["position"], pose["heading"])
@@ -66,7 +87,10 @@ func start() -> void:
 	for k in field.size():
 		_spawn_rival(field[k], grid[k + 1], k)
 	hud.visible = true
-	hud.show_versus(field.map(func(r): return r["name"]))
+	if sp_rival >= 0:
+		hud.show_sp(field[0]["name"])
+	else:
+		hud.show_versus(field.map(func(r): return r["name"]))
 	_in_intro = true
 	if music:
 		music.play_track(&"intro" if intro else &"race")
@@ -77,9 +101,9 @@ func start() -> void:
 	if intro:
 		var cast: Array = [{ "node": session.car, "name": "YOU", "car": session.car_spec["name"] }]
 		for k in rivals.size():
-			cast.append({ "node": rivals[k], "name": RIVALS[k]["name"], "car": RIVALS[k]["car"] })
+			cast.append({ "node": rivals[k], "name": field[k]["name"], "car": field[k]["car"] })
 		hud.visible = false
-		intro.play(track, cast, "VS BATTLE", "PASS 1  ·  DOWNHILL")
+		intro.play(track, cast, "SP BATTLE" if sp_rival >= 0 else "VS BATTLE", "PASS 1  ·  DOWNHILL")
 		await intro.finished
 		if not active:
 			return
@@ -88,12 +112,16 @@ func start() -> void:
 	hud.visible = true
 	_in_intro = false
 	run = TimeAttackRun.new(track.start_distance, track.finish_distance)
+	if sp_rival >= 0:
+		sp = SpBattleRules.new(track.start_distance + SP_RUN_UP, track.finish_distance)
+		if not session.car.wall_contact.is_connected(_player_hit):
+			session.car.wall_contact.connect(_player_hit)
 	session.camera.snap.call_deferred()
 	var field_cars: Array[CarBody] = [session.car]
 	field_cars.append_array(rivals)
 	var field_names: Array[String] = ["YOU"]
 	for k in rivals.size():
-		field_names.append(RIVALS[k]["name"])
+		field_names.append(field[k]["name"])
 	session.replay.begin(field_cars, field_names)
 	session.camera.director.set_cars(field_cars, field_names)
 
@@ -101,6 +129,7 @@ func start() -> void:
 func stop() -> void:
 	active = false
 	run = null
+	sp = null
 	hud.visible = false
 	if intro:
 		intro.skip()
@@ -130,8 +159,10 @@ func _spawn_rival(spec: Dictionary, pose: Dictionary, k: int) -> void:
 	car.name = "Rival_%s" % spec["name"].replace(" ", "_")
 	car.preset = spec["preset"]
 	car.tire_product = "street"
-	var driver := AiDriver.new(car, track, spec["skill"], -GRID_LANE if k % 2 == 0 else GRID_LANE)
-	car.input_source = driver.input
+	# The lane of its grid slot, so a rival beside the player keeps to its own side.
+	var side := signf(track.lateral_offset(pose["position"], track.nearest_index(pose["position"])))
+	var driver := AiDriver.new(car, track, spec["skill"], GRID_LANE * (side if side != 0.0 else 1.0))
+	car.input_source = func() -> VehicleTypes.DriverInput: return _roll_cap(driver.input(), car, driver.distance - run.progress if run else 0.0)
 	add_child(car)
 	car.global_position = pose["position"]
 	car.rotation.y = pose["heading"]
@@ -141,6 +172,7 @@ func _spawn_rival(spec: Dictionary, pose: Dictionary, k: int) -> void:
 	visual.car = car
 	car.add_child(visual)
 	car.place(pose["position"], pose["heading"])
+	car.wall_contact.connect(_on_wall_contact.bind(k + 1))
 	rivals.append(car)
 	drivers.append(driver)
 
@@ -161,6 +193,20 @@ func _filter_input(input: VehicleTypes.DriverInput) -> VehicleTypes.DriverInput:
 		input.throttle = minf(input.throttle, 1.0)
 		input.brake = 1.0
 		input.handbrake = 0.0
+	return _roll_cap(input, session.car, run.progress - drivers[0].distance if run and drivers.size() > 0 else 0.0)
+
+
+## Before the SP line both cars are held to the rolling speed and to each other: `ahead` (m) is how
+## far this car leads the other. Off throttle above the speed or in front; light brake further out.
+func _roll_cap(input: VehicleTypes.DriverInput, car: CarBody, ahead: float) -> VehicleTypes.DriverInput:
+	if sp == null or sp.phase != SpBattleRules.Phase.ROLLING:
+		return input
+	var kmh := car.speed_kmh()
+	var cap := SP_ROLL_KMH + (SP_ROLL_CATCH_KMH if ahead < -SP_ROLL_GAP else 0.0)
+	if kmh > cap or ahead > SP_ROLL_GAP:
+		input.throttle = 0.0
+	if (kmh > cap + 6.0 or ahead > 2.0 * SP_ROLL_GAP) and kmh > 40.0:
+		input.brake = maxf(input.brake, 0.3)
 	return input
 
 
@@ -193,7 +239,7 @@ func _physics_process(delta: float) -> void:
 		d.rival_distance = run.progress
 		if racing and not _finish_times.has(k) and d.distance >= track.finish_distance:
 			_finish_times[k] = _clock
-			if _player_place > 0:
+			if _player_place > 0 and sp == null:
 				hud.versus_result(_player_place, run.time, _standings_text())
 	for e in events:
 		match e:
@@ -201,15 +247,26 @@ func _physics_process(delta: float) -> void:
 				hud.go()
 			"finish":
 				_player_place = 1 + _finish_times.size()
-				hud.versus_result(_player_place, run.time, _standings_text())
-				finished.emit(_player_place)
+				if sp == null:
+					hud.versus_result(_player_place, run.time, _standings_text())
+					finished.emit(_player_place)
+	if sp and racing and sp.phase != SpBattleRules.Phase.OVER:
+		for e in sp.update(delta, run.progress, drivers[0].distance):
+			match e:
+				"armed":
+					hud.sp_armed()
+				"over":
+					hud.sp_result(sp, field[0]["name"], run.time if run.phase == TimeAttackRun.Phase.FINISHED else _clock)
+					finished.emit(1 if sp.winner == 0 else 2)
 
 
 func _process(_delta: float) -> void:
 	if not active or run == null:
 		return
 	hud.update_run(run)
-	if run.phase == TimeAttackRun.Phase.RUNNING:
+	if sp:
+		hud.update_sp(sp, maxf(run.progress, drivers[0].distance))
+	elif run.phase == TimeAttackRun.Phase.RUNNING:
 		hud.set_place(_live_place(), rivals.size() + 1)
 
 
@@ -225,7 +282,7 @@ func _standings_text() -> String:
 	var rows := []
 	for k in drivers.size():
 		var t: float = _finish_times.get(k, -1.0)
-		rows.append([t if t >= 0.0 else INF, RIVALS[k]["name"], TimeAttackRun.format_time(t)])
+		rows.append([t if t >= 0.0 else INF, field[k]["name"], TimeAttackRun.format_time(t)])
 	if _player_place > 0:
 		rows.append([run.time, "YOU", TimeAttackRun.format_time(run.time)])
 	rows.sort_custom(func(a, b): return a[0] < b[0])
@@ -233,6 +290,12 @@ func _standings_text() -> String:
 	for i in rows.size():
 		lines.append("%d.  %-9s %s" % [i + 1, rows[i][1], rows[i][2]])
 	return "\n".join(lines)
+
+
+## A wall or car hit on car `i` (0 the player, 1 the rival) costs SP in an SP battle.
+func _on_wall_contact(_point: Vector3, _normal: Vector3, dv: float, _slide: float, i: int) -> void:
+	if active and sp and i <= 1:
+		sp.hit(i, dv)
 
 
 func player_place() -> int:

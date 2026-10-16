@@ -29,6 +29,7 @@ var _settings_first: Button
 var _settings_return: Callable
 var _bars: Array[InkBar] = []
 var _opponents_button: Button
+var _rival_button: Button
 var _title_first: Button
 var _pause_first: Button
 ## Garage page: the mode it leads into, its buttons per car id, and the spec card.
@@ -90,6 +91,7 @@ func _build_title() -> void:
 	menu.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	column.add_child(menu)
 	_title_first = _button(menu, "VS BATTLE", func(): _open_garage("VS BATTLE", _start_vs))
+	_button(menu, "SP BATTLE", func(): _open_garage("SP BATTLE", _start_sp))
 	_button(menu, "SPECTATE", func(): _open_garage("SPECTATE", _start_spectate))
 	_button(menu, "TIME ATTACK", _start_time_attack)
 	_button(menu, "FREE DRIVE", func(): _open_garage("FREE DRIVE", _start_free_drive))
@@ -179,6 +181,10 @@ func _build_garage() -> void:
 		_car_buttons[spec["id"]] = b
 	_opponents_button = _slider(left, func(): return "OPPONENTS", 1, GameSettings.MAX_OPPONENTS, "opponents", 400)
 	_opponents_button.focus_entered.connect(func(): _show_card(session.car_spec))
+	_rival_button = _value_button(left, _rival_text, func():
+		GameSettings.set_value("sp_rival", (int(GameSettings.value("sp_rival")) + 1) % VsBattle.RIVALS.size()))
+	_rival_button.custom_minimum_size.x = 400
+	_rival_button.focus_entered.connect(func(): _show_card(session.car_spec))
 	_button(left, "BACK", open_title)
 
 	# Spec card: turntable in the car shader, a drivetrain stamp, name and blurb in Bangers.
@@ -335,6 +341,7 @@ func _apply_setting(key: String) -> void:
 
 func _open_garage(mode: String, next: Callable) -> void:
 	_opponents_button.visible = mode == "VS BATTLE"
+	_rival_button.visible = mode == "SP BATTLE"
 	_garage_mode.text = mode
 	_garage_next = next
 	_show(_garage, _car_buttons[session.car_spec["id"]])
@@ -484,9 +491,23 @@ func _set_play_hud(on: bool) -> void:
 	vs_battle.hud.visible = on and vs_battle.active and vs_battle.run != null
 
 
+func _rival_text() -> String:
+	var rival: Dictionary = VsBattle.RIVALS[clampi(int(GameSettings.value("sp_rival")), 0, VsBattle.RIVALS.size() - 1)]
+	return "RIVAL: %s  ·  %s" % [rival["name"], rival["car"]]
+
+
 func _start_vs() -> void:
 	_leave_watch()
+	vs_battle.sp_rival = -1
 	vs_battle.opponents = GameSettings.value("opponents")
+	time_attack.free_drive()
+	_close()
+	vs_battle.start()
+
+
+func _start_sp() -> void:
+	_leave_watch()
+	vs_battle.sp_rival = GameSettings.value("sp_rival")
 	time_attack.free_drive()
 	_close()
 	vs_battle.start()

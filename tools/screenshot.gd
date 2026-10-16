@@ -1,7 +1,7 @@
 extends SceneTree
 ## Scripted visual checks (needs a window, not --headless):
 ## `godot --path . -s res://tools/screenshot.gd -- <scene> <out_dir> <scenario>`
-## Scenarios: day, brake, drift, scrape, night, overview, spectate (autopilot VS, every cinematic
+## Scenarios: day, brake, drift, scrape, night, overview, sp (SP battle), spectate (autopilot VS, every cinematic
 ## shot, then the replay at full and quarter speed). Each scripts the pedals, saves PNGs at
 ## the interesting moments and prints frame-time stats (vsync off) for the driving part.
 
@@ -39,6 +39,11 @@ const SCENARIOS := {
 	# VS battle: intro (crane, a rival card, the player card), then racing the rivals.
 	"vs": [[0.3, 0, 0, 0, 0, ""], [1.8, 0, 0, 0, 0, "vs_intro_grid"], [4.4, 0, 0, 0, 0, "vs_intro_rival"], [10.2, 0, 0, 0, 0, "vs_intro_player"],
 		[13.5, 0, 0, 0, 0, "vs_countdown"], [21.0, 0.9, 0, 0, 0, "vs_race"], [24.0, 0.9, 0, 0, 0, "vs_race_2"]],
+	# SP battle: the garage with the rival picker, then 1v1 against JUNJUN on autopilot (intro
+	# skipped): the rolling run-up, the armed gauges, then the player's gauge emptied for the result.
+	"sp": [[0.5, 0, 0, 0, 0, ""], [1.5, 0, 0, 0, 0, "garage_sp"], [1.8, 0, 0, 0, 0, ""], [2.2, 0, 0, 0, 0, ""],
+		[8.0, 0, 0, 0, 0, "sp_rolling"], [18.0, 0, 0, 0, 0, "sp_battle"], [24.0, 0, 0, 0, 0, "sp_battle_2"],
+		[24.2, 0, 0, 0, 0, ""], [25.5, 0, 0, 0, 0, "sp_result"]],
 	"cams": [[2.0, 0, 0, 0, 0, ""], [6.0, 0.85, 0, 0, 0, "cam_chase"], [6.3, 0.85, 0, 0, 0, "cam_far"], [6.6, 0.85, 0, 0, 0, "cam_hood"], [6.9, 0.85, 0, 0, 0, "cam_bumper"]],
 }
 
@@ -116,7 +121,7 @@ func _process(delta: float) -> bool:
 			root.scaling_3d_scale = float(OS.get_environment("PANG_SCALE"))
 		print("3d scale ", root.scaling_3d_scale, " window ", root.size)
 		RenderingServer.viewport_set_measure_render_time(root.get_viewport_rid(), true)
-	if _scenario == "spectate":
+	if _scenario == "spectate" or _scenario == "sp":
 		if _scene.vs_battle._in_intro:
 			_scene.intro.skip()
 	elif session.car.input_source != _scripted:
@@ -153,6 +158,16 @@ func _process(delta: float) -> bool:
 				Engine.time_scale = 0.25
 			elif _step == 6 + shots * 2:
 				session.set_clean_feed(true)
+		if _scenario == "sp":
+			var menu: GameMenu = _scene.menu
+			match _step:
+				0:
+					menu._open_garage("SP BATTLE", menu._start_sp)
+					menu._rival_button.grab_focus.call_deferred()
+				2:
+					menu._start_sp()
+				3: session.set_autopilot(true)
+				7: _scene.vs_battle.sp.sp[0] = 0.0
 		if _scenario == "pause" and _step == 1:
 			_scene.menu.open_pause()
 		if _scenario == "settings":

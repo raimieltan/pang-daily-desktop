@@ -48,6 +48,7 @@ The build covers the driving, the first road, time attack and presentation; the 
 | Roadside | PH signage (DPWH boards, chevrons, km posts, delineators), guardrails and concrete barriers, painted rocks, sodium lamps, utility poles, convex mirrors, barangay arch, sari-sari store, waiting shed, houses, coconut / banana / bamboo / cogon, viewpoint pull-off at the goal, valley lights | `game/track/track_builder.gd` |
 | Time attack | Countdown, 4 sector splits with delta vs PB, PB ghost at 20 Hz, Enter to restart, reset to last checkpoint (R); bests saved locally per road + car + tune | `game/race/time_attack*.gd` |
 | VS battle | Downhill race against 1–5 AI rivals from a two-wide grid, live position, finishing order; AI uses pure pursuit, a curvature speed plan, per-rival skill and a light rubber band | `game/race/vs_battle.gd`, `game/race/ai_driver.gd` |
+| SP battle | 1v1 against a picked rival (garage RIVAL picker): rolling start held to 70 km/h side by side, gauges arm 150 m past the line, gap drain and wall-hit penalties, ends on an empty gauge or the road end; ink / red gauges on the HUD | `game/race/sp_battle_rules.gd`, `game/race/vs_battle.gd` (`sp_rival`), `game/race/sp_gauge.gd` |
 | Day / night | Live toggle (N); car headlights, sodium lamp pools, valley lights | `game/ui/day_night_switch.gd` |
 | Cameras | Chase, far, hood, bumper, cinematic (V); FOV widens with speed; impact shake | `game/camera/` |
 | Replays | Full race replay with seek, speed, car switching; auto-directed cinematic cameras; spectate mode | `game/replay/`, `game/camera/cinematic_director.gd` |
@@ -66,7 +67,7 @@ The build covers the driving, the first road, time attack and presentation; the 
 
 **Not started**
 
-SP battle gauge, uphill direction, rain and surface grip changes (the sim has a surface-grip input, nothing drives it), tuning sliders and saved setups, parts and PI, wear and failures, wallet and transactions, delivery jobs, rival ladder and NPC lines, hubs (KYO Coffee, talyer, Marketplace), traffic and hazards, controller rumble.
+Uphill direction, rain and surface grip changes (the sim has a surface-grip input, nothing drives it), tuning sliders and saved setups, parts and PI, wear and failures, wallet and transactions, delivery jobs, rival ladder and NPC lines, hubs (KYO Coffee, talyer, Marketplace), traffic and hazards, controller rumble.
 
 ## Design pillars
 
@@ -140,7 +141,7 @@ Time attack is the backbone; SP battles are the signature rival mode; the VS pac
 | Mode | Format | Win condition | Role in the grind | MVP | Built |
 | --- | --- | --- | --- | --- | --- |
 | Time attack | Solo run against your PB ghost | Beat a target time | Core grind; feeds leaderboards and rival unlocks | Yes | Yes (downhill) |
-| SP battle | 1v1, rolling start, Tokyo Xtreme Racer style | Trailing car's SP gauge drains by gap; empty gauge loses | Rival fights; quick "sige, try lang" challenges | Yes | No |
+| SP battle | 1v1, rolling start, Tokyo Xtreme Racer style | Trailing car's SP gauge drains by gap; empty gauge loses | Rival fights; quick "sige, try lang" challenges | Yes | Yes (from the title; no road / KYO challenges) |
 | VS battle | Pack race vs 1–5 AI rivals from a grid | Finishing position | Free play, spectate, trailer footage | Yes | Yes |
 | Touge 1v1 (cat and mouse) | Two legs: lead, then chase, roles swap | Leader pulls a gap, or chaser stays within it | Late-game rivals, Initial D-style duels | Post-MVP | No |
 | Point-to-point | Start to finish line with traffic | First to the finish | Street races, traffic as hazard | Post-MVP | No |
@@ -153,7 +154,8 @@ Time attack is the backbone; SP battles are the signature rival mode; the VS pac
 - Wall hits and big collisions cost extra SP.
 - The battle ends when one car hits 0 SP or the road ends; at road end, higher SP wins.
 - Rivals can be challenged by flashing headlights on the road or from KYO Coffee.
-- Build note: reuse the VS battle grid, AI driver, intro and results; add the gauge, gap-based drain, wall-hit penalty and a 1v1 rolling start.
+- Built (Oct 16, 2026) on the VS battle: drain is 0.5 SP/s plus 0.2 per metre of gap beyond 3 m (capped at 25/s); a hit above 1.5 m/s of impulse costs 4 SP per m/s (max 15, once per 0.5 s); at road end a tie goes to the car ahead. The run-up holds both cars to 70 km/h and to each other until the gauges arm 150 m past the line. Tuning lives in `SpBattleRules`; verify with `tests/probe_sp_battle.gd`.
+- Not built: flashing headlights to challenge on the road, KYO Coffee challenges, rewards.
 
 **Traffic rule:** traffic in races creates readable situations (a tricycle visible a corner ahead), never unavoidable crashes.
 
