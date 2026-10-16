@@ -486,14 +486,49 @@ func rail_base(i: int, side: int) -> Vector3:
 	return pts[i] + rgt[i] * s * 3.9 + Vector3.UP * prof["heights"][3]
 
 
+## Metres of concrete barrier at each end of a guardrail run.
+const END_BLOCKS := 4
+
+
+## A jersey barrier block, 1.9 m long along -Z, sitting on y = 0, centered on x = 0.
+static func _jersey_mesh() -> ArrayMesh:
+	var profile := [Vector2(-0.3, 0.0), Vector2(-0.3, 0.08), Vector2(-0.15, 0.3), Vector2(-0.1, 0.8),
+		Vector2(0.1, 0.8), Vector2(0.15, 0.3), Vector2(0.3, 0.08), Vector2(0.3, 0.0)]
+	var st := SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var half := 0.95
+	for k in profile.size() - 1:
+		var a: Vector2 = profile[k]
+		var b: Vector2 = profile[k + 1]
+		var a0 := Vector3(a.x, a.y, half); var a1 := Vector3(a.x, a.y, -half)
+		var b0 := Vector3(b.x, b.y, half); var b1 := Vector3(b.x, b.y, -half)
+		for v in [a0, b0, b1, a0, b1, a1]:
+			st.add_vertex(v)
+	for z in [half, -half]:
+		var c := Vector3(0.0, 0.4, z)
+		for k in profile.size() - 1:
+			var a: Vector2 = profile[k]
+			var b: Vector2 = profile[k + 1]
+			var tri := [c, Vector3(a.x, a.y, z), Vector3(b.x, b.y, z)]
+			if z < 0.0:
+				tri.reverse()
+			for v in tri:
+				st.add_vertex(v)
+	st.generate_normals()
+	return st.commit()
+
+
 func build_guardrails(parent: Node3D, owner: Node) -> void:
 	var beam_tool := SurfaceTool.new()
 	beam_tool.begin(Mesh.PRIMITIVE_TRIANGLES)
 	var wall_faces := PackedVector3Array()
 	var posts: Array[Transform3D] = []
+	var blocks := [[] as Array[Transform3D], [] as Array[Transform3D]]
+	var block_n := 0
 	for run in guardrail_runs():
 		var side: int = run["side"]
 		var s := 1.0 if side == 1 else -1.0
+		var all_concrete: bool = int(run["to"]) - int(run["from"]) < 60
 		var prev_low := Vector3.ZERO
 		var prev_high := Vector3.ZERO
 		var prev_wall_low := Vector3.ZERO
@@ -504,12 +539,22 @@ func build_guardrails(parent: Node3D, owner: Node) -> void:
 			var high := base + Vector3.UP * 0.8
 			var wall_low := base - Vector3.UP * 0.3
 			var wall_high := base + Vector3.UP * 1.0
+			# Concrete end blocks for the first and last few metres; short runs are all concrete.
+			var concrete: bool = all_concrete or i - int(run["from"]) < END_BLOCKS or int(run["to"]) - i < END_BLOCKS
 			if i > run["from"]:
-				# W-beam face toward the road (double sided via material).
-				for v in [prev_low, low, high, prev_low, high, prev_high, prev_low, high, low, prev_low, prev_high, high]:
-					beam_tool.add_vertex(v)
+				if not concrete:
+					# W-beam face toward the road (double sided via material).
+					for v in [prev_low, low, high, prev_low, high, prev_high, prev_low, high, low, prev_low, prev_high, high]:
+						beam_tool.add_vertex(v)
 				wall_faces.append_array([prev_wall_low, wall_low, wall_high, prev_wall_low, wall_high, prev_wall_high])
 			prev_low = low; prev_high = high; prev_wall_low = wall_low; prev_wall_high = wall_high
+			if concrete:
+				if (i - int(run["from"])) % 2 == 0 and i + 1 <= int(run["to"]):
+					var basis := Basis.looking_at(fwd[i] * Vector3(1, 0, 1), Vector3.UP)
+					var at := base + rgt[i] * s * 0.1 + fwd[i] * (SPACING * 0.5)
+					blocks[block_n % 2].append(Transform3D(basis, at))
+					block_n += 1
+				continue
 			if (i - run["from"]) % 2 == 0:
 				var basis := Basis.looking_at(fwd[i] * Vector3(1, 0, 1), Vector3.UP)
 				posts.append(Transform3D(basis, base + rgt[i] * s * 0.12 + Vector3.UP * 0.4))
@@ -526,6 +571,13 @@ func build_guardrails(parent: Node3D, owner: Node) -> void:
 	var post_instance := Scatter.make("GuardrailPosts", post_mesh, posts)
 	parent.add_child(post_instance)
 	post_instance.owner = owner
+	var jersey := _jersey_mesh()
+	for k in 2:
+		var m := jersey.duplicate() as ArrayMesh
+		m.surface_set_material(0, MangaArt.world_preset("board" if k == 0 else "post"))
+		var sc := Scatter.make("Barriers%s" % ("White" if k == 0 else "Black"), m, blocks[k])
+		parent.add_child(sc)
+		sc.owner = owner
 	var body := StaticBody3D.new()
 	body.name = "GuardrailCollision"
 	body.collision_layer = CarBody.STATIC_LAYER
@@ -766,6 +818,14 @@ func build_props(parent: Node3D, owner: Node, start_distance: float, finish_dist
 		_build_store(props, owner, _lot("store"))
 	if not _lot("viewpoint").is_empty():
 		_build_viewpoint(props, owner, _lot("viewpoint"))
+	if not _lot("shed").is_empty():
+		_build_shed(props, owner, _lot("shed"))
+	var n := 0
+	for lot in lots:
+		if lot["kind"] == "house":
+			_build_house(props, owner, lot, n)
+			n += 1
+	_build_painted_rocks(props, owner)
 
 
 ## Street lamps (always on the left): start, goal, and the barangay stretch after the start.
@@ -1092,6 +1152,9 @@ const ARCH_AFTER_START := 30.0
 const STORE_SIZE := Vector3(5.2, 2.6, 3.8)
 ## Lateral offset of the store's front wall (just past the gravel shoulder).
 const STORE_FRONT := 4.4
+## Waiting shed and roadside house footprints: frontage, wall height, depth.
+const SHED_SIZE := Vector3(4.2, 2.5, 2.4)
+const HOUSE_SIZE := Vector3(7.0, 2.8, 5.5)
 ## Viewpoint pull-off: frontage along the road and depth out over the valley.
 const VIEW_SIZE := Vector2(30.0, 8.0)
 const TRIM := Color(0.95, 0.72, 0.1)
@@ -1110,6 +1173,11 @@ func plan_lots(start_distance: float, finish_distance: float) -> void:
 	# The sari-sari store on stilts over the drop, front at road level, in the barangay stretch.
 	_find_lot("store", start_distance + ARCH_AFTER_START + 25.0, start_distance + 300.0,
 		STORE_SIZE.x, STORE_SIZE.z, STORE_FRONT, lamps)
+	# The waiting shed and a few houses along the road, each on stilts over the drop.
+	_find_lot("shed", start_distance + ARCH_AFTER_START + 20.0, start_distance + 420.0,
+		SHED_SIZE.x, SHED_SIZE.z, 4.3, lamps)
+	for span in [[start_distance + 100.0, start_distance + 380.0], [520.0, 900.0], [960.0, finish_distance - 90.0]]:
+		_find_lot("house", span[0], span[1], HOUSE_SIZE.x, HOUSE_SIZE.z, 5.6, lamps)
 	# The viewpoint pull-off by the goal, on the valley side.
 	# Its street lamps stay: they light the deck.
 	_find_lot("viewpoint", finish_distance - 70.0, finish_distance + 10.0, VIEW_SIZE.x, VIEW_SIZE.y,
@@ -1366,15 +1434,7 @@ func _build_store(parent: Node3D, owner: Node, lot: Dictionary) -> void:
 	_box(root, owner, Vector3(2.0, 0.06, 0.34), Transform3D(Basis(), Vector3(-1.1, 0.45, bench_z)), wood)
 	for bx in [-1.95, -0.25]:
 		_box(root, owner, Vector3(0.06, 0.45, 0.3), Transform3D(Basis(), Vector3(bx, 0.22, bench_z)), wood)
-	# Stilts down to the slope (the road's fill skirt) under the back of the deck.
-	for sx in [-hw + 0.1, 0.0, hw - 0.1]:
-		for sz in [-1.4, -d + 0.15]:
-			var foot := xf * Vector3(sx, 0.0, sz)
-			var j := nearest_sample(foot.x, foot.z)
-			var ground := _roadside(j, (foot - pts[j]).dot(rgt[j])).y - foot.y - 0.3
-			if ground > -0.3:
-				continue
-			_box(root, owner, Vector3(0.14, -ground, 0.14), Transform3D(Basis(), Vector3(sx, ground * 0.5, sz)), wood)
+	_stilts(root, owner, xf, [-hw + 0.1, 0.0, hw - 0.1], [-1.4, -d + 0.15], wood)
 	_solid(root, owner, "StoreCollision", [
 		[Vector3(w, h, d), Transform3D(Basis(), Vector3(0, h * 0.5, -d * 0.5))],
 	])
@@ -1658,3 +1718,157 @@ func build_valley_lights(parent: Node3D, owner: Node, bounds: Rect2) -> void:
 		root.add_child(sc)
 		sc.owner = owner
 	print("valley lights: %d warm, %d white, %d sodium" % [warm.size(), white.size(), sodium.size()])
+
+
+
+## Posts from a lot's floor (y = 0 in `xf`) down to the slope (the road's fill skirt) under it.
+func _stilts(root: Node3D, owner: Node, xf: Transform3D, xs: Array, zs: Array, mat: Material) -> void:
+	for sx in xs:
+		for sz in zs:
+			var foot := xf * Vector3(sx, 0.0, sz)
+			var j := nearest_sample(foot.x, foot.z)
+			var ground := _roadside(j, (foot - pts[j]).dot(rgt[j])).y - foot.y - 0.3
+			if ground > -0.3:
+				continue
+			_box(root, owner, Vector3(0.14, -ground, 0.14), Transform3D(Basis(), Vector3(sx, ground * 0.5, sz)), mat)
+
+
+## Floor deck from the road edge back over the lot, in lot space.
+func _deck(root: Node3D, owner: Node, w: float, d: float, front: float, mat: Material) -> void:
+	_box(root, owner, Vector3(w + 0.2, 0.18, d + front), Transform3D(Basis(), Vector3(0, -0.09, (front - d) * 0.5)), mat)
+
+
+## Waiting shed: a concrete bench shelter under a GI roof, its open side to the road, with the
+## barangay project lettering every PH shed carries.
+func _build_shed(parent: Node3D, owner: Node, lot: Dictionary) -> void:
+	var xf: Transform3D = lot["xform"]
+	var root := Node3D.new()
+	root.name = "WaitingShed"
+	root.transform = xf
+	parent.add_child(root)
+	root.owner = owner
+	var w := SHED_SIZE.x
+	var h := SHED_SIZE.y
+	var d := SHED_SIZE.z
+	var concrete := MangaArt.world_preset("concrete")
+	var paint := MangaArt.world_preset("board")
+	var dark := MangaArt.world_preset("pole")
+	_deck(root, owner, w, d, 0.6, concrete)
+	_box(root, owner, Vector3(w, h, 0.15), Transform3D(Basis(), Vector3(0, h * 0.5, -d + 0.075)), concrete)
+	for x in [-w * 0.5 + 0.075, w * 0.5 - 0.075]:
+		_box(root, owner, Vector3(0.15, h, d), Transform3D(Basis(), Vector3(x, h * 0.5, -d * 0.5)), concrete)
+	# Bench along the back wall.
+	_box(root, owner, Vector3(w - 0.4, 0.08, 0.45), Transform3D(Basis(), Vector3(0, 0.45, -d + 0.4)), paint)
+	_box(root, owner, Vector3(w - 0.4, 0.45, 0.3), Transform3D(Basis(), Vector3(0, 0.22, -d + 0.4)), concrete)
+	# Roof sloping to the back, fascia board with the lettering facing the road.
+	var tilt := atan2(0.4, d + 0.8)
+	_box(root, owner, Vector3(w + 0.5, 0.05, (d + 0.8) / cos(tilt)), Transform3D(Basis(Vector3.RIGHT, tilt), Vector3(0, h + 0.2, -d * 0.5 + 0.3)), dark)
+	_box(root, owner, Vector3(w, 0.5, 0.08), Transform3D(Basis(), Vector3(0, h + 0.1, 0.62)), paint)
+	_box(root, owner, Vector3(w, 0.08, 0.1), Transform3D(Basis(), Vector3(0, h - 0.13, 0.63)), MangaArt.accent(TRIM))
+	_paint(root, owner, "WAITING SHED", w * 0.9, 0.22, Vector3(0, h + 0.2, 0.67), MangaArt.SIGN_RED)
+	_paint(root, owner, "PROJECT NG BRGY. SAN ISIDRO", w * 0.9, 0.1, Vector3(0, h + 0.0, 0.67), MangaArt.INK)
+	_stilts(root, owner, xf, [-w * 0.5 + 0.1, w * 0.5 - 0.1], [-d + 0.15], dark)
+	_solid(root, owner, "ShedCollision", [
+		[Vector3(w, h, 0.15), Transform3D(Basis(), Vector3(0, h * 0.5, -d + 0.075))],
+		[Vector3(0.15, h, d), Transform3D(Basis(), Vector3(-w * 0.5 + 0.075, h * 0.5, -d * 0.5))],
+		[Vector3(0.15, h, d), Transform3D(Basis(), Vector3(w * 0.5 - 0.075, h * 0.5, -d * 0.5))],
+	])
+
+
+const LAUNDRY := [Color(0.8, 0.07, 0.05), Color(0.95, 0.72, 0.1), Color(0.1, 0.35, 0.8), Color(0.95, 0.93, 0.88), Color(0.15, 0.6, 0.25)]
+
+
+## Roadside house on stilts over the drop: hollow-block lower wall and plywood upper, a GI roof,
+## a door and two windows (one lit warm from inside), and a clothesline (sampayan) in front.
+func _build_house(parent: Node3D, owner: Node, lot: Dictionary, n: int) -> void:
+	var xf: Transform3D = lot["xform"]
+	var root := Node3D.new()
+	root.name = "House%d" % n
+	root.transform = xf
+	parent.add_child(root)
+	root.owner = owner
+	var rng := RandomNumberGenerator.new()
+	rng.seed = seed_ * 7 + n * 131
+	var w := HOUSE_SIZE.x
+	var h := HOUSE_SIZE.y
+	var d := HOUSE_SIZE.z
+	var block := MangaArt.world_preset("concrete")
+	var ply := MangaArt.world_preset("board")
+	var dark := MangaArt.world_preset("pole")
+	var ink := MangaArt.world_preset("post")
+	# Yard deck from the road edge, then the house set back a metre.
+	var front := 1.5
+	_deck(root, owner, w, d + 1.0, front, block)
+	var z0 := -1.0
+	_box(root, owner, Vector3(w, 1.1, d), Transform3D(Basis(), Vector3(0, 0.55, z0 - d * 0.5)), block)
+	_box(root, owner, Vector3(w, h - 1.1, d), Transform3D(Basis(), Vector3(0, 1.1 + (h - 1.1) * 0.5, z0 - d * 0.5)), ply)
+	# Door, a dark window and a lit window on the road face.
+	var face := z0 + 0.02
+	_box(root, owner, Vector3(0.9, 2.0, 0.04), Transform3D(Basis(), Vector3(-w * 0.5 + 1.3, 1.0, face)), dark)
+	_box(root, owner, Vector3(1.2, 0.9, 0.04), Transform3D(Basis(), Vector3(0.4, 1.6, face)), ink)
+	var lit_x := w * 0.5 - 1.4
+	var lit := MeshInstance3D.new()
+	var lm := QuadMesh.new()
+	lm.size = Vector2(1.2, 0.9)
+	lm.material = MangaArt.lamp(BULB, 1.2)
+	lit.mesh = lm
+	lit.position = Vector3(lit_x, 1.6, face + 0.01)
+	root.add_child(lit)
+	lit.owner = owner
+	for wx in [0.4, lit_x]:
+		_box(root, owner, Vector3(0.05, 0.9, 0.06), Transform3D(Basis(), Vector3(wx, 1.6, face + 0.02)), dark)
+		_box(root, owner, Vector3(1.3, 0.06, 0.12), Transform3D(Basis(), Vector3(wx, 1.12, face + 0.05)), dark)
+	var light := OmniLight3D.new()
+	light.position = Vector3(lit_x, 1.6, face + 0.8)
+	light.omni_range = 3.5
+	light.omni_attenuation = 0.8
+	light.light_energy = 0.9
+	light.light_color = BULB
+	light.shadow_enabled = false
+	root.add_child(light)
+	light.owner = owner
+	# GI roof sloping back, overhanging the front.
+	var roof_len := d + 1.0
+	var tilt := atan2(0.6, roof_len)
+	_box(root, owner, Vector3(w + 0.5, 0.05, roof_len / cos(tilt)), Transform3D(Basis(Vector3.RIGHT, tilt), Vector3(0, h + 0.3, z0 - d * 0.5 + 0.5)), dark)
+	# Sampayan: a line between two posts in the yard, a few clothes pegged on it (spot color).
+	var line_z := 0.0
+	for px in [-w * 0.5 + 0.5, 0.6]:
+		_box(root, owner, Vector3(0.06, 1.9, 0.06), Transform3D(Basis(), Vector3(px, 0.95, line_z)), dark)
+	_box(root, owner, Vector3(w * 0.5 + 0.1, 0.015, 0.015), Transform3D(Basis(), Vector3((-w * 0.5 + 0.5 + 0.6) * 0.5, 1.85, line_z)), ink)
+	var x := -w * 0.5 + 0.8
+	while x < 0.4:
+		var size := Vector2(rng.randf_range(0.3, 0.6), rng.randf_range(0.4, 0.7))
+		var col: Color = LAUNDRY[rng.randi() % LAUNDRY.size()]
+		_box(root, owner, Vector3(size.x, size.y, 0.01), Transform3D(Basis(), Vector3(x + size.x * 0.5, 1.85 - size.y * 0.5, line_z)), MangaArt.accent(col))
+		x += size.x + rng.randf_range(0.08, 0.25)
+	_stilts(root, owner, xf, [-w * 0.5 + 0.1, 0.0, w * 0.5 - 0.1], [z0 - 1.5, z0 - d + 0.15], dark)
+	_solid(root, owner, "HouseCollision", [
+		[Vector3(w, h, d), Transform3D(Basis(), Vector3(0, h * 0.5, z0 - d * 0.5))],
+	])
+
+
+## White-painted rocks along the toe of the cut wall, in stretches (the provincial road edge).
+func _build_painted_rocks(parent: Node3D, owner: Node) -> void:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = seed_ * 17 + 4
+	var xforms: Array[Transform3D] = []
+	for i in range(0, pts.size(), 3):
+		if (i / 70) % 3 != 1:
+			continue
+		for side in 2:
+			if side_type[i][side] != Side.CUT or absf(curvature[i]) > 1.0 / 60.0:
+				continue
+			var s := 1.0 if side == 1 else -1.0
+			var at := _roadside(i, s * 3.95)
+			var sc := Vector3(rng.randf_range(0.5, 0.8), rng.randf_range(0.35, 0.55), rng.randf_range(0.45, 0.7))
+			xforms.append(Transform3D(Basis(Vector3.UP, rng.randf() * TAU).scaled(sc), at + Vector3.UP * sc.y * 0.15))
+	var rock := SphereMesh.new()
+	rock.radius = 0.5
+	rock.height = 0.8
+	rock.radial_segments = 7
+	rock.rings = 3
+	rock.material = MangaArt.world_preset("board")
+	var sc := Scatter.make("PaintedRocks", rock, xforms)
+	parent.add_child(sc)
+	sc.owner = owner
