@@ -1,0 +1,11 @@
+Model Information:
+* title:	CNG
+* source:	https://sketchfab.com/3d-models/cng-011baf8efab94b37988e16756951a2b1
+* author:	asrafullislamsiam (https://sketchfab.com/asrafullislamsiam)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "CNG" (https://sketchfab.com/3d-models/cng-011baf8efab94b37988e16756951a2b1) by asrafullislamsiam (https://sketchfab.com/asrafullislamsiam) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

@@ -1,0 +1,11 @@
+Model Information:
+* title:	Calgary Flames Captain
+* source:	https://sketchfab.com/3d-models/calgary-flames-captain-a58fcf4b09e9480f86ef7ab5c5a2f57e
+* author:	restore50 (https://sketchfab.com/restore50)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Calgary Flames Captain" (https://sketchfab.com/3d-models/calgary-flames-captain-a58fcf4b09e9480f86ef7ab5c5a2f57e) by restore50 (https://sketchfab.com/restore50) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
