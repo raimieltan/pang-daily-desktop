@@ -6,7 +6,7 @@ modular contract (see `assets/vehicles/dalagan_evo/README.md`) and restyled for 
 **Credit (CC-BY-4.0, required):** based on "2007 Honda Civic Type R FD2"
 (https://sketchfab.com/3d-models/2007-honda-civic-type-r-fd2-7da33a4102b848d5abe7f3bb7c445f46)
 by claries (https://sketchfab.com/R1peer), licensed under CC-BY-4.0
-(http://creativecommons.org/licenses/by/4.0/). The source is in `2007_honda_civic_type_r_fd2/`,
+(http://creativecommons.org/licenses/by/4.0/). The source is in `reference-assets/2007_honda_civic_type_r_fd2/`,
 which has a `.gdignore`. The credit is also stored on `vehicle_root` as the `credit` extra.
 
 ## Rebuild

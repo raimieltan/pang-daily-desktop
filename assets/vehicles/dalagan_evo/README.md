@@ -7,7 +7,7 @@ and restyled for the manga renderer.
 (https://sketchfab.com/3d-models/mitsubishi-lancer-evolution-5-stylized-toon-c6f74d4645cb47aea7813f24bc59386f)
 by Ponter (https://sketchfab.com/ponter), licensed under CC-BY-4.0
 (http://creativecommons.org/licenses/by/4.0/). The source is in
-`mitsubishi_lancer_evolution_5_stylized_toon/`, which has a `.gdignore`. The credit is also
+`reference-assets/mitsubishi_lancer_evolution_5_stylized_toon/`, which has a `.gdignore`. The credit is also
 stored on `vehicle_root` as the `credit` extra.
 
 ## Rebuild

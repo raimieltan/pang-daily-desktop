@@ -3,7 +3,7 @@
 Run: Blender --background --factory-startup --python tools/vehicle_builders/build-dalagan-evo.py
 
 Geometry is "Mitsubishi Lancer Evolution 5 Stylized Toon" by Ponter (CC-BY-4.0,
-mitsubishi_lancer_evolution_5_stylized_toon/). This builder:
+reference-assets/mitsubishi_lancer_evolution_5_stylized_toon/). This builder:
   * fits it to our axles (front Z 1.28, rear Z -1.22) with a small lengthwise scale,
   * reads each face's palette colour and maps it to our named materials (paint, glass, trim,
     tire, rim, lamps...) so MangaArt's car shader colours it; the baked toon shades collapse to
@@ -22,7 +22,7 @@ from pathlib import Path
 from mathutils import Vector
 
 ROOT = Path(__file__).resolve().parents[2]
-REF = ROOT / 'mitsubishi_lancer_evolution_5_stylized_toon/scene.gltf'
+REF = ROOT / 'reference-assets/mitsubishi_lancer_evolution_5_stylized_toon/scene.gltf'
 ENGINE_SOURCE = ROOT / 'assets/vehicles/banwa_dalagan_1996_modular.glb'
 OUT = ROOT / 'assets/vehicles/dalagan_evo'
 OUT.mkdir(parents=True, exist_ok=True)

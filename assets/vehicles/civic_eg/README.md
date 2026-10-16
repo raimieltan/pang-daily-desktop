@@ -6,7 +6,7 @@ modular contract (see `../dalagan_evo/README.md` for the slot table and axes).
 **Credit (CC-BY-4.0, required):** based on "1991 Honda Civic EG6"
 (https://sketchfab.com/3d-models/1991-honda-civic-eg6-f81da34570b145deb463fa091604d251)
 by rifdanzz (https://sketchfab.com/rifdanzz), licensed under CC-BY-4.0
-(http://creativecommons.org/licenses/by/4.0/). The source is in `1991_honda_civic_eg6/`, which
+(http://creativecommons.org/licenses/by/4.0/). The source is in `reference-assets/1991_honda_civic_eg6/`, which
 has a `.gdignore`. The credit is also stored on `vehicle_root` as the `credit` extra.
 
 ## Rebuild

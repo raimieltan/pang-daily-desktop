@@ -2,7 +2,7 @@
 
 Run: Blender --background --factory-startup --python tools/vehicle_builders/build-civic-fd.py
 
-Geometry is "2007 Honda Civic Type R FD2" by claries (CC-BY-4.0, 2007_honda_civic_type_r_fd2/).
+Geometry is "2007 Honda Civic Type R FD2" by claries (CC-BY-4.0, reference-assets/2007_honda_civic_type_r_fd2/).
 The source lies along +X, so it is turned to face +Z before fitting. Its painted body is one
 object, so (like the Evo) the body is cut along straight seam planes and faces are sorted by
 position; glass, trim, lamps, grille, wing blade, tires and rims come from their own source
@@ -19,7 +19,7 @@ from mathutils import Matrix
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import modular_kit as kit  # noqa: E402
 
-REF = kit.ROOT / '2007_honda_civic_type_r_fd2/scene.gltf'
+REF = kit.ROOT / 'reference-assets/2007_honda_civic_type_r_fd2/scene.gltf'
 OUT = kit.ROOT / 'assets/vehicles/civic-fd'
 
 kit.start()

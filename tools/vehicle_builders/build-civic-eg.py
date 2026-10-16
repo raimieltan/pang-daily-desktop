@@ -2,7 +2,7 @@
 
 Run: Blender --background --factory-startup --python tools/vehicle_builders/build-civic-eg.py
 
-Geometry is "1991 Honda Civic EG6" by rifdanzz (CC-BY-4.0, 1991_honda_civic_eg6/). The source
+Geometry is "1991 Honda Civic EG6" by rifdanzz (CC-BY-4.0, reference-assets/1991_honda_civic_eg6/). The source
 already ships its panels as separate objects, so faces are sorted by source object (then by side)
 rather than by seam planes. Lamp colours come from the source's photo texture; the plate texture is
 dropped for our plain plate. Shared steps live in modular_kit.py.
@@ -13,7 +13,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import modular_kit as kit  # noqa: E402
 
-REF = kit.ROOT / '1991_honda_civic_eg6/scene.gltf'
+REF = kit.ROOT / 'reference-assets/1991_honda_civic_eg6/scene.gltf'
 OUT = kit.ROOT / 'assets/vehicles/civic_eg'
 
 kit.start()
