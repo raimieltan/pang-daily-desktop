@@ -43,7 +43,12 @@ func _ready() -> void:
 	vs_battle.intro = intro
 	vs_battle.music = music
 	add_child(vs_battle)
-	session.replay.frozen_nodes.assign([time_attack, vs_battle])
+	var life := RoadsideLife.new()
+	life.name = "RoadsideLife"
+	life.track = track
+	life.racing = func() -> bool: return time_attack.active or vs_battle.active
+	add_child(life)
+	session.replay.frozen_nodes.assign([time_attack, vs_battle, life])
 	menu = GameMenu.new()
 	menu.session = session
 	menu.time_attack = time_attack

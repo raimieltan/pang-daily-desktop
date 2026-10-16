@@ -19,6 +19,7 @@ const SCENARIOS := {
 	"overview": [[2.0, 0, 0, 0, 0, ""], [9.0, 0.85, 0, 0, 0, "overview"]],
 	# Standing shot (pair with PANG_DIST) to check roadside props by day. PANG_EYE="d,lat,h,d2,lat2,h2"
 	# frames it from a fixed eye at road distance d, lateral lat (right +), height h, aimed at d2.
+	# PANG_FREE=1 starts in free drive (the roadside traffic only rides there).
 	"props": [[1.5, 0, 0, 0, 0, "props_day"]],
 	# Menus: the title on launch; the pause menu over a run.
 	"title": [[1.5, 0, 0, 0, 0, "title"]],
@@ -99,6 +100,8 @@ func _process(delta: float) -> bool:
 			session.camera.snap.call_deferred()
 		if OS.has_environment("PANG_EYE"):
 			_eye_camera(session)
+		if OS.has_environment("PANG_FREE"):
+			_scene.time_attack.free_drive()
 		if OS.has_environment("PANG_MANGA_OFF"):
 			session.camera.manga.enabled = false
 		if OS.has_environment("PANG_SCALE"):
@@ -213,6 +216,10 @@ func _shot(name: String) -> void:
 		RenderingServer.force_draw()
 	if OS.has_environment("PANG_NO_PAGE"):
 		_scene.session.camera.manga.enabled = false
+	var life: Node = _scene.get_node_or_null("RoadsideLife")
+	if life:
+		for n in life.get_children():
+			print("  %s at %.1f m  %s" % [n.name, n.get("distance") if n.get("distance") != null else n.get("_d"), n.global_position])
 	var image := root.get_texture().get_image()
 	var path := _out.path_join(name + ".png")
 	image.save_png(path)

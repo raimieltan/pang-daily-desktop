@@ -70,6 +70,8 @@ func _ready() -> void:
 	max_contacts_reported = 4
 	collision_layer = VEHICLE_LAYER
 	collision_mask = STATIC_LAYER | VEHICLE_LAYER
+	# Roadside traffic yields to every car (RoadsideLife).
+	add_to_group(&"cars")
 	can_sleep = false
 	continuous_cd = true
 	linear_damp_mode = RigidBody3D.DAMP_MODE_REPLACE
