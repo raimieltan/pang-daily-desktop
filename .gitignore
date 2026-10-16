@@ -13,3 +13,9 @@ __pycache__/
 trailer/out/
 trailer/renders/
 trailer/edit/node_modules/
+
+# macOS / local agent tooling
+.DS_Store
+.claude/settings.local.json
+.claude/.headroom_wrap_*
+.superpowers/
