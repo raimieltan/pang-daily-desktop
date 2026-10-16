@@ -10,6 +10,8 @@ Pang Daily is a racing-first touge game set in a fictionalized Iloilo: you grind
 
 The design shifts from a car-life RPG to a racing grind. Racing, times and tuning are the core loop; the car-life layer (money, wear, KYO Coffee, the talyer, the Marketplace) stays as the flavor and the economy around it.
 
+Beside the grind sits one story mode, "The Ghost Line": a five-act psychological thriller about Pang, his friend Jolo and an anonymous benchmark, played on the same roads, cars and hubs. It has its own doc, `docs/story/STORY_MODE.md`.
+
 **One-line pitch:** a broke-car-guy touge racer — shave seconds off your local mountain road in a car you can barely afford to keep running.
 
 **What changed from the RPG plan**
@@ -17,7 +19,7 @@ The design shifts from a car-life RPG to a racing grind. Racing, times and tunin
 | Kept | Cut or reduced |
 | --- | --- |
 | Iloilo setting, Taglish/Hiligaynon voice, humor | Branching dialogue trees |
-| FWD as legitimate (two of the four cars) | Five-chapter story arc |
+| FWD as legitimate (two of the four cars) | Five-chapter story arc (one story mode returned Oct 17, outside the grind) |
 | Money pressure, wear, repair vs upgrade | Relationship meters and crew politics |
 | KYO Coffee, talyer, Marketplace | Walking / character controller (later, optional) |
 | Rivals with personality | Police system, open-world roaming (later) |
@@ -33,10 +35,12 @@ Reference points: Initial D Arcade Stage (handling feel), Tokyo Xtreme Racer / W
 | Car roster | MVP and trailer use the four performance cars: Dalagan GSR, Silak Box, EG Hatch, Civic FD2R. No D-class starter sedan. |
 | Road length | Pass 1 stays at ~1.4 km for now; lengthen it later. |
 | Old docs | Babylon-era docs archived to `docs/archive/`. |
+| Story (Oct 17) | One story mode, "The Ghost Line" (`docs/story/`), from the title screen. It reverses the cut of story chapters for this story only; it has no economy and does not gate the grind. |
+| Mechanic (Oct 17) | Ruel runs the talyer (the story's mechanic); he replaces Tito Jun everywhere. |
 
-## Build status (Oct 16, 2026)
+## Build status (Oct 17, 2026)
 
-The build covers the driving, the first road, time attack and presentation; the whole economy layer (tuning, parts, wear, money, rival ladder, hubs) is not started.
+The build covers the driving, the first road, time attack, SP battles, a drivable barangay hub, presentation, and the full story mode; the economy layer (tuning, parts, wear, money, rival ladder) is not started.
 
 **Built**
 
@@ -57,6 +61,9 @@ The build covers the driving, the first road, time attack and presentation; the 
 | Input | Keyboard and gamepad (analog triggers and stick) | `game/vehicle/player_input.gd` |
 | Art | Manga-panel look: B&W screentone world, coloured cars, ink skids, smoke, sparks | `game/art/`, `docs/ART_DIRECTION.md` |
 | Trailer | Movie Maker capture tooling and a Remotion edit for a 30 s vertical trailer | `trailer/` |
+| Barangay hub | Drivable neighbourhood: Kyo Coffee (parked rivals to challenge), Ruel's talyer (swap cars), cruising rivals to flash, the road up to Pass 1 | `scenes/hub.gd`, `game/world/` |
+| Weather | Rain (ink streaks, mist, rain loop), wet road look (`manga_wet`) and wet grip (× 0.62) on every car; used by story mode, no toggle in free modes yet | `game/world/weather.gd` |
+| Story mode | "The Ghost Line": 47 beats over S00–S35, dialogue, phone feed, act cards, recorded practice passes cut into the Ghost Line, flying sector trials, the authored night run, evidence board, daylight ending; headless end-to-end probe | `game/story/`, `docs/story/STORY_MODE.md` |
 
 **Partial**
 
@@ -67,7 +74,7 @@ The build covers the driving, the first road, time attack and presentation; the 
 
 **Not started**
 
-Uphill direction, rain and surface grip changes (the sim has a surface-grip input, nothing drives it), tuning sliders and saved setups, parts and PI, wear and failures, wallet and transactions, delivery jobs, rival ladder and NPC lines, hubs (KYO Coffee, talyer, Marketplace), traffic and hazards, controller rumble.
+Uphill direction, a rain toggle and leaderboard category outside story mode, tuning sliders and saved setups, parts and PI, wear and failures, wallet and transactions, delivery jobs, rival ladder and NPC lines, the Marketplace, hazards, controller rumble.
 
 ## Design pillars
 
@@ -109,7 +116,7 @@ Handling is simulated and then shaped: a four-wheel vehicle sim gives real diffe
 | AWD traction | Pulls out of hairpins hard, heavier on entry | Dalagan GSR |
 | Trail braking | Braking into the turn loads the front and adds grip | All |
 | Weight transfer | Heavy cars feel slow to change direction | Dalagan GSR, Civic FD2R |
-| Surface and rain | Patched asphalt and wet roads cut grip visibly | Not built (sim has a surface-grip input) |
+| Surface and rain | Patched asphalt and wet roads cut grip visibly | Wet road built (`Weather`, story mode); patched asphalt not |
 
 **Tunable parameters (per car preset, then modified by tune and parts):** engine torque curve and redline, gearing, differential type and lock, tire grip and slip curve, spring rates, damping, anti-roll, steering angle and rack rate, mass, weight distribution, CG height, traction and stability assist.
 
@@ -193,7 +200,7 @@ Times are the main progression signal: every run shows how much you gained or lo
 
 ## Tuning system
 
-Tuning is a small set of sliders that each change something the player can feel on the next run; parts unlock the slider, and Tito Jun explains each one in plain words.
+Tuning is a small set of sliders that each change something the player can feel on the next run; parts unlock the slider, and Ruel explains each one in plain words.
 
 | Slider | Unlocked by | Effect on feel | Plain-words hint |
 | --- | --- | --- | --- |
@@ -225,7 +232,7 @@ Parts come in four tiers, and the cheapest path to speed is usually used parts a
 | --- | --- | --- | --- | --- |
 | Stock | Already on the car | — | Worn | Fails if neglected |
 | Used | Marketplace | Low | Hidden, 30–90% | Advertised condition may lie |
-| New | Parts shop via Tito Jun | Medium–high | 100% | None beyond normal wear |
+| New | Parts shop via Ruel | Medium–high | 100% | None beyond normal wear |
 | Rare | Rival rewards, contacts | High or not for sale | Varies | Hard to replace |
 
 **Part categories**
@@ -261,7 +268,7 @@ Hard driving costs money: tires and brakes wear every run, and neglected parts f
 - Wear rate scales with how hard you drive; smooth runs are cheaper.
 - Failures end a run but never delete the car or progress.
 - Repairs happen at the talyer and cost ₱; used replacement parts are cheaper but may be worse.
-- Tito Jun can let you pay later once trust is high enough (one simple flag, not a meter).
+- Ruel can let you pay later once trust is high enough (one simple flag, not a meter).
 - Build note: the sim already reports per-corner load, slip and grip every step (`vehicle_types.gd`) and body contacts with impulse (`car_body.gd`); wear reads from these.
 
 ## Economy
@@ -300,7 +307,7 @@ Progression is a ladder of named local drivers: beat each one's time or SP battl
 
 | # | Rival | Car | Driving style | Beat them by | Unlocks |
 | --- | --- | --- | --- | --- | --- |
-| 1 | KAPITAN | Silak Box (RWD turbo), blue | Old-school and showy; slides the box everywhere, loses time doing it | Time attack target | Coilovers at Tito Jun's, rival 2 |
+| 1 | KAPITAN | Silak Box (RWD turbo), blue | Old-school and showy; slides the box everywhere, loses time doing it | Time attack target | Coilovers at Ruel's, rival 2 |
 | 2 | TISOY | EG Hatch (FWD), black | Clean and technical, never makes mistakes, a little slow in the fast stuff | Time attack target | Camber kit, night runs |
 | 3 | BUKO | Dalagan GSR (AWD), green | Quick on the straights and out of hairpins, heavy and late on entry | SP battle downhill | BUKO's ghost, LSD |
 | 4 | ATE LIZA | Civic FD2R (FWD), red | Brakes early, fast mid-corner, knows every patch on the road | SP battle uphill | Rare parts contact, second road |
@@ -323,7 +330,7 @@ The three hubs are menus wrapped in personality, not walkable quest spaces: each
 | Hub | What you do there | NPC | Example line |
 | --- | --- | --- | --- |
 | KYO Coffee | Pick rival challenges, view leaderboards, set wagers, hear about new roads | The rival cast, rotating tambays | "Maasin ta?" |
-| Talyer | Repair, install parts, tune, save setups, test lane | Tito Jun | "Unahon ta anay ang preno mo." |
+| Talyer | Repair, install parts, tune, save setups, test lane | Ruel | "Unahon ta anay ang preno mo." |
 | Marketplace (phone) | Buy and sell used parts, see listings with hidden condition | Marketplace sellers | "Good condition gid ni boss." |
 
 **Rules**
@@ -332,7 +339,7 @@ The three hubs are menus wrapped in personality, not walkable quest spaces: each
 - NPC lines react to recent events: a new part, a rival beaten, a failed run, a broke wallet.
 - Visual mods are visible on the parked car at KYO, so the car itself shows progress.
 - Walking around hubs is post-MVP.
-- Today the front end is a title menu (VS battle, spectate, time attack, free drive, settings), a garage page that picks the car, and a pause menu. Hubs replace the title menu as the home screen.
+- Today the front end is a title menu (story, barangay, VS battle, SP battle, spectate, time attack, free drive, settings), a garage page that picks the car, and a pause menu. The barangay is drivable (Kyo Coffee challenges, Ruel's talyer, the road up to Pass 1); hubs replace the title menu as the home screen once the economy exists.
 
 ## Roads and world scope
 
@@ -416,7 +423,7 @@ The MVP is one mountain road, the four performance cars, three ladder rivals and
 6. **M5 Rivals.** SP battles, rivals 1–3, KYO and talyer hubs with lines. Gate: beating BUKO feels earned.
 7. **M6 Polish.** Sound, camera feel, rain, trailer capture. Gate: ready for a public demo. *Done early: car audio, cameras, replays, trailer capture and edit. Missing: rain.*
 
-**Out of scope for MVP:** online leaderboards and ghosts, multiplayer, walking, police, open world, story chapters, drag and point-to-point, car buying, a longer Pass 1.
+**Out of scope for MVP:** online leaderboards and ghosts, multiplayer, walking, police, open world, a second story, drag and point-to-point, car buying, a longer Pass 1. (Story mode "The Ghost Line" is built; it is outside the MVP loop.)
 
 **Success metrics for the demo**
 
@@ -441,6 +448,10 @@ The MVP is one mountain road, the four performance cars, three ladder rivals and
 | --- | --- |
 | `docs/GAME_DESIGN.md` | Canon: this doc |
 | `docs/ART_DIRECTION.md` | Canon: manga-panel art direction for the Godot build |
+| `docs/story/STORY_MODE.md` | Canon: how story mode plays "The Ghost Line" (beats, mechanics, evidence) |
+| `docs/story/GHOST_LINE_PLOT.md` | Canon: the story's full plot |
+| `docs/story/GHOST_LINE_STORYBOARD.md` | Canon: scene-by-scene playable storyboard (S00–S35) |
+| `docs/story/GHOST_LINE_MANUSCRIPT.md` | Canon: the prose manuscript; source of the dialogue |
 | `docs/research/touge-arcade-handling.md` | Reference: Pass 1 map spec and touge handling research |
 | `docs/vehicles/civic-fd.md` | Reference: Civic FD feel notes |
 | `docs/archive/` | Archived Babylon-era docs (old vision, story, economy, hubs, web stack). Reference only, not canon |

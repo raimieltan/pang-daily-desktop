@@ -11,7 +11,8 @@ Babylon build (`pang-daily/src/game/vehicles/handling`, `src/game-core/suspensio
   `_godot_fixture.test.ts` and run it with vitest to regenerate `tests/fixtures/ts_reference.json`.
 
 Design canon: `docs/GAME_DESIGN.md` (racing-first design, decisions, build status) and
-`docs/ART_DIRECTION.md`. Babylon-era docs are in `docs/archive/`, reference only.
+`docs/ART_DIRECTION.md`. Story mode ("The Ghost Line"): `docs/story/` — `STORY_MODE.md` for how it
+plays, plus the plot, storyboard and manuscript. Babylon-era docs are in `docs/archive/`, reference only.
 
 Carried over from the Babylon repo (2026-10-15), which is retired:
 
