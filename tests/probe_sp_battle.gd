@@ -57,6 +57,15 @@ func _physics_process(delta: float) -> bool:
 			_me.distance, c.speed_kmh(), _scene.track.lateral_offset(c.global_position, _me._index), c.last_input.throttle, c.last_input.brake,
 			_vs.drivers[0].distance, r.speed_kmh(), _scene.track.lateral_offset(r.global_position, _me._index),
 			str(snappedf(tr["speed"] * 3.6, 1)), str(snappedf(tr["lane"], 0.1)), _me._plan[_me._index] * 3.6, _scene.car.model.mechanics.gear, _scene.car.model.mechanics.engine_rpm, _scene.car.preset, _scene.car.tire_product])
+	# PROBE_DRIVE=1: drivetrain and per-wheel slip / load / lateral force, 14–26 s.
+	if OS.has_environment("PROBE_DRIVE") and fmod(_t, 0.5) < delta and _t > 14.0 and _t < 26.0:
+		var m: FourWheelDynamics = _scene.car.model.mechanics
+		var w := m.wheels
+		print("DR t=%4.1f %3.0f km/h g%d %4.0f rpm thr_in %.2f clutch %.2f axle %5.0f slip %+.2f %+.2f %+.2f %+.2f load %4.0f %4.0f %4.0f %4.0f lat %+.1f %+.1f %+.1f %+.1f" % [_t,
+			_scene.car.speed_kmh(), m.gear, m.engine_rpm, _scene.car.model.state.throttle, m.clutch, m.axle_torque,
+			w[0].slip_ratio, w[1].slip_ratio, w[2].slip_ratio, w[3].slip_ratio,
+			w[0].vertical_load, w[1].vertical_load, w[2].vertical_load, w[3].vertical_load,
+			w[0].lateral_force / 1000.0, w[1].lateral_force / 1000.0, w[2].lateral_force / 1000.0, w[3].lateral_force / 1000.0])
 	if _t > 240.0:
 		print("TIMEOUT")
 		quit(1)

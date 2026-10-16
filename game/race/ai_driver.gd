@@ -26,6 +26,9 @@ const PASS_OFFSET := 2.6
 const FOLLOW_TIME := 0.45
 const FOLLOW_MIN := 6.0
 const FOLLOW_MIN_SPEED := 5.0
+## A pass lane, once taken, is held this long (s) after the car stops being in the way: without
+## it the in-path test flickers and the car weaves between lanes, scrubbing speed.
+const AVOID_HOLD := 1.0
 
 var car: CarBody
 var track: TrackData
@@ -51,6 +54,8 @@ var _lane_now := 0.0
 var _stuck := 0.0
 var _mark_distance := 0.0
 var _mark_time := 0.0
+var _avoid_lane := NAN
+var _avoid_hold := 0.0
 var _plan: PackedFloat32Array
 static var _plans := {}
 
@@ -140,13 +145,25 @@ func _steer(p: Vector3, speed: float, avoid: float) -> float:
 
 ## How to treat the other cars this step: { "lane": a lane to pass on (NAN: keep the racing
 ## lane), "speed": a speed cap (m/s, INF: none) }. Looks at cars in front within a reach that grows
-## with speed, in the car's own frame (ahead along its nose, side to its right).
+## with speed, measured along and across the road (not the car's own frame, which swings with
+## every correction and would feed back into the steering).
 func _traffic(p: Vector3, speed: float) -> Dictionary:
+	var out := _traffic_raw(p, speed)
+	if not is_nan(out["lane"]):
+		_avoid_lane = out["lane"]
+		_avoid_hold = AVOID_HOLD
+	elif _avoid_hold > 0.0:
+		_avoid_hold -= _dt()
+		out["lane"] = _avoid_lane
+	return out
+
+
+func _traffic_raw(p: Vector3, speed: float) -> Dictionary:
 	var out := { "lane": NAN, "speed": INF }
 	if others.is_empty():
 		return out
-	var forward := -car.global_basis.z
-	var right := car.global_basis.x
+	# Closing speeds along the road, not the nose.
+	var forward := track.forwards[_index]
 	var reach := clampf(8.0 + speed * 1.2, 12.0, 45.0)
 	var my_lat := track.lateral_offset(p, _index)
 	var room := track.half_width - 1.2
@@ -156,16 +173,17 @@ func _traffic(p: Vector3, speed: float) -> Dictionary:
 		if o == car or not is_instance_valid(o) or not (o as Node).is_inside_tree():
 			continue
 		var other := o as CarBody
-		var to: Vector3 = other.global_position - p
-		var ahead := to.dot(forward)
-		var side := to.dot(right)
-		if ahead < -CAR_LENGTH or ahead > reach or absf(side) > 4.0:
+		if p.distance_squared_to(other.global_position) > (reach + CAR_LENGTH) * (reach + CAR_LENGTH):
 			continue
 		var closing := (car.linear_velocity - other.linear_velocity).dot(forward)
 		var other_lat := track.lateral_offset(other.global_position, _index)
 		# Who is in front is decided along the road, so two cars never both wait for each other.
 		var other_index := track.nearest_index(other.global_position, _index)
 		var road_ahead := (other_index - _index) * track.spacing
+		var ahead := road_ahead
+		var side := other_lat - my_lat
+		if ahead < -CAR_LENGTH or ahead > reach or absf(side) > 4.0:
+			continue
 		var other_speed := maxf(0.0, other.linear_velocity.dot(forward))
 		if ahead > CAR_LENGTH * 0.8 and road_ahead > 0.0:
 			# In front. In the way if our paths overlap within the time to reach it.
@@ -174,13 +192,14 @@ func _traffic(p: Vector3, speed: float) -> Dictionary:
 			if ahead >= nearest:
 				continue
 			nearest = ahead
-			# Pass on the side with more road; if neither side fits, follow.
+			# Pass on the side with more road (keeping the side already taken); if neither fits, follow.
 			var left := other_lat - PASS_OFFSET
 			var rightl := other_lat + PASS_OFFSET
 			var left_ok := left > -room
 			var right_ok := rightl < room
 			if left_ok or right_ok:
-				var pick := left if (left_ok and (not right_ok or absf(left - my_lat) < absf(rightl - my_lat))) else rightl
+				var from := _avoid_lane if _avoid_hold > 0.0 else my_lat
+				var pick := left if (left_ok and (not right_ok or absf(left - from) < absf(rightl - from))) else rightl
 				out["lane"] = clampf(pick, -room, room)
 			# Hold station only when it matters: on its line and about to run into it, or in a
 			# tight corner where there is no room to go round. Otherwise keep racing and pass.
