@@ -10,11 +10,11 @@ Babylon build (`pang-daily/src/game/vehicles/handling`, `src/game-core/suspensio
 - `tools/ts_reference_probe.test.ts.txt` — copy into the TS repo's `src/game/vehicles/` as
   `_godot_fixture.test.ts` and run it with vitest to regenerate `tests/fixtures/ts_reference.json`.
 
+Design canon: `docs/GAME_DESIGN.md` (racing-first design, decisions, build status) and
+`docs/ART_DIRECTION.md`. Babylon-era docs are in `docs/archive/`, reference only.
+
 Carried over from the Babylon repo (2026-10-15), which is retired:
 
-- `docs/` — design docs, story canon, economy/handling notes, plans (`docs/superpowers/`). Godot's
-  `ART_DIRECTION.md` is current; the Babylon version is `ART_DIRECTION_babylon.md`. Web-only docs
-  (auth, backend, browser saves, persistence) describe the old Next.js stack.
 - `assets/vehicles/` — every car (Dalagan, Civic EK/FD, Lancer box, starter sedan), body kits,
   wheels, mounting interfaces and QA previews. `.blend` and baseline sources in `source/`.
 - `assets/audio/radio/` — the radio tracks and ambience. Not CC-licensed (see `CREDITS.md`).
