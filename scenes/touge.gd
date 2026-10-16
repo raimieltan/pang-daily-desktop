@@ -15,6 +15,7 @@ var intro: RaceIntro
 var music: MusicPlayer
 var menu: GameMenu
 var _progress_index := 0
+var _kyo_hint: Label
 
 
 func _ready() -> void:
@@ -58,7 +59,45 @@ func _ready() -> void:
 	menu.time_attack = time_attack
 	menu.vs_battle = vs_battle
 	menu.music = music
+	# Arriving from the barangay: straight onto the road, no title.
+	var from_hub := HubChallenge.rival >= 0 or HubChallenge.free_drive
+	var skip := GameMenu.skip_title
+	GameMenu.skip_title = skip or from_hub
 	add_child(menu)
+	GameMenu.skip_title = skip
+	if from_hub:
+		_start_from_hub.call_deferred()
+
+
+## A challenge made in the barangay: the SP battle against that rival (or free drive from the
+## main road's exit), and E takes you back to Kyo once it is over.
+func _start_from_hub() -> void:
+	if HubChallenge.car_id != "":
+		session.set_car(HubChallenge.car_id)
+	_kyo_hint = MangaType.label("E   BACK TO KYO", 30)
+	_kyo_hint.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
+	_kyo_hint.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	_kyo_hint.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	_kyo_hint.position.y = -60
+	var layer := CanvasLayer.new()
+	layer.layer = 12
+	layer.add_child(_kyo_hint)
+	add_child(layer)
+	time_attack.free_drive()
+	if HubChallenge.rival >= 0:
+		_kyo_hint.visible = false
+		vs_battle.sp_rival = HubChallenge.rival
+		vs_battle.finished.connect(func(_place: int): _kyo_hint.visible = true, CONNECT_ONE_SHOT)
+		vs_battle.start()
+	else:
+		music.stop_music()
+	HubChallenge.rival = -1
+	HubChallenge.free_drive = false
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if _kyo_hint and _kyo_hint.visible and InputMap.has_action("interact") and event.is_action_pressed("interact"):
+		HubChallenge.back_to_hub(get_tree())
 
 
 func _physics_process(_delta: float) -> void:

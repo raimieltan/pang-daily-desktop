@@ -90,7 +90,8 @@ func _build_title() -> void:
 	menu.add_theme_constant_override("separation", 6)
 	menu.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	column.add_child(menu)
-	_title_first = _button(menu, "VS BATTLE", func(): _open_garage("VS BATTLE", _start_vs))
+	_title_first = _button(menu, "BARANGAY", func(): _open_garage("BARANGAY", _start_barangay))
+	_button(menu, "VS BATTLE", func(): _open_garage("VS BATTLE", _start_vs))
 	_button(menu, "SP BATTLE", func(): _open_garage("SP BATTLE", _start_sp))
 	_button(menu, "SPECTATE", func(): _open_garage("SPECTATE", _start_spectate))
 	_button(menu, "TIME ATTACK", _start_time_attack)
@@ -511,6 +512,13 @@ func _start_sp() -> void:
 	time_attack.free_drive()
 	_close()
 	vs_battle.start()
+
+
+## The neighbourhood hub: drive to Kyo Coffee and challenge the rivals there.
+func _start_barangay() -> void:
+	HubChallenge.car_id = session.car_spec["id"]
+	HubChallenge.return_to = "kyo"
+	HubChallenge.back_to_hub(get_tree())
 
 
 func _start_time_attack() -> void:
