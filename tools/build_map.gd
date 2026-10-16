@@ -66,10 +66,12 @@ func _initialize() -> void:
 	terrain_body.owner = root
 	terrain_shape.owner = root
 
-	b.plan_village(data.start_distance, data.finish_distance)
+	b.plan_lots(data.start_distance, data.finish_distance)
+	b.plan_valley(bounds)
 	b.build_guardrails(root, root)
 	b.build_trees(root, root, bounds, grid)
 	b.build_backdrop(root, root, bounds)
+	b.build_valley_lights(root, root, bounds)
 	b.build_props(root, root, data.start_distance, data.finish_distance)
 	b.build_gantry(root, root, data.start_distance, "START", Color(0.75, 0.12, 0.1))
 	b.build_gantry(root, root, data.finish_distance, "GOAL", Color(0.1, 0.25, 0.7))

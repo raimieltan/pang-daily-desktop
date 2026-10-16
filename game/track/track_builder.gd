@@ -41,6 +41,7 @@ var _uphill := Vector2.ZERO  # horizontal unit vector up the mountain
 var _centroid := Vector3.ZERO
 var _hash := {}
 const HASH_CELL := 24.0
+const CITY_LIGHTS_SHADER := preload("res://game/art/manga_city_lights.gdshader")
 
 
 func _init(layout_: Array, seed__ := 7) -> void:
@@ -466,9 +467,8 @@ func guardrail_runs() -> Array[Dictionary]:
 			var need := side_type[i][side] == Side.FILL or outside_tight
 			if need and side_type[i][side] == Side.CUT:
 				need = false   # a wall is its own barrier
-			if need and not store.is_empty() and store["side"] == side \
-					and absi(i - int(store["i"])) <= roundi((STORE_SIZE.x * 0.5 + 1.5) / SPACING):
-				need = false   # the store's frontage opens onto the road
+			if need and _fronts_lot(i, side):
+				need = false   # the lot opens onto the road
 			if need and start < 0:
 				start = i
 			elif not need and start >= 0:
@@ -554,7 +554,7 @@ func build_trees(parent: Node3D, owner: Node, bounds: Rect2, grid: Dictionary) -
 		var z := rng.randf_range(bounds.position.y, bounds.end.y)
 		var i := nearest_sample(x, z)
 		var d := INF if i < 0 else Vector2(pts[i].x - x, pts[i].z - z).length()
-		if d < 17.0:
+		if d < 17.0 or _cleared(x, z):
 			continue
 		# Forest thins out far from the road to keep the draw count down.
 		if d > 70.0 and rng.randf() > 0.35:
@@ -595,7 +595,7 @@ func _build_undergrowth(parent: Node3D, owner: Node, bounds: Rect2, grid: Dictio
 				var p := pts[i] + rgt[i] * lateral + fwd[i] * rng.randf_range(-0.5, 0.5)
 				if nearest_sample(p.x, p.z) >= 0 and Vector2(p.x - pts[nearest_sample(p.x, p.z)].x, p.z - pts[nearest_sample(p.x, p.z)].z).length() < 4.5:
 					continue
-				if _in_store_lot(p):
+				if _in_lot(p):
 					continue
 				var h := _grid_height(bounds, grid, p.x, p.z)
 				var sc := rng.randf_range(0.8, 1.5)
@@ -603,7 +603,7 @@ func _build_undergrowth(parent: Node3D, owner: Node, bounds: Rect2, grid: Dictio
 			if i % 6 == 0 and rng.randf() < 0.6:
 				var lateral := s * (skirt[i][side] + rng.randf_range(1.0, 12.0))
 				var p := pts[i] + rgt[i] * lateral
-				if _in_store_lot(p):
+				if _in_lot(p):
 					continue
 				var h := _grid_height(bounds, grid, p.x, p.z)
 				var sc := rng.randf_range(0.7, 1.4)
@@ -756,13 +756,16 @@ func build_props(parent: Node3D, owner: Node, start_distance: float, finish_dist
 	_build_poles(props, owner, 180.0, 720.0)
 	_build_mirrors(props, owner)
 	for d in _lamp_distances(start_distance, finish_distance):
-		if store.is_empty() or store["side"] == 1 or not _in_store_lot(_roadside(_index(d), -4.7)):
+		var store := _lot("store")
+		if store.is_empty() or not _in_lot(_roadside(_index(d), -4.7), [store]):
 			_build_street_lamp(props, owner, d)
 	_build_warning_signs(props, owner, start_distance, finish_distance)
 	_build_km_posts(props, owner, start_distance, finish_distance)
 	_build_arch(props, owner, start_distance + ARCH_AFTER_START)
-	if not store.is_empty():
-		_build_store(props, owner)
+	if not _lot("store").is_empty():
+		_build_store(props, owner, _lot("store"))
+	if not _lot("viewpoint").is_empty():
+		_build_viewpoint(props, owner, _lot("viewpoint"))
 
 
 ## Street lamps (always on the left): start, goal, and the barangay stretch after the start.
@@ -863,7 +866,7 @@ func _build_poles(parent: Node3D, owner: Node, from_d: float, to_d: float) -> vo
 		var lateral := 6.2 * (1.0 if side == 1 else -1.0)
 		var base := _roadside(i, lateral)
 		var basis := _facing_traffic(i)
-		if not _in_store_lot(base):
+		if not _in_lot(base):
 			poles.append(Transform3D(Basis(), base + Vector3.UP * 4.5))
 			arms.append(Transform3D(basis, base + Vector3.UP * 8.4))
 			tops.append(base + Vector3.UP * 8.45)
@@ -1089,51 +1092,91 @@ const ARCH_AFTER_START := 30.0
 const STORE_SIZE := Vector3(5.2, 2.6, 3.8)
 ## Lateral offset of the store's front wall (just past the gravel shoulder).
 const STORE_FRONT := 4.4
+## Viewpoint pull-off: frontage along the road and depth out over the valley.
+const VIEW_SIZE := Vector2(30.0, 8.0)
 const TRIM := Color(0.95, 0.72, 0.1)
 const BULB := Color(1.0, 0.78, 0.45)
 
-## The sari-sari store's lot once planned: { i: sample, side: 0 left / 1 right, xform: front-wall
-## frame (+Z toward the road, +X along it, origin at floor level) }. Empty = no store.
-var store := {}
+## Reserved roadside lots (buildings, the viewpoint pad): { kind, i: sample, side: 0 left / 1 right,
+## frontage, depth, xform: front frame (+Z toward the road, +X along it, origin at road-edge level) }.
+## Guardrails, poles, lamps and undergrowth leave them open.
+var lots: Array[Dictionary] = []
 
 
-## Picks the store's lot in the barangay stretch: a straight run with a drop on one side (the store
-## stands on stilts over it, its front at road level), clear of the street lamps. Call it before
-## the guardrails and trees, which leave the lot open.
-func plan_village(start_distance: float, finish_distance: float) -> void:
-	store = {}
-	var half := roundi((STORE_SIZE.x * 0.5 + 6.0) / SPACING)
+## Plans every lot before the dressing is built. Call it before the guardrails and trees.
+func plan_lots(start_distance: float, finish_distance: float) -> void:
+	lots.clear()
 	var lamps := _lamp_distances(start_distance, finish_distance)
-	for d in range(int(start_distance + ARCH_AFTER_START + 25.0), int(start_distance + 300.0)):
+	# The sari-sari store on stilts over the drop, front at road level, in the barangay stretch.
+	_find_lot("store", start_distance + ARCH_AFTER_START + 25.0, start_distance + 300.0,
+		STORE_SIZE.x, STORE_SIZE.z, STORE_FRONT, lamps)
+	# The viewpoint pull-off by the goal, on the valley side.
+	# Its street lamps stay: they light the deck.
+	_find_lot("viewpoint", finish_distance - 70.0, finish_distance + 10.0, VIEW_SIZE.x, VIEW_SIZE.y,
+		3.3, [] as Array[float], 1.0 / 90.0)
+	for lot in lots:
+		print("%s at %.0f m, %s side" % [lot["kind"], lot["i"] * SPACING, "right" if lot["side"] == 1 else "left"])
+
+
+## First lot between `from_d` and `to_d` on a drop (fill) side that is straight enough, has room
+## behind it, avoids other lots and (on the left) the street lamps. Returns it, or {} if none.
+func _find_lot(kind: String, from_d: float, to_d: float, frontage: float, depth: float, front: float,
+		lamps: Array[float], max_curvature := 1.0 / 150.0) -> Dictionary:
+	var half := roundi((frontage * 0.5 + 6.0) / SPACING)
+	for d in range(int(from_d), int(to_d)):
 		var i := _index(d)
 		if i - half < 0 or i + half >= pts.size():
 			continue
 		for side in [1, 0]:
-			if side == 0 and lamps.any(func(l: float) -> bool: return absf(l - d) < STORE_SIZE.x + 3.0):
+			if side == 0 and lamps.any(func(l: float) -> bool: return absf(l - d) < frontage * 0.5 + 6.0):
 				continue
 			var ok := true
 			for j in range(i - half, i + half + 1):
-				if side_type[j][side] != Side.FILL or absf(curvature[j]) > 1.0 / 150.0 or skirt[j][side] < 9.0:
+				if side_type[j][side] != Side.FILL or absf(curvature[j]) > max_curvature or skirt[j][side] < minf(depth + front, MAX_SKIRT - 1.0):
 					ok = false
 					break
-			if ok:
-				var s := 1.0 if side == 1 else -1.0
-				var front := _roadside(i, s * 3.6)
-				front += rgt[i] * s * (STORE_FRONT - 3.6)
-				var z := -rgt[i] * s
-				var x := Vector3.UP.cross(z).normalized()
-				store = { "i": i, "side": side, "xform": Transform3D(Basis(x, Vector3.UP, z), front) }
-				print("sari-sari store at %.0f m, %s side" % [i * SPACING, "right" if side == 1 else "left"])
-				return
-	push_warning("No lot for the sari-sari store in the barangay stretch.")
+			if not ok:
+				continue
+			var s := 1.0 if side == 1 else -1.0
+			var origin := _roadside(i, s * 3.6) + rgt[i] * s * (front - 3.6)
+			var taken := false
+			for other in lots:
+				if other["side"] == side and absi(int(other["i"]) - i) * SPACING < (frontage + float(other["frontage"])) * 0.5 + 8.0:
+					taken = true
+			if taken:
+				continue
+			var z := -rgt[i] * s
+			var x := Vector3.UP.cross(z).normalized()
+			var lot := { "kind": kind, "i": i, "side": side, "frontage": frontage, "depth": depth,
+				"xform": Transform3D(Basis(x, Vector3.UP, z), origin) }
+			lots.append(lot)
+			return lot
+	push_warning("No lot for %s between %.0f and %.0f m." % [kind, from_d, to_d])
+	return {}
 
 
-## True when `p` falls on the store's lot (its footprint plus a margin), so nothing grows there.
-func _in_store_lot(p: Vector3) -> bool:
-	if store.is_empty():
-		return false
-	var local: Vector3 = (store["xform"] as Transform3D).affine_inverse() * p
-	return absf(local.x) < STORE_SIZE.x * 0.5 + 2.0 and local.z < 1.5 and local.z > -STORE_SIZE.z - 2.5
+func _lot(kind: String) -> Dictionary:
+	for lot in lots:
+		if lot["kind"] == kind:
+			return lot
+	return {}
+
+
+## True when `p` falls on a lot (its footprint plus a margin), so nothing grows or stands there.
+func _in_lot(p: Vector3, among: Array[Dictionary] = lots) -> bool:
+	for lot in among:
+		var local: Vector3 = (lot["xform"] as Transform3D).affine_inverse() * p
+		if absf(local.x) < float(lot["frontage"]) * 0.5 + 2.0 and local.z < 1.5 and local.z > -float(lot["depth"]) - 2.5:
+			return true
+	return false
+
+
+## True when sample `i` on `side` fronts a lot (no guardrail there: the lot opens onto the road).
+func _fronts_lot(i: int, side: int) -> bool:
+	for lot in lots:
+		if lot["side"] == side and absi(i - int(lot["i"])) <= roundi((float(lot["frontage"]) * 0.5 + 1.5) / SPACING):
+			return true
+	return false
 
 
 func _box(parent: Node3D, owner: Node, size: Vector3, xform: Transform3D, mat: Material) -> MeshInstance3D:
@@ -1238,8 +1281,8 @@ func _build_arch(parent: Node3D, owner: Node, distance: float) -> void:
 ## Sari-sari store on the valley side: plywood box on stilts, its front at road level with the
 ## barred tindahan window and counter, a rusty GI roof over the shoulder, snack strips hanging in
 ## the window (spot color), a bare bulb under the eave, and a bench out front.
-func _build_store(parent: Node3D, owner: Node) -> void:
-	var xf: Transform3D = store["xform"]
+func _build_store(parent: Node3D, owner: Node, lot: Dictionary) -> void:
+	var xf: Transform3D = lot["xform"]
 	var root := Node3D.new()
 	root.name = "SariSariStore"
 	root.transform = xf
@@ -1335,3 +1378,283 @@ func _build_store(parent: Node3D, owner: Node) -> void:
 	_solid(root, owner, "StoreCollision", [
 		[Vector3(w, h, d), Transform3D(Basis(), Vector3(0, h * 0.5, -d * 0.5))],
 	])
+
+
+# --- Viewpoint ------------------------------------------------------------------------------------
+
+## The pull-off by the goal: a concrete pad flush with the road edge (tapered at both ends) out over
+## the valley, a parapet along its lip, benches facing the view, the deck's sign and a litter sign.
+func _build_viewpoint(parent: Node3D, owner: Node, lot: Dictionary) -> void:
+	var root := Node3D.new()
+	root.name = "Viewpoint"
+	parent.add_child(root)
+	root.owner = owner
+	var i0: int = lot["i"]
+	var side: int = lot["side"]
+	var s := 1.0 if side == 1 else -1.0
+	var half := roundi(VIEW_SIZE.x * 0.5 / SPACING)
+	var taper := 6.0
+	var inner := 3.25
+	var top := SurfaceTool.new()
+	top.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var wall := SurfaceTool.new()
+	wall.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var rail := SurfaceTool.new()
+	rail.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var rail_posts: Array[Transform3D] = []
+	var faces := PackedVector3Array()
+	var prev := {}
+	for j in range(i0 - half, i0 + half + 1):
+		var along := absf(j - i0) * SPACING
+		var depth := VIEW_SIZE.y * clampf((VIEW_SIZE.x * 0.5 - along) / taper, 0.0, 1.0)
+		var edge_h: float = _roadside(j, s * 3.6).y - pts[j].y
+		var a := pts[j] + rgt[j] * s * inner + Vector3.UP * edge_h
+		var b := pts[j] + rgt[j] * s * (inner + depth) + Vector3.UP * (edge_h - 0.02)
+		var c := pts[j] + rgt[j] * s * (inner + depth + 0.3) + Vector3.UP * (edge_h - 0.02)
+		var ground := minf(_roadside(j, s * minf(inner + depth + 0.3, skirt[j][side])).y, c.y - 0.5) - 1.0
+		var foot := Vector3(c.x, ground, c.z)
+		var cur := { "a": a, "b": b, "c": c, "foot": foot, "depth": depth }
+		if not prev.is_empty():
+			var quad := func(st: SurfaceTool, p0: Vector3, p1: Vector3, p2: Vector3, p3: Vector3, collide: bool) -> void:
+				for v in [p0, p1, p2, p0, p2, p3, p0, p2, p1, p0, p3, p2]:
+					st.add_vertex(v)
+				if collide:
+					faces.append_array([p0, p1, p2, p0, p2, p3])
+			quad.call(top, prev["a"], cur["a"], cur["c"], prev["c"], true)
+			# Retaining face down to the slope.
+			quad.call(wall, prev["c"], cur["c"], cur["foot"], prev["foot"], false)
+			# Parapet along the lip: a 0.5 m wall, 0.25 m thick, with a pipe railing over it so the
+			# valley stays in view. Collision goes up to the top rail.
+			if cur["depth"] > 0.5 and prev["depth"] > 0.5:
+				var up := Vector3.UP * 0.5
+				var pb: Vector3 = prev["b"]
+				var cb: Vector3 = cur["b"]
+				var pc: Vector3 = prev["c"]
+				var cc: Vector3 = cur["c"]
+				quad.call(wall, pb, cb, cb + up, pb + up, false)
+				quad.call(wall, pc, cc, cc + up, pc + up, false)
+				quad.call(wall, pb + up, cb + up, cc + up, pc + up, false)
+				faces.append_array([pb, cb, cb + Vector3.UP * 1.1, pb, cb + Vector3.UP * 1.1, pb + Vector3.UP * 1.1])
+				var pm: Vector3 = (pb + pc) * 0.5
+				var cm: Vector3 = (cb + cc) * 0.5
+				for h: float in [0.78, 1.05]:
+					var t := Vector3.UP * 0.025
+					var y := Vector3.UP * h
+					quad.call(rail, pm + y - t, cm + y - t, cm + y + t, pm + y + t, false)
+				if j % 2 == 0:
+					rail_posts.append(Transform3D(Basis(), cm + Vector3.UP * 0.78))
+		prev = cur
+	top.generate_normals()
+	top.set_material(MangaArt.world_preset("concrete"))
+	wall.generate_normals()
+	wall.set_material(MangaArt.world_preset("concrete"))
+	rail.generate_normals()
+	rail.set_material(MangaArt.world_preset("pole"))
+	for pair in [["Pad", top], ["Parapet", wall], ["Railing", rail]]:
+		var mi := MeshInstance3D.new()
+		mi.name = pair[0]
+		mi.mesh = (pair[1] as SurfaceTool).commit()
+		root.add_child(mi)
+		mi.owner = owner
+	var post := BoxMesh.new()
+	post.size = Vector3(0.05, 0.6, 0.05)
+	post.material = MangaArt.world_preset("pole")
+	var posts := Scatter.make("RailPosts", post, rail_posts)
+	root.add_child(posts)
+	posts.owner = owner
+	var body := StaticBody3D.new()
+	body.name = "ViewpointCollision"
+	body.collision_layer = CarBody.STATIC_LAYER
+	body.collision_mask = 0
+	var shape := CollisionShape3D.new()
+	var concave := ConcavePolygonShape3D.new()
+	concave.backface_collision = true
+	concave.set_faces(faces)
+	shape.shape = concave
+	body.add_child(shape)
+	root.add_child(body)
+	body.owner = owner
+	shape.owner = owner
+	# Furniture in a frame at the pad's middle: +Z toward the road, origin on the deck at the lip.
+	var z := -rgt[i0] * s
+	var x := Vector3.UP.cross(z).normalized()
+	var lip := pts[i0] + rgt[i0] * s * (inner + VIEW_SIZE.y) + Vector3.UP * (_roadside(i0, s * 3.6).y - pts[i0].y)
+	var deck := Node3D.new()
+	deck.name = "Deck"
+	deck.transform = Transform3D(Basis(x, Vector3.UP, z), lip)
+	root.add_child(deck)
+	deck.owner = owner
+	var wood := MangaArt.world_preset("pole")
+	for bx in [-6.0, 3.0]:
+		_box(deck, owner, Vector3(2.2, 0.07, 0.4), Transform3D(Basis(), Vector3(bx, 0.45, 1.3)), wood)
+		_box(deck, owner, Vector3(2.2, 0.35, 0.06), Transform3D(Basis(), Vector3(bx, 0.75, 1.48)), wood)
+		for lx in [-0.95, 0.95]:
+			_box(deck, owner, Vector3(0.08, 0.45, 0.36), Transform3D(Basis(), Vector3(bx + lx, 0.22, 1.3)), wood)
+	# The deck's sign at the road end, facing traffic; the litter sign by the bench.
+	var sign_root := Node3D.new()
+	sign_root.name = "ViewDeckSign"
+	var si := clampi(i0 - half + 4, 0, pts.size() - 1)
+	sign_root.transform = Transform3D(_facing_traffic(si), _roadside(si, s * 4.6))
+	root.add_child(sign_root)
+	sign_root.owner = owner
+	_box(sign_root, owner, Vector3(2.6, 1.0, 0.12), Transform3D(Basis(), Vector3(0, 2.0, 0)), MangaArt.world_preset("board"))
+	_box(sign_root, owner, Vector3(2.6, 0.1, 0.14), Transform3D(Basis(), Vector3(0, 1.45, 0)), MangaArt.accent(TRIM))
+	for px in [-1.0, 1.0]:
+		_box(sign_root, owner, Vector3(0.1, 2.5, 0.1), Transform3D(Basis(), Vector3(px, 1.25, -0.08)), MangaArt.world_preset("post"))
+	_paint(sign_root, owner, "VIEW DECK", 2.4, 0.42, Vector3(0, 2.18, 0.07), MangaArt.SIGN_RED)
+	_paint(sign_root, owner, "SCENIC VIEWPOINT · 50 M", 2.4, 0.2, Vector3(0, 1.8, 0.07), MangaArt.INK)
+	_box(deck, owner, Vector3(0.9, 0.5, 0.05), Transform3D(Basis(), Vector3(0.0, 1.35, 0.2)), MangaArt.world_preset("board"))
+	_box(deck, owner, Vector3(0.06, 1.1, 0.06), Transform3D(Basis(), Vector3(0.0, 0.55, 0.16)), MangaArt.world_preset("post"))
+	_paint(deck, owner, "BAWAL MAGTAPON", 0.85, 0.12, Vector3(0, 1.45, 0.23), MangaArt.SIGN_RED)
+	_paint(deck, owner, "NG BASURA DITO", 0.85, 0.12, Vector3(0, 1.27, 0.23), MangaArt.INK)
+
+
+# --- Valley lights --------------------------------------------------------------------------------
+
+## Barrio clearings on the slopes below the road, planned before the trees: (x, z, radius).
+var barrios: Array[Vector3] = []
+
+
+## Picks the barrios' spots (clearings in the forest below the road, well away from it).
+func plan_valley(bounds: Rect2) -> void:
+	barrios.clear()
+	var rng := RandomNumberGenerator.new()
+	rng.seed = seed_ * 53 + 11
+	var center := bounds.get_center()
+	var low := INF
+	for p in pts:
+		low = minf(low, p.y)
+	var ridge := bounds.size.length() * 0.5 + 180.0
+	var view := _lot("viewpoint")
+	if not view.is_empty():
+		# The view from the deck: a poblacion on the slope below and a sitio nearer in.
+		var xf: Transform3D = view["xform"]
+		for spec in [Vector3(0.0, -270.0, 70.0), Vector3(70.0, -150.0, 30.0)]:
+			var c := xf * Vector3(spec.x, 0.0, spec.y)
+			barrios.append(Vector3(c.x, c.z, spec.z))
+	var tries := 0
+	while barrios.size() < 18 and tries < 400:
+		tries += 1
+		var c := center + (-_uphill).rotated(rng.randf_range(-1.1, 1.1)) * rng.randf_range(150.0, ridge - 120.0)
+		if not bounds.has_point(c) or _road_distance(c.x, c.y) < 110.0 or terrain_height(c.x, c.y) > low - 8.0:
+			continue
+		barrios.append(Vector3(c.x, c.y, rng.randf_range(18.0, 45.0)))
+
+
+func _road_distance(x: float, z: float) -> float:
+	var i := nearest_sample(x, z)
+	return INF if i < 0 else Vector2(pts[i].x - x, pts[i].z - z).length()
+
+
+## True where trees give way: barrio clearings and the view corridor below the viewpoint deck.
+func _cleared(x: float, z: float) -> bool:
+	for b in barrios:
+		if Vector2(b.x - x, b.y - z).length() < b.z * 0.8 + 8.0:
+			return true
+	var view := _lot("viewpoint")
+	if not view.is_empty():
+		var local: Vector3 = (view["xform"] as Transform3D).affine_inverse() * Vector3(x, 0.0, z)
+		var out := -local.z
+		if out > 0.0 and out < 220.0 and absf(local.x) < VIEW_SIZE.x * 0.5 + out * 0.7:
+			return true
+	return false
+
+
+## Night lights in the valley below the pass: barrios scattered on the lower slopes (warm bulbs,
+## the odd white tube light) and a lowland town spread across the valley floor out to the near
+## ridge, joined by strings of sodium road lamps. Billboard dots, hidden by day (see the shader).
+func build_valley_lights(parent: Node3D, owner: Node, bounds: Rect2) -> void:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = seed_ * 59 + 3
+	var center := bounds.get_center()
+	var down := -_uphill
+	var ridge := bounds.size.length() * 0.5 + 180.0
+	var warm: Array[Transform3D] = []
+	var white: Array[Transform3D] = []
+	var sodium: Array[Transform3D] = []
+	# Past the terrain the lowland plain lies at the foot of the far ridge (no geometry there: at
+	# night it is just dark, and from the road the lights read as a town across the valley).
+	var low := INF
+	for q in pts:
+		low = minf(low, q.y)
+	var plain := low - 50.0
+	var ground := func(x: float, z: float) -> float:
+		var p := Vector2(x, z)
+		if bounds.has_point(p):
+			return terrain_height(x, z)
+		return plain + _noise.get_noise_2d(x * 0.3, z * 0.3) * 8.0
+	var dot := func(list: Array[Transform3D], x: float, z: float, lift: float) -> void:
+		list.append(Transform3D(Basis(), Vector3(x, ground.call(x, z) + lift, z)))
+	# Barrios: small houses in each clearing, one window light apiece.
+	var houses: Array[Transform3D] = []
+	var roofs: Array[Transform3D] = []
+	for b in barrios:
+		var n := int(PI * b.z * b.z / rng.randf_range(80.0, 120.0))
+		for k in n:
+			var p := Vector2(b.x, b.y) + Vector2(rng.randfn(0.0, b.z * 0.4), rng.randfn(0.0, b.z * 0.4))
+			if _road_distance(p.x, p.y) < 60.0:
+				continue
+			var yaw := Basis(Vector3.UP, rng.randf() * TAU)
+			var sc := rng.randf_range(0.8, 1.3)
+			var h: float = ground.call(p.x, p.y)
+			houses.append(Transform3D(yaw.scaled(Vector3(sc, 1.0, sc)), Vector3(p.x, h + 1.2, p.y)))
+			roofs.append(Transform3D(yaw.scaled(Vector3(sc, 1.0, sc)), Vector3(p.x, h + 3.3, p.y)))
+			var window := Vector3(p.x, 0.0, p.y) + yaw.z * 2.9 * sc
+			dot.call(white if rng.randf() < 0.2 else warm, window.x, window.z, 1.8)
+	var house := BoxMesh.new()
+	house.size = Vector3(6.0, 3.0, 5.0)
+	house.material = MangaArt.world_preset("concrete")
+	var roof := PrismMesh.new()
+	roof.size = Vector3(6.8, 1.4, 5.6)
+	roof.material = MangaArt.world_preset("pole")
+	for spec in [["BarrioHouses", house, houses], ["BarrioRoofs", roof, roofs]]:
+		var chunked := Scatter.make_chunked(spec[0], spec[1], spec[2])
+		parent.add_child(chunked)
+		chunked.owner = owner
+		for part in chunked.get_children():
+			part.owner = owner
+	# The lowland town past the terrain: dense clusters joined by lamp-lit roads.
+	var towns: Array[Vector2] = []
+	var view := _lot("viewpoint")
+	for t in 7:
+		var dir := down.rotated(rng.randf_range(-0.8, 0.8))
+		var c := center + dir * rng.randf_range(ridge * 0.72, ridge - 60.0)
+		if t == 0 and not view.is_empty():
+			# The biggest town lies straight out across the valley from the viewpoint deck.
+			var out := (view["xform"] as Transform3D) * Vector3(0.0, 0.0, -620.0)
+			c = Vector2(out.x, out.z)
+			if c.distance_to(center) > ridge - 60.0:
+				c = center + (c - center).normalized() * (ridge - 60.0)
+		towns.append(c)
+		var n := rng.randi_range(80, 220)
+		var spread := rng.randf_range(50.0, 130.0)
+		for k in n:
+			var p := c + Vector2(rng.randfn(0.0, spread * 0.45), rng.randfn(0.0, spread * 0.45))
+			var roll := rng.randf()
+			dot.call(white if roll < 0.3 else (sodium if roll < 0.45 else warm), p.x, p.y, 3.0)
+	towns.sort_custom(func(a: Vector2, b: Vector2) -> bool: return a.angle_to_point(center) < b.angle_to_point(center))
+	for t in range(1, towns.size()):
+		var a := towns[t - 1]
+		var b := towns[t]
+		var steps := int(a.distance_to(b) / 28.0)
+		for k in steps:
+			var p := a.lerp(b, float(k) / steps) + Vector2(sin(k * 0.4), cos(k * 0.3)) * 6.0
+			dot.call(sodium, p.x, p.y, 6.0)
+	var root := Node3D.new()
+	root.name = "ValleyLights"
+	parent.add_child(root)
+	root.owner = owner
+	var quad := QuadMesh.new()
+	quad.size = Vector2(1, 1)
+	var colors := [["Warm", warm, Color(1.0, 0.72, 0.38)], ["White", white, Color(0.85, 0.92, 1.0)], ["Sodium", sodium, MangaArt.SODIUM]]
+	for spec in colors:
+		var m := ShaderMaterial.new()
+		m.shader = CITY_LIGHTS_SHADER
+		m.set_shader_parameter("color", spec[2])
+		var q := quad.duplicate() as QuadMesh
+		q.material = m
+		var sc := Scatter.make(spec[0], q, spec[1])
+		sc.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		root.add_child(sc)
+		sc.owner = owner
+	print("valley lights: %d warm, %d white, %d sodium" % [warm.size(), white.size(), sodium.size()])
