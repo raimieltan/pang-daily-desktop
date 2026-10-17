@@ -18,7 +18,7 @@ Beside the grind sits one story mode, "The Ghost Line": a five-act psychological
 
 | Kept | Cut or reduced |
 | --- | --- |
-| Iloilo setting, Taglish/Hiligaynon voice, humor | Branching dialogue trees |
+| Iloilo setting, humor (dialogue in English) | Branching dialogue trees |
 | FWD as legitimate (two of the four cars) | Five-chapter story arc (one story mode returned Oct 17, outside the grind) |
 | Money pressure, wear, repair vs upgrade | Relationship meters and crew politics |
 | KYO Coffee, talyer, Marketplace | Walking / character controller (later, optional) |
@@ -63,7 +63,7 @@ The build covers the driving, the first road, time attack, SP battles, a drivabl
 | Trailer | Movie Maker capture tooling and a Remotion edit for a 30 s vertical trailer | `trailer/` |
 | Barangay hub | Drivable neighbourhood: Kyo Coffee (parked rivals to challenge), Ruel's talyer (swap cars), cruising rivals to flash, the road up to Pass 1 | `scenes/hub.gd`, `game/world/` |
 | Weather | Rain (ink streaks, mist, rain loop), wet road look (`manga_wet`) and wet grip (× 0.62) on every car; rain on the windscreen with wipers in hood view; used by story mode, no toggle in free modes yet | `game/world/weather.gd`, `game/world/windscreen.gd` |
-| Story mode | "The Ghost Line": 47 beats over S00–S35, dialogue, phone feed, act cards, recorded practice passes cut into the Ghost Line, flying sector trials, the authored night run, evidence board, daylight ending; speaker portraits; 3D rooms (clinic, rented room, Jolo's home); Hiligaynon/Taglish dialogue; headless end-to-end probe | `game/story/`, `scenes/story_room.gd`, `docs/story/STORY_MODE.md` |
+| Story mode | "The Ghost Line": 47 beats over S00–S35, dialogue, phone feed, act cards, recorded practice passes cut into the Ghost Line, flying sector trials, the authored night run, evidence board, daylight ending; speaker portraits; 3D rooms (clinic, rented room, Jolo's home); manga comic pages between scenes; headless end-to-end probe | `game/story/`, `scenes/story_room.gd`, `docs/story/STORY_MODE.md` |
 
 **Partial**
 
@@ -320,7 +320,7 @@ AI skill in `vs_battle.gd`: KAPITAN 0.90, TISOY 0.92, BUKO 0.93, ATE LIZA 0.97, 
 - Each rival has a fixed ghost and an AI personality (brake points, line, aggression, mistake rate). Today only skill is modelled.
 - Rivals stay in the game after you beat them; rematches pay less but keep their banter.
 - Losing never blocks progress; you can retry any time or grind elsewhere.
-- Rival lines are 2–4 short exchanges in Taglish/Hiligaynon before and after each battle.
+- Rival lines are 2–4 short exchanges in English before and after each battle.
 - All five race in the VS pack mode from the start; the ladder is about beating each one 1v1 or on time.
 
 ## Hubs
@@ -391,7 +391,7 @@ The HUD stays minimal during runs; the garage and results screens carry the deta
 | Road select | Road, direction, time of day, weather, mode | No |
 | Settings | Volumes, display, VS opponent count | Yes |
 
-**Text style:** Taglish/Hiligaynon for NPC lines with optional English subtitles; UI labels in English.
+**Text style:** English for NPC lines and UI labels (Oct 17, 2026: the Taglish/Hiligaynon pass was reverted after playtest).
 
 ## MVP scope and milestones
 

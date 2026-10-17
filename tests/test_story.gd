@@ -51,6 +51,49 @@ func test_beats_are_well_formed() -> void:
 	_check(StoryScript.acts().size() == 6, "prologue and five acts (got %d)" % StoryScript.acts().size())
 
 
+const COMIC_ARTS := ["face", "snap", "speed", "rain", "wipers", "lights", "road", "tone", "black", "white"]
+const COMIC_KEYS := ["art", "who", "say", "cap", "fx", "side", "sfx"]
+
+
+## Comic pages: 1–4 panels a page, known art, a face for every "face" panel, real sounds, and
+## something to read or see in each.
+func test_comic_pages_are_well_formed() -> void:
+	var count := 0
+	for b in StoryScript.BEATS:
+		for key in ["comic", "comic_after"]:
+			for page in b.get(key, []):
+				_check(page is Array and page.size() >= 1 and page.size() <= 4, "%s.%s: a page of 1-4 panels" % [b["id"], key])
+				for p in page:
+					count += 1
+					var where := "%s.%s" % [b["id"], key]
+					_check(p.get("art", "") in COMIC_ARTS, "%s: known art %s" % [where, p.get("art")])
+					for k in p:
+						_check(k in COMIC_KEYS, "%s: known panel key %s" % [where, k])
+					if p.get("art", "") == "face":
+						_check(StoryPortrait.LOOKS.has(p.get("who", "")), "%s: %s has a face" % [where, p.get("who")])
+					if p.has("sfx"):
+						_check(StoryDialogue.SFX.has(p["sfx"]), "%s: sound %s exists" % [where, p["sfx"]])
+					if p.has("side"):
+						_check(p["side"] in ["left", "right"], "%s: side %s" % [where, p["side"]])
+		if b.get("cold_open", false) or b["stage"] == "panel":
+			for page in b.get("comic", []):
+				for p in page:
+					_check(p.get("art", "") != "snap", "%s: no scene to freeze behind the page" % b["id"])
+	_check(count > 0, "the story has comic pages")
+
+
+func test_comic_layouts_fit_the_page() -> void:
+	var page := Vector2(1152, 648)
+	for n in range(1, 5):
+		var rects := StoryComic.layout(n, page)
+		_check(rects.size() == n, "%d panels laid out" % n)
+		for r in rects:
+			_check(Rect2(Vector2.ZERO, page).encloses(r) and r.size.x > 100 and r.size.y > 100, "%d-panel rect %s on the page" % [n, r])
+		for i in rects.size():
+			for j in range(i + 1, rects.size()):
+				_check(not rects[i].intersects(rects[j]), "%d-panel rects %d and %d apart" % [n, i, j])
+
+
 func test_every_storyboard_scene_has_a_beat() -> void:
 	var scenes := {}
 	for b in StoryScript.BEATS:

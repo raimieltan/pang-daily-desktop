@@ -30,6 +30,9 @@ const LOOKS := {
 	"KID": { "hair": "messy", "wear": "hoodie", "eyes": "big", "mouth": "open", "extras": [] },
 }
 
+## No paper square, tone or frame: the face drawn straight onto a comic panel.
+var bare := false
+
 var _look := {}
 var _scarred := false
 
@@ -48,8 +51,9 @@ func _draw() -> void:
 		return
 	var s := minf(size.x, size.y) / 200.0
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2(s, s))
-	draw_rect(Rect2(0, 0, 200, 200), PAPER)
-	_tone_corner()
+	if not bare:
+		draw_rect(Rect2(0, 0, 200, 200), PAPER)
+		_tone_corner()
 	var hair: String = _look["hair"]
 	if hair == "hood":
 		_hood_back()
@@ -70,7 +74,8 @@ func _draw() -> void:
 		_hood_front()
 	if hair == "cap":
 		_cap_front()
-	draw_rect(Rect2(0, 0, 200, 200), INK, false, 5.0)
+	if not bare:
+		draw_rect(Rect2(0, 0, 200, 200), INK, false, 5.0)
 	draw_set_transform(Vector2.ZERO)
 
 

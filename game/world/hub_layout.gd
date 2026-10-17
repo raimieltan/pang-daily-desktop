@@ -47,16 +47,16 @@ const CRUISERS := [2, 4]
 ## Cruising speed on the barangay roads (m/s): about 40 km/h.
 const CRUISE_SPEED := 11.0
 
-## What each rival says when you pull up (Hiligaynon/Taglish, short).
+## What each rival says when you pull up (short).
 const LINES := {
-	"JUNJUN": "Sige, try lang. Pass 1, downhill.",
-	"ATE LIZA": "Maasin ta? Basi lang madasig ka na subong.",
-	"KAPITAN": "Ikaw na naman? Sige, isa lang.",
-	"BUKO": "Basta indi ka maghibi ha.",
-	"TISOY": "Ano, bilisan ta? Tara sa bukid.",
+	"JUNJUN": "Sure, give it a try. Pass 1, downhill.",
+	"ATE LIZA": "Where to? Maybe you're quicker today.",
+	"KAPITAN": "You again? Fine, just one.",
+	"BUKO": "Just don't cry about it after.",
+	"TISOY": "So, a run? Let's go up the mountain.",
 }
 ## Ruel, the mechanic (docs/story: he runs the talyer).
-const RUEL := "Unahon ta anay ang preno mo."
+const RUEL := "Let's look at your brakes first."
 
 ## Houses: centre (x, z), footprint (w, d), wall tone, roof tone, facing (deg, 0 north).
 const HOUSES := [

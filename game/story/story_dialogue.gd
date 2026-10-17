@@ -2,9 +2,10 @@ class_name StoryDialogue
 extends CanvasLayer
 ## The story's page furniture, in the manga lettering of docs/ART_DIRECTION.md §7: letterbox bars,
 ## a place/time caption stamp, speech panels with the speaker's portrait and name on an ink slab,
-## ink narration boxes, a phone feed for the group chat, act cards, hard black cuts, and the sound
-## motifs.
-## Enter / Space / E / click advances (the first press finishes the line being lettered).
+## ink narration boxes, a phone feed for the group chat, act cards, comic pages between scenes
+## (StoryComic), hard black cuts, and the sound motifs.
+## Enter / Space / E / click advances (the first press finishes the line being lettered); the
+## press is read before the GUI, so a click on a panel or a card advances too.
 
 signal advanced
 
@@ -41,6 +42,8 @@ var _card: Control
 var _card_act: Label
 var _card_title: Label
 var _card_sub: Label
+var _card_hint: Label
+var _comic: StoryComic
 var _subtitle: Label
 var _subtitle_time := 0.0
 var _typing := false
@@ -104,7 +107,7 @@ func _ready() -> void:
 	column.add_child(_text)
 	_more = Label.new()
 	MangaType.ink(_more, 22, MangaType.caption())
-	_more.text = "▼"
+	_more.text = "CLICK / SPACE  ▼"
 	_more.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	column.add_child(_more)
 	_panel.visible = false
@@ -167,8 +170,23 @@ func _ready() -> void:
 	MangaType.ink(_card_sub, 28, MangaType.caption())
 	_card_sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	card_column.add_child(_card_sub)
+	_card_hint = Label.new()
+	MangaType.ink(_card_hint, 20, MangaType.caption())
+	_card_hint.text = "CLICK / SPACE TO CONTINUE  ▶"
+	_card_hint.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
+	_card_hint.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	_card_hint.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	_card_hint.offset_right = -36
+	_card_hint.offset_bottom = -26
+	_card.add_child(_card_hint)
 	_card.visible = false
 	add_child(_card)
+	for c in [_panel, _phone, _card, paper]:
+		c.mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+	_comic = StoryComic.new()
+	_comic.visible = false
+	add_child(_comic)
 
 	_subtitle = Label.new()
 	MangaType.pop(_subtitle, 32, MangaType.caption())
@@ -349,12 +367,13 @@ func _process(delta: float) -> void:
 			_text.visible_characters = -1
 	_more.visible = _waiting and not _typing and _panel.visible
 	_more.modulate.a = 0.5 + 0.5 * sin(Time.get_ticks_msec() * 0.008)
+	_card_hint.modulate.a = (0.55 + 0.45 * sin(Time.get_ticks_msec() * 0.008)) if _waiting else 0.0
 	if _subtitle_time > 0.0:
 		_subtitle_time -= delta
 		_subtitle.modulate.a = clampf(_subtitle_time * 2.0, 0.0, 1.0)
 
 
-func _unhandled_input(event: InputEvent) -> void:
+func _input(event: InputEvent) -> void:
 	if not _waiting:
 		return
 	var pressed: bool = event.is_action_pressed("ui_accept") or (InputMap.has_action("interact") and event.is_action_pressed("interact")) \
@@ -383,9 +402,14 @@ func chapter(act: String, title: String, sub: String) -> void:
 	_card_title.text = title
 	_fit_title(title)
 	_card_sub.text = sub
-	_card.modulate.a = 0.0
 	_card.visible = true
-	await create_tween().tween_property(_card, "modulate:a", 1.0, 0.5).finished
+	if is_black():
+		# Out of a black frame (a scene change, the end of a page): the black lifts off the card.
+		_card.modulate.a = 1.0
+		await fade(false, 0.5)
+	else:
+		_card.modulate.a = 0.0
+		await create_tween().tween_property(_card, "modulate:a", 1.0, 0.5).finished
 	_waiting = true
 	if auto_advance > 0.0:
 		await get_tree().create_timer(auto_advance).timeout
@@ -407,9 +431,70 @@ func _fit_title(title: String) -> void:
 	_card_title.add_theme_constant_override("outline_size", maxi(6, size / 6))
 
 
+## Comic pages (StoryComic): each panel lands on the next press. The page comes in over the scene
+## (a frozen copy of it is there for "snap" panels) or out of black; `out` is how the last page
+## leaves: "fade" back to the scene, "black" to a held black frame (a cut or a scene change next).
+func comic(pages: Array, out := "fade") -> void:
+	_panel.visible = false
+	_phone.visible = false
+	set_caption("")
+	letterbox(false)
+	var from_black := is_black()
+	_comic.snap = null
+	# Headless runs never draw a frame to freeze ("snap" panels fall back to screentone).
+	if not from_black and DisplayServer.get_name() != "headless":
+		await RenderingServer.frame_post_draw
+		_comic.snap = ImageTexture.create_from_image(get_viewport().get_texture().get_image())
+	_comic.visible = true
+	_comic.modulate.a = 1.0 if from_black else 0.0
+	# The page is the scene now: the car behind it goes quiet (music carries on).
+	var muted := _mute_car(true)
+	for k in pages.size():
+		var page: Array = pages[k]
+		_comic.show_page(page)
+		if k == 0:
+			if from_black:
+				await fade(false, 0.45)
+			else:
+				await create_tween().tween_property(_comic, "modulate:a", 1.0, 0.35).finished
+		for i in page.size():
+			var p: Dictionary = page[i]
+			if p.has("sfx"):
+				sfx(str(p["sfx"]))
+			_comic.reveal(i)
+			# A beat for the panel to land before the press counts.
+			await get_tree().create_timer(0.2).timeout
+			_comic.waiting = true
+			await _wait_advance(0)
+			_comic.waiting = false
+	if out == "black":
+		await fade(true, 0.35)
+		_comic.visible = false
+	else:
+		await create_tween().tween_property(_comic, "modulate:a", 0.0, 0.4).finished
+		_comic.visible = false
+	for i in muted:
+		AudioServer.set_bus_mute(i, false)
+
+
+## Mute the car's buses that are not muted already; returns the ones it muted.
+static func _mute_car(on: bool) -> Array:
+	var out := []
+	for bus in ["Engine", "EngineOff", "Tires", "Fx"]:
+		var i := AudioServer.get_bus_index(bus)
+		if i >= 0 and AudioServer.is_bus_mute(i) != on:
+			AudioServer.set_bus_mute(i, on)
+			out.append(i)
+	return out
+
+
 ## Fade the page to black (or back).
 func fade(to_black: bool, seconds := 0.6) -> void:
 	await create_tween().tween_property(_black, "color:a", 1.0 if to_black else 0.0, seconds).finished
+
+
+func is_black() -> bool:
+	return _black.color.a > 0.5
 
 
 func black(on: bool) -> void:

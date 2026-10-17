@@ -51,6 +51,8 @@ var _cabin := false
 func _ready() -> void:
 	dialogue = StoryDialogue.new()
 	add_child(dialogue)
+	# Every scene opens out of black; the first beat lifts it (_reveal).
+	dialogue.black(true)
 	board = EvidenceBoard.new()
 	board.dialogue = dialogue
 	add_child(board)
@@ -91,6 +93,8 @@ func _run() -> void:
 	while StoryMode.active and is_inside_tree():
 		var b := StoryMode.current()
 		if b.get("stage", "panel") != stage:
+			if not dialogue.is_black():
+				await dialogue.fade(true, 0.45)
 			StoryMode.goto(get_tree(), StoryMode.beat)
 			return
 		dialogue.set_tokens(tokens())
@@ -107,6 +111,7 @@ func _run() -> void:
 
 func _play(b: Dictionary) -> void:
 	_conditions(b)
+	await _reveal(b)
 	match b["type"]:
 		"chapter":
 			await dialogue.chapter(b["act"], b["title"], b.get("subtitle", ""))
@@ -134,6 +139,34 @@ func _play(b: Dictionary) -> void:
 			await _lines(b, "after")
 		"end":
 			await dialogue.chapter("PANG DAILY", "THE GHOST LINE", "The road continued ahead, imperfect and unrepeatable.")
+	if b.has("comic_after"):
+		await dialogue.comic(b["comic_after"], "black" if _cut_next() else "fade")
+
+
+## The way into a beat: the stage set up behind the black (or the last page), then the beat's
+## comic pages, or the black lifting. Act cards lift it themselves; the cold open keeps it.
+func _reveal(b: Dictionary) -> void:
+	var cold: bool = b.get("cold_open", false)
+	if b["type"] in ["chapter", "end"]:
+		return
+	if not cold:
+		await _settle(b)
+	else:
+		# Held still behind the pages: the cold open starts the car itself.
+		_hold(true)
+	if b.has("comic"):
+		await dialogue.comic(b["comic"], "black" if cold else "fade")
+	elif dialogue.is_black() and not cold:
+		await dialogue.fade(false, 0.5)
+
+
+## Whether the next beat starts somewhere else (another stage, an act card): pages end on black.
+func _cut_next() -> bool:
+	var i := StoryMode.beat + 1
+	if i >= StoryScript.BEATS.size():
+		return true
+	var n: Dictionary = StoryScript.BEATS[i]
+	return n.get("stage", "panel") != stage or n["type"] == "chapter" or n.get("cold_open", false)
 
 
 ## The player's own record, for {tokens} in lines and cards.

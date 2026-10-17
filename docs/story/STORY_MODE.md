@@ -25,6 +25,8 @@ It is reached from the title screen (STORY). It sits beside the racing grind, no
 | Walking | None. "Playable exploration" scenes are drive-to objectives in the barangay plus dialogue at the place. |
 | The crash | The player drives the night run up to the approach to 8A; from 70 m out the night plays as it happened (too fast for the wet, late brakes, a sharp correction). No button prompt pretends it can be avoided. |
 | Beating the Ghost Line | Allowed. If the player's run beats it, "beaten" lines replace the usual ones (Dante: "Unofficial… Ghost Time stands."); the story never tells the player they failed when they did not. |
+| Language | All dialogue is in English (Oct 17 playtest: the Hiligaynon/Taglish pass read badly and was reverted). The Iloilo setting stays in names, places and signage. |
+| Between scenes | Manga pages (`StoryComic`): a beat's `comic` pages play before it and `comic_after` after it, one panel per press, so scene changes and the cold open are bridged by panels instead of hard jumps. Every scene change fades through black; the car's sound is muted while a page is up. |
 | Scoring | Story races record place and time only. The daylight drive has no clock, medal or unlock. No achievement for "beating Ghost" or for forgiveness. |
 
 ## Structure
@@ -130,12 +132,12 @@ Synthesized by `tools/audio/make_story_sfx.py` (all original): `assets/audio/sto
 | `tests/probe_story.gd` | The whole story headless, AI driving: `godot --headless --fixed-fps 120 --path . -s res://tests/probe_story.gd [-- beat_id]` |
 | `tools/story_shot.gd` | Screenshots from any beat (needs a window) |
 
-## Language
+## Comic pages
 
-The cast code-switches the way people in Iloilo do: Ruel, Jolo, the regulars, the witness and Jolo's parents speak Hiligaynon in casual and emotional lines; Dante speaks Taglish; Nico and the evidence (sectors, loggers, cards) stay in English. Lines the story leans on ("Drive the road!", "The road won't be the same twice") stay as the manuscript has them. The Hiligaynon has not been checked by a native speaker yet.
+A page is 1–4 panels (the layout follows the count). Panel art: `face` (the speaker's portrait, the bubble in the free side), `snap` (the scene behind the page, frozen), `speed`, `rain`, `wipers`, `lights`, `road`, `tone`, `black`, `white`; text: `cap` (caption box), `say` (bubble, `who` speaking), `fx` (a sound word); `sfx` plays a story sound as the panel lands. The prologue and Act I use them at every transition (the cold open's lead-in and its "the rest would be missing" page come from the manuscript). Clicks, Space, Enter and E advance; a CLICK / SPACE hint shows whenever the story is waiting.
 
 ## Not built / open
 
-- A native Hiligaynon speaker's pass over the dialogue.
+- Comic pages for the transitions in Acts II–V.
 - The parked-car scenes show the view out of the windscreen; there is no car interior or passenger.
 - Story races use the base handling; no tuning or parts in story mode.
