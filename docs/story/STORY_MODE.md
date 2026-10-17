@@ -143,6 +143,7 @@ A page is 1–4 panels (the layout follows the count). Panel art: `face` (the sp
 ## Not built / open
 
 - Comic pages for the non-memory transitions in Acts II–V.
+- Review leftovers from the restructure (Oct 17): the period stamp is one line, top right (the design wanted period + place); a memory's trigger panels render warm and unscarred (the page is drawn at the memory's index); `StoryTint` shares layer 20 with the pause menu; a `night` key cancels the present-day rain default (s17e, s20, s23, s24 stay dry at night); old saves are dropped without a notice; s11's entry panel is rain art under a daylight caption.
 - Full-colour / watercolour memories: the world is modelled in grey (one lit value per preset; Blender colours are discarded on import), so colour is an art-pipeline project. The warm tint is the cheap version.
 - The parked-car scenes show the view out of the windscreen; there is no car interior or passenger.
 - Story races use the base handling; no tuning or parts in story mode.
