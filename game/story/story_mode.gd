@@ -136,11 +136,51 @@ static func unpack(text: String) -> PackedFloat32Array:
 	return Marshalls.base64_to_raw(text).to_float32_array() if text != "" else PackedFloat32Array()
 
 
+## The line study's floor: three passes baked from a quick driver (tools/bake_passes.gd), one per
+## slot. Pang was quick that week whatever the player does, so a recorded pass slower than the
+## baked one in its slot takes the baked driving under its own label: the Ghost Line is never a
+## lap anyone could beat by driving the study badly.
+const BAKED_PATH := "res://game/story/baked_passes.json"
+static var baked: Array = []
+static var _baked_loaded := false
+
+
+static func baked_passes() -> Array:
+	if not _baked_loaded and baked.is_empty():
+		_baked_loaded = true
+		if FileAccess.file_exists(BAKED_PATH):
+			var data = JSON.parse_string(FileAccess.get_file_as_string(BAKED_PATH))
+			if data is Array:
+				baked = data
+	return baked
+
+
 static func add_pass(label: String, frames: PackedFloat32Array, splits: PackedFloat64Array, time: float) -> void:
 	var passes: Array = record.get("passes", [])
-	passes.append({ "label": label, "frames": pack(frames), "splits": Array(splits), "time": time })
+	var entry := { "label": label, "frames": pack(frames), "splits": Array(splits), "time": time }
+	var slot := passes.size()
+	var floor := baked_passes()
+	if slot < floor.size() and float(floor[slot]["time"]) < time:
+		entry = { "label": label, "frames": floor[slot]["frames"], "splits": Array(floor[slot]["splits"]),
+			"time": float(floor[slot]["time"]) }
+	passes.append(entry)
 	record["passes"] = passes
 	record.erase("ghost")
+
+
+## Dante's number. "Dante took something off it": the GHOST TIME he posted is the cut's time less
+## POSTED_CUT, so the car in the clip arrives after the clock says it did. Beat it in public and
+## he reposts a time under yours ("Ghost responded"); the record keeps that.
+const POSTED_CUT := 0.03
+const REPOST_MARGIN := 0.3
+
+
+static func posted_time(cut: float) -> float:
+	return float(record["posted"]) if record.has("posted") else cut * (1.0 - POSTED_CUT)
+
+
+static func repost(run_time: float) -> void:
+	record["posted"] = floorf((run_time - REPOST_MARGIN) * 100.0) / 100.0
 
 
 ## The Ghost Line, built (and cached) from the practice passes: GhostLine.composite().

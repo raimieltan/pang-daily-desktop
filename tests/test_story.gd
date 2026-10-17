@@ -243,6 +243,45 @@ func test_composite_never_cuts_from_one_pass() -> void:
 	_check(g.seams.size() >= 2, "and so at least two seams")
 
 
+## The line study's floor: a recorded pass slower than the baked pass in its slot takes the baked
+## driving (under its own label), a quicker one is kept, and a slot with nothing baked keeps what
+## was driven. Driving the study badly cannot make the Ghost Line beatable.
+func test_baked_passes_floor_the_line_study() -> void:
+	var fast := _pass("BAKED", [30.0, 30.0, 30.0, 30.0], 0.0)
+	var baked := { "label": "BAKED", "frames": StoryMode.pack(fast["frames"]), "splits": Array(fast["splits"]), "time": fast["time"] }
+	var baked_before := StoryMode.baked
+	var record_before := StoryMode.record
+	StoryMode.baked = [baked, baked]
+	StoryMode.record = {}
+	var slow := _pass("A", [20.0, 20.0, 20.0, 20.0], 1.0)
+	var quick := _pass("B", [32.0, 32.0, 32.0, 32.0], 1.0)
+	StoryMode.add_pass("PASS A", slow["frames"], slow["splits"], slow["time"])
+	StoryMode.add_pass("PASS B", quick["frames"], quick["splits"], quick["time"])
+	StoryMode.add_pass("PASS C", slow["frames"], slow["splits"], slow["time"])
+	var passes: Array = StoryMode.record["passes"]
+	_check(passes.size() == 3, "three passes recorded")
+	_check(absf(float(passes[0]["time"]) - fast["time"]) < 1e-6 and passes[0]["label"] == "PASS A",
+		"a slow pass takes the baked time under its own label")
+	_check(StoryMode.unpack(passes[0]["frames"]) == fast["frames"], "...and the baked frames")
+	_check(absf(float(passes[1]["time"]) - quick["time"]) < 1e-6, "a pass quicker than the floor is kept")
+	_check(absf(float(passes[2]["time"]) - slow["time"]) < 1e-6, "a slot with nothing baked keeps what was driven")
+	StoryMode.baked = baked_before
+	StoryMode.record = record_before
+
+
+## Dante's number: the posted GHOST TIME is the cut's time with something taken off, and beating
+## it in public moves it under the run that beat it ("Ghost responded").
+func test_posted_ghost_time_is_shorter_than_the_cut() -> void:
+	var record_before := StoryMode.record
+	StoryMode.record = {}
+	var posted := StoryMode.posted_time(90.0)
+	_check(posted < 90.0 * 0.99 and posted > 90.0 * 0.9, "posted is a little under the cut (got %.2f)" % posted)
+	StoryMode.repost(85.0)
+	_check(StoryMode.posted_time(90.0) < 85.0, "after a public beating the posted time drops under the run that beat it")
+	_check(StoryMode.record.has("posted"), "and the record remembers it")
+	StoryMode.record = record_before
+
+
 func test_ghost_pose_interpolates_and_ends() -> void:
 	var a := _pass("A", [20.0, 20.0, 20.0, 20.0], 0.0)
 	var g := GhostLine.composite([a])
