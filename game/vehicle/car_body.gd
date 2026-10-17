@@ -207,6 +207,22 @@ func _integrate_forces(state: PhysicsDirectBodyState3D) -> void:
 	_report_contacts(state, up)
 
 
+## Leaning on a rail: the body is frictionless in the engine so a brush never snags, and the scrub
+## comes from here instead: RAIL_MU times the push into the rail (capped at RAIL_DRAG_MAX_G),
+## against the slide, at the contact point, so a long lean also turns the car. Enough that riding
+## a guardrail through a hairpin is slower than driving it (tests/probe_rail_scrub.gd).
+const RAIL_MU := 0.35
+const RAIL_DRAG_MAX_G := 2.5
+const RAIL_SLIDE_MIN := 0.5
+static var rail_scrub := true
+
+
+static func rail_drag(impulse: float, slide: float, dt: float, mass_: float) -> float:
+	if slide < RAIL_SLIDE_MIN:
+		return 0.0
+	return minf(RAIL_MU * impulse / dt, RAIL_DRAG_MAX_G * 9.81 * mass_)
+
+
 func _report_contacts(state: PhysicsDirectBodyState3D, up: Vector3) -> void:
 	for i in state.get_contact_count():
 		var normal := state.get_contact_local_normal(i)
@@ -215,8 +231,14 @@ func _report_contacts(state: PhysicsDirectBodyState3D, up: Vector3) -> void:
 			continue
 		var point := state.get_contact_local_position(i)
 		var velocity := state.get_contact_local_velocity_at_position(i)
-		var slide := (velocity - normal * velocity.dot(normal)).length()
-		var dv := state.get_contact_impulse(i).length() / mass
+		var along := velocity - normal * velocity.dot(normal)
+		var slide := along.length()
+		var impulse := state.get_contact_impulse(i).length()
+		var dv := impulse / mass
+		if rail_scrub:
+			var drag := rail_drag(impulse, slide, state.step, mass)
+			if drag > 0.0:
+				state.apply_force(-along / slide * drag, point - state.transform.origin)
 		wall_contact.emit.call_deferred(point, normal, dv, slide)
 
 

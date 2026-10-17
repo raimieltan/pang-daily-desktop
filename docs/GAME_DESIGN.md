@@ -126,6 +126,8 @@ Handling is simulated and then shaped: a four-wheel vehicle sim gives real diffe
 
 **Cameras:** chase (default), far, hood, bumper, cinematic. In-car is later.
 
+**Guardrails:** riding a rail is slower than driving the corner. The body is frictionless in the engine so a brush never snags, and the car applies its own scrub along the rail from how hard it is pushed into it (`CarBody.RAIL_MU`, capped), at the contact point, so a long lean also turns the car. `tests/probe_rail_scrub.gd` measures it (Oct 17, 2026: a lean costs 18% of the speed over two seconds that the frictionless rail did not).
+
 **Out of scope:** tire temperature, deformable bodywork, manual clutch (optional later).
 
 ## Cars
