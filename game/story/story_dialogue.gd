@@ -1,8 +1,9 @@
 class_name StoryDialogue
 extends CanvasLayer
 ## The story's page furniture, in the manga lettering of docs/ART_DIRECTION.md §7: letterbox bars,
-## a place/time caption stamp, speech panels with the speaker's name on an ink slab, ink narration
-## boxes, a phone feed for the group chat, act cards, hard black cuts, and the sound motifs.
+## a place/time caption stamp, speech panels with the speaker's portrait and name on an ink slab,
+## ink narration boxes, a phone feed for the group chat, act cards, hard black cuts, and the sound
+## motifs.
 ## Enter / Space / E / click advances (the first press finishes the line being lettered).
 
 signal advanced
@@ -27,6 +28,7 @@ var _panel: PanelContainer
 var _name: Label
 var _text: Label
 var _more: Label
+var _portrait: StoryPortrait
 var _phone: PanelContainer
 var _feed: VBoxContainer
 var _phone_title: Label
@@ -71,9 +73,17 @@ func _ready() -> void:
 	_panel.offset_left = -560
 	_panel.offset_right = 560
 	add_child(_panel)
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 22)
+	_panel.add_child(row)
+	_portrait = StoryPortrait.new()
+	_portrait.custom_minimum_size = Vector2(150, 150)
+	_portrait.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	row.add_child(_portrait)
 	var column := VBoxContainer.new()
 	column.add_theme_constant_override("separation", 6)
-	_panel.add_child(column)
+	column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(column)
 	_name = Label.new()
 	MangaType.ink(_name, 26, MangaType.caption())
 	_name.add_theme_color_override("font_color", MangaType.PAPER)
@@ -87,7 +97,7 @@ func _ready() -> void:
 	_text = Label.new()
 	MangaType.ink(_text, 30, MangaType.caption())
 	_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_text.custom_minimum_size = Vector2(1060, 70)
+	_text.custom_minimum_size = Vector2(0, 70)
 	column.add_child(_text)
 	_more = Label.new()
 	MangaType.ink(_more, 22, MangaType.caption())
@@ -270,6 +280,7 @@ func say(who: String, text: String) -> void:
 	_more.add_theme_color_override("font_color", MangaType.PAPER if narration else MangaType.INK)
 	_name.visible = not narration
 	_name.text = who
+	_portrait.visible = not narration and _portrait.show_speaker(who)
 	_text.text = text
 	_text.visible_characters = 0
 	_shown = 0.0
