@@ -11,6 +11,10 @@ const SHOTS := [
 	["chase", Vector3.ZERO, Vector3.ZERO, false],
 	["kyo_night", Vector3(118, 88, 1.7), Vector3(145, 102, 4.5), true],
 	["overview", Vector3(40, -60, 120), Vector3(40, 80, 0), false],
+	# Where the road meets the lots: it has to read as a road from a driver's height.
+	["main_road", Vector3(30, -2, 2.2), Vector3(90, 0, 0.5), false],
+	["loop_road", Vector3(-108, 40, 2.2), Vector3(-104, 110, 0.5), false],
+	["loop_night", Vector3(-108, 40, 2.2), Vector3(-104, 110, 0.5), true],
 ]
 
 var _hub: Node3D

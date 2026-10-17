@@ -32,6 +32,12 @@ func build(parent: Node3D) -> Node3D:
 	return root
 
 
+## Albedo of the barangay ground and of its asphalt: far apart, so the road is a dark band with white
+## paint on pale ground (on the same grey the road vanished into the lots).
+const HUB_GROUND := 0.86
+const HUB_ASPHALT := 0.22
+
+
 # --- ground and roads ---------------------------------------------------------------------------
 
 func _ground() -> void:
@@ -41,6 +47,8 @@ func _ground() -> void:
 	var plane := PlaneMesh.new()
 	plane.size = b.size
 	plane.material = MangaArt.world_preset("grass")
+	# Pale lots and verges: the dark asphalt has to read against them from the chase camera.
+	plane.material.set_shader_parameter("lit_value", HUB_GROUND)
 	mi.mesh = plane
 	mi.position = HubLayout.pos(b.get_center().x, b.get_center().y)
 	root.add_child(mi)
@@ -92,6 +100,7 @@ func _ribbon(name: String, pts: PackedVector2Array, width: float, y: float, lane
 			st.set_normal(Vector3.UP)
 			st.add_vertex(HubLayout.pos(v[0].x, v[0].y, y))
 	var mat := MangaArt.road()
+	mat.set_shader_parameter("lit_value", HUB_ASPHALT)
 	mat.set_shader_parameter("lane_half_width", lane_half)
 	st.set_material(mat)
 	var mi := MeshInstance3D.new()
