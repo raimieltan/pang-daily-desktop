@@ -31,7 +31,7 @@ func test_beats_are_well_formed() -> void:
 			_check(StoryRoom.SETS.has(b.get("set", "")), "%s: room set %s exists" % [id, b.get("set")])
 		if b.has("spot"):
 			_check(b["stage"] == "hub" and HubLayout.PLACES.has(b["spot"]), "%s: spot is a hub place" % id)
-		for key in ["lines", "before", "after", "win", "lose", "beaten"]:
+		for key in ["lines", "before", "after", "win", "lose", "beaten", "ahead"]:
 			for line in b.get(key, []):
 				var wait: bool = line is Array and line.size() == 2 and line[0] == "~wait" and (line[1] is float or line[1] is int)
 				_check(wait or (line is Array and line.size() == 2 and line[0] is String and line[1] is String), "%s.%s: [speaker, text]" % [id, key])
@@ -280,6 +280,41 @@ func test_posted_ghost_time_is_shorter_than_the_cut() -> void:
 	_check(StoryMode.posted_time(90.0) < 85.0, "after a public beating the posted time drops under the run that beat it")
 	_check(StoryMode.record.has("posted"), "and the record remembers it")
 	StoryMode.record = record_before
+
+
+## What a drive chases: the cut itself, or (`posted`) Dante's shorter number with the splits scaled
+## to it. And the lines that follow: "beaten" under the target; "ahead" of the car in the clip but
+## not of the posted clock; else "after".
+func test_posted_target_and_the_lines_that_follow() -> void:
+	var record_before := StoryMode.record
+	StoryMode.record = {}
+	var g := GhostLine.composite([_pass("A", [30.0, 20.0, 20.0, 20.0], -1.0),
+		_pass("B", [20.0, 30.0, 25.0, 20.0], 0.0), _pass("C", [20.0, 20.0, 20.0, 30.0], 1.0)])
+	var cut := StoryDirector.target_for(g, false)
+	_check(absf(float(cut["time"]) - g.time) < 1e-6 and cut["splits"] == g.splits, "the cut is its own target")
+	var posted := StoryDirector.target_for(g, true)
+	_check(absf(float(posted["time"]) - StoryMode.posted_time(g.time)) < 1e-6, "the posted target is Dante's number")
+	var sp: PackedFloat64Array = posted["splits"]
+	_check(sp.size() == 4 and absf(sp[3] - float(posted["time"])) < 1e-6
+		and absf(sp[0] / g.splits[0] - sp[3] / g.splits[3]) < 1e-6, "its splits scale to it")
+	var b := { "beaten": [], "ahead": [], "after": [] }
+	_check(StoryDirector.after_key(b, float(posted["time"]) - 0.1, posted, g.time) == "beaten", "under the posted clock: beaten")
+	_check(StoryDirector.after_key(b, g.time - 0.1, posted, g.time) == "ahead", "ahead of the car in the clip, behind the clock: ahead")
+	_check(StoryDirector.after_key(b, g.time + 0.1, posted, g.time) == "after", "behind both: after")
+	_check(StoryDirector.after_key({ "beaten": [] }, g.time - 0.1, posted, g.time) == "after", "no ahead lines: after")
+	_check(StoryDirector.after_key(b, g.time - 0.1, cut, g.time) == "beaten", "against the cut itself, under it is beaten")
+	StoryMode.record = record_before
+
+
+## The event and the night run chase Dante's posted number; the private chase and Nico's trials
+## chase the cut. The event answers all three outcomes.
+func test_public_drives_chase_the_posted_number() -> void:
+	for id in ["s09", "s13"]:
+		_check(StoryScript.BEATS[StoryScript.index_of(id)].get("posted", false), "%s chases the posted number" % id)
+	for id in ["s08", "s26"]:
+		_check(not StoryScript.BEATS[StoryScript.index_of(id)].get("posted", false), "%s chases the cut" % id)
+	var s09: Dictionary = StoryScript.BEATS[StoryScript.index_of("s09")]
+	_check(s09.has("beaten") and s09.has("ahead") and s09.has("after"), "the event has beaten, ahead and after lines")
 
 
 func test_ghost_pose_interpolates_and_ends() -> void:

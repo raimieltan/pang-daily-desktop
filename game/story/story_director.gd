@@ -191,7 +191,8 @@ func _cut_next() -> bool:
 
 ## The player's own record, for {tokens} in lines and cards.
 func tokens() -> Dictionary:
-	var t := { "ghost_time": TimeAttackRun.format_time(_ghost.time) if _ghost.valid() else "--:--.---" }
+	var t := { "ghost_time": TimeAttackRun.format_time(StoryMode.posted_time(_ghost.time)) if _ghost.valid() else "--:--.---" }
+	t["cut_time"] = TimeAttackRun.format_time(_ghost.time) if _ghost.valid() else "--:--.---"
 	t["crash_cut"] = "%.1f s" % float(StoryMode.record.get("camera_cut", 0.0))
 	return t
 
@@ -494,23 +495,50 @@ func _attack(b: Dictionary) -> void:
 	if not await _need_ghost():
 		return
 	var label := "COMBINED BEST SECTORS" if b.get("label_clue", false) else "GHOST TIME"
+	var target := _target(b)
 	if b.get("label_clue", false):
 		# The fair, missable clue: the board says what the target is, then the promo slide covers it.
 		get_tree().create_timer(5.5).timeout.connect(func():
 			if time_attack.hud:
-				time_attack.hud.best_text("GHOST TIME  " + TimeAttackRun.format_time(_ghost.time)))
-	var run := await _timed_run({ "time": _ghost.time, "splits": _ghost.splits }, _ghost.frames, label)
+				time_attack.hud.best_text("GHOST TIME  " + TimeAttackRun.format_time(target["time"])))
+	var run := await _timed_run(target, _ghost.frames, label)
 	StoryMode.results[b["id"]] = { "time": run["time"], "splits": Array(run["splits"]) }
+	var key := after_key(b, run["time"], target, _ghost.time)
+	if key == "beaten" and b.get("posted", false):
+		# Beaten in public: by the time the board is read, Dante has posted a time under yours.
+		StoryMode.repost(run["time"])
+	StoryMode.save()
 	_hold(true)
 	if b.has("after_cards"):
 		await _examine(b, b["after_cards"])
-	await _lines(b, _after_key(b, run["time"]))
+	await _lines(b, key)
 
 
-## "beaten" lines replace "after" when the player's own run beat the Ghost Line: what they did
-## stands, and the story never tells them otherwise.
-func _after_key(b: Dictionary, time: float) -> String:
-	return "beaten" if b.has("beaten") and time < _ghost.time else "after"
+## What a drive chases: the cut itself, or (`posted`) the number Dante put on it, the splits
+## scaled down to it. The car in the clip always drives the cut.
+func _target(b: Dictionary) -> Dictionary:
+	return target_for(_ghost, b.get("posted", false))
+
+
+static func target_for(g: GhostLine, posted: bool) -> Dictionary:
+	if not posted or not g.valid():
+		return { "time": g.time, "splits": g.splits }
+	var t := StoryMode.posted_time(g.time)
+	var splits := PackedFloat64Array()
+	for v in g.splits:
+		splits.append(v * t / g.time)
+	return { "time": t, "splits": splits }
+
+
+## Which lines follow a run. "beaten" when the player's run beat the target: what they did stands,
+## and the story never tells them otherwise. "ahead" when they beat the car in the clip but not the
+## clock Dante put on it (the board says otherwise, and that is the clue). Else "after".
+static func after_key(b: Dictionary, time: float, target: Dictionary, cut: float) -> String:
+	if b.has("beaten") and time < float(target["time"]):
+		return "beaten"
+	if b.has("ahead") and time < cut:
+		return "ahead"
+	return "after"
 
 
 ## Flying sectors against the ghost's own sector, then (`connect`) the whole road in one go.
@@ -535,7 +563,7 @@ func _sectors(b: Dictionary) -> void:
 		MangaArt.apply_night(0.0)
 		weather.wet = 0.0
 		dialogue.set_caption("ALL OF IT  ·  ONE RUN  ·  TODAY'S ROAD")
-		var run := await _timed_run({ "time": _ghost.time, "splits": _ghost.splits }, _ghost.frames, "GHOST TIME")
+		var run := await _timed_run(_target(b), _ghost.frames, "GHOST TIME")
 		dialogue.set_caption("")
 		result["connected"] = run["time"]
 	StoryMode.results[b["id"]] = result
@@ -543,7 +571,7 @@ func _sectors(b: Dictionary) -> void:
 	_hold(true)
 	if b.has("after_cards"):
 		await _examine(b, b["after_cards"])
-	await _lines(b, _after_key(b, float(result.get("connected", INF))))
+	await _lines(b, after_key(b, float(result.get("connected", INF)), _target(b), _ghost.time))
 
 
 ## One timed sector with a run-up; the ghost leaves the sector line when you cross it.
@@ -631,7 +659,7 @@ func _crash(b: Dictionary) -> void:
 			return
 		_hold(false)
 		time_attack.records = false
-		time_attack.reference = { "time": _ghost.time, "splits": _ghost.splits }
+		time_attack.reference = _target(b)
 		time_attack.ghost_override = _ghost.frames
 		time_attack.best_label = "GHOST TIME"
 		time_attack.ghost_opacity = 0.6
@@ -831,12 +859,15 @@ func _evidence_context() -> Dictionary:
 	return c
 
 
-## The challenge board: drivers who matched a sector, nobody who matched the sum.
+## The challenge board, Dante's numbers: the posted time with the sectors scaled to it. Drivers who
+## matched a sector, nobody who matched the sum.
 func _board_rows() -> Array:
 	var rows := []
 	var gs := []
+	var posted := target_for(_ghost, true)
+	var psp: PackedFloat64Array = posted["splits"]
 	for k in 4:
-		gs.append(_ghost.sector_time(k))
+		gs.append(psp[k] - (psp[k - 1] if k > 0 else 0.0))
 	var drivers := [["NICO", [0.04, 0.9, 0.7, 0.8]], ["ATE LIZA", [0.6, 0.02, 1.1, 0.9]], ["BUKO", [0.9, 1.3, 0.8, 0.03]]]
 	for dr in drivers:
 		var row := [dr[0]]
@@ -858,7 +889,7 @@ func _board_rows() -> Array:
 	var ghost_row := ["GHOST"]
 	for k in 4:
 		ghost_row.append("%.2f" % gs[k])
-	ghost_row.append(TimeAttackRun.format_time(_ghost.time))
+	ghost_row.append(TimeAttackRun.format_time(posted["time"]))
 	rows.append(ghost_row)
 	return rows
 
@@ -884,6 +915,7 @@ func _trial_rows() -> Array:
 	if r.has("connected"):
 		rows.append(["YOUR ONE CONTINUOUS RUN", TimeAttackRun.format_time(float(r["connected"]))])
 	rows.append(["GHOST TIME (BEST SECTORS, 3 PASSES)", TimeAttackRun.format_time(_ghost.time)])
+	rows.append(["GHOST TIME AS POSTED", TimeAttackRun.format_time(StoryMode.posted_time(_ghost.time))])
 	rows.append(["NO SINGLE PASS EVER DROVE", "ALL OF IT"])
 	return rows
 
