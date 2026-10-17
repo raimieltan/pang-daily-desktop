@@ -64,7 +64,7 @@ The wipers dragged water from side to side. Their rubber edges had worn unevenly
 
 Jolo had his phone raised near the passenger window. He was still recording. He recorded everything: the good runs, the bad ones, the small arguments in the garage, the moments when Pang insisted a noise was nothing and Ruel insisted that noises did not become harmless just because a man ignored them.
 
-“Pang.” Jolo's voice came thin through the engine note. “Pang, listen.”
+“Feels different here,” Jolo said, thin through the engine note. Then: “It's wet past the sign.”
 
 The corner appeared. Pang knew it by the shape of the trees and the pale concrete post on the outside. He knew the sequence before it arrived because he had watched it so many times: the entry, the shallow turn, the late sweep toward the exit. Ghost's line. The perfect line.
 
@@ -72,19 +72,19 @@ A brightness moved between the trees.
 
 For an instant, Pang thought another car was beside them. The light slid across the wet glass at an impossible angle, close enough to make the road feel narrower than it was. He looked toward it and back. The headlights waited in the edge of his vision like eyes that had found him.
 
-“Drive the road\!” Jolo shouted.
+“Pang.” Jolo's voice. “Pang, it's wet. It's wet.”
 
 Pang was already committed. He braked. The car's nose dipped. The rear moved in a way he had felt before, on other corners, on other nights, and his hands answered before the rest of him could think. A sharp correction. The steering wheel pushed back. The tires lost the surface that had been holding them a second earlier.
 
 There was no clean instant when the car stopped obeying him. It happened in increments: the wheel growing light, the painted line moving sideways, the road no longer arriving from the direction he expected. Jolo's phone flashed white as it caught the headlights. The world turned toward the trees.
 
-Pang heard Jolo say his name once.
+Pang heard Jolo say, very quietly, “Okay. Okay.”
 
 Then the windshield filled with light.
 
 Afterward, he would remember the impact as silence. Not the sound of metal folding or glass breaking, but an abrupt absence where the world had been. A silence so complete it seemed to have happened before the crash, as if the road had already taken everything away and the car was only catching up.
 
-For months, he would try to recover the seconds that came before it. He would remember the headlights, Jolo's voice, the white smear of rain. He would remember that he had reacted to something beside him. He would not remember exactly what he saw, where the other car was, or whether there had even been a car on the same road.
+For months, he would try to recover the seconds that came before it. He would remember the headlights, the white smear of rain, and Jolo saying something like *drive the road*. He would remember that he had reacted to something beside him. He would not remember exactly what he saw, where the other car was, or whether there had even been a car on the same road.
 
 In his mind, the headlights would always arrive at the corner.
 
@@ -102,35 +102,35 @@ Pang woke from a sleep he had not realized he was in. For a moment he was back o
 
 He was sitting on an upside-down plastic pail beside the car, eating a pan de sal from a paper bag and pointing the bread at Pang like a teacher's ruler. His phone was propped against a jar of bolts, its camera trained on the open hood. The garage was barely wide enough to fit the car and three people without someone turning sideways. Tools hung from a board above the workbench. A faded calendar curled at the corners. Beyond the open roller door, the city had begun its ordinary afternoon argument: motorcycles, tricycles, horns, a vendor calling out the day's fruit.
 
-“I'm thinking,” Pang said.
+“Thinking,” Pang said.
 
-“You've been thinking for twenty minutes. The hood's still open.”
+“Twenty minutes, boss. Hood's still up.”
 
-“I'm deciding what to do.”
+“I'm deciding.”
 
-“That's thinking with extra steps.”
+“That's thinking with your arms crossed.”
 
-Ruel leaned over the engine bay. He did not smile, but the corner of his mouth moved. “If you two are finished becoming philosophers, one of you can hand me the ten-millimeter.”
+Ruel leaned over the engine bay. He did not smile, but the corner of his mouth moved. “When the philosophers are done. Ten-millimeter.”
 
 Pang passed it over. The car was old enough that every repair seemed to uncover another repair. Its paint had faded into a color that could not decide whether it was blue or gray. The driver's seat had a split seam. A strip of black tape held one side of the console together. The engine, which Pang knew by sound better than he knew most people's voices, had been rebuilt in pieces over years of overtime and favors.
 
 Ruel had kept it alive through a combination of thrift, skill, and refusal to be impressed. He could tell Pang the state of a part without looking at it. He could also tell when Pang was trying to turn a mechanical problem into a question of pride.
 
-“Your front tires are near the end,” Ruel said. “And I don't like the feel of the brake pedal.”
+“Fronts are near the end,” Ruel said. “And I don't like the pedal.”
 
-“They're not done yet.”
+“They're not done.”
 
 “They are not finished becoming dangerous. Different thing.”
 
 Pang looked toward Jolo, who had suddenly become fascinated by the bread in his hand.
 
-“We can do the tires next week,” Jolo said. “Maybe sooner if tonight goes well.”
+“Tires next week,” Jolo said. “Sooner if tonight goes good.”
 
-“What happens tonight?” Ruel asked.
+“What's tonight,” Ruel asked.
 
-“Small meet. Private. The prize will cover the parts.”
+“Small meet. Private. Prize covers the parts.”
 
-“The prize will cover some of the parts,” Ruel corrected.
+“Some of the parts,” Ruel corrected.
 
 Jolo spread his hands. “ ‘Some’ is how ‘more’ begins.”
 
@@ -146,11 +146,11 @@ Jolo had plans beyond the next race. He wanted a garage with their name on it, a
 
 Pang wanted the same things, though he said them less often. What he wanted most was to stop having every ambition measured against the cost of a part.
 
-Ruel looked at them both, then at the tires. “You can go,” he said. “But you do not confuse me not stopping you, with me approving.”
+Ruel looked at them both, then at the tires. “Go,” he said. “Me not stopping you is not me saying yes.”
 
 Jolo stood and clapped once. “That's almost a blessing.”
 
-“It's a bill waiting to happen.”
+“It's an invoice.”
 
 Pang lowered the hood. The latch caught on the first try. It was a small victory, and he took it as one.
 
@@ -164,7 +164,7 @@ Cars gathered under white work lights. Their owners stood in loose groups with p
 
 Jolo moved through the crowd like he had been invited by every person there. He greeted a man who sold used wheels, teased a driver whose car had been in the shop for a month, and found the organizer to confirm that Pang's entry fee had been accepted. By the time Pang rolled to the start, Jolo had collected three new contacts and a promise of a discounted alignment.
 
-“Just bring it home in one piece,” Ruel had said before they left.
+“Bring it home in one piece,” Ruel had texted before they left.
 
 Jolo had answered, “Define home.” Ruel had not laughed.
 
@@ -184,7 +184,7 @@ The crowd's surprise reached him before the result did. Someone slapped the roof
 
 Pang climbed out and tried not to grin too much. The prize was not life-changing money. It was enough to matter: enough for the tire bill to look possible, enough for the next week to feel less like a problem already arriving.
 
-“You saw that?” Jolo said, as if he had not filmed all of it. “You saw what you did?”
+“You saw that?” Jolo said, as if he had not filmed all of it. “You see what you did?”
 
 “I drove.”
 
@@ -198,7 +198,7 @@ A man in a dark overshirt approached with the relaxed pace of someone who knew h
 
 Pang glanced at Jolo. His friend was smiling like the future had just opened a door.
 
-Dante looked at the ordinary car, the cheap tires, and the people still talking about the finish. “There are better events than this,” he said. “Come by next week. I'll introduce you around.”
+Dante looked at the ordinary car, the cheap tires, and the people still talking about the finish. “Come by Kyo, my friend,” he said. “Meet some people. Coffee's on me.”
 
 # **Chapter Three**
 
@@ -212,23 +212,23 @@ The difference mattered. Pang felt it land.
 
 Jolo handled the practical side. He asked about entry fees, the rules at the next event, and whether there would be a media pass for the runs. He turned every introduction into a possible future. Dante never promised much outright. He offered access, which was more powerful because it looked like a gift and behaved like a loan.
 
-“You have something people want to watch,” Dante told Pang. “Not just pace. A story. Small car, limited budget, driver who makes it work. People understand that.”
+“Look— people want to watch you,” Dante told Pang. “Small car. No budget. Driver who makes it work.”
 
 “I just drive.”
 
-“Everybody says that. The ones who last learn that people don't follow numbers alone.”
+“Everybody just drives. The ones who last have a story.”
 
 Pang could hear the salesmanship in it, but he also understood the appeal. For years, money had been the wall between what he knew how to do and what he was allowed to attempt. Dante seemed to know where the wall had a door.
 
 They met Nico that evening. His car was clean in a way Pang's never could be: paint deep enough to hold the parking lot lights, wheels without a nick, an engine bay arranged as if every wire had been asked to justify itself. Nico listened while someone retold Pang's win, then looked at the car and asked what tires he was running.
 
-“Whatever I can afford,” Pang said.
+“Three,” Pang said.
 
 Nico nodded, as though that confirmed something. “You drove well.”
 
 The compliment sounded more insulting than an insult would have. Pang asked whether Nico wanted to say something else.
 
-“I think you found a few seconds you won't find again on the same setup.” Nico's tone remained even. “That's still driving well. It isn't the same as being ready.”
+“But you found time you won't find twice. Not on those.” Nico's tone remained even. “That's still good driving. It isn't ready.”
 
 Jolo made a small sound that was supposed to be a cough.
 
@@ -264,19 +264,19 @@ Then the route opened. Nico's car put its power down cleanly. He did not rush th
 
 By the finish, Nico was ahead.
 
-“You're fast,” Nico said when Pang found him in the paddock area. “But you drive every corner like the next one owes you something.”
+“You're quick,” Nico said when Pang found him in the paddock area. “You take every corner like it's personal.”
 
-Pang pulled off his gloves. “And you drive like you have a spreadsheet open in your head.”
+Pang pulled off his gloves. “You drive like there's a spreadsheet open in your head.”
 
-“I do compare the runs.” Nico glanced at his phone. “First pass, second pass, tire temperature, entry speed. One good corner tells you what you can do. A repeatable run tells you what the car and the driver can actually do.”
+“There is.” Nico glanced at his phone. “First pass, second pass, tire temperature, entry speed. Yours has one row.”
 
-“Must be nice to afford enough tires to find out.”
+“Must be nice. Ten sets of tires.”
 
-Nico accepted the hit. “It is. I won't pretend otherwise.” He paused. “But money isn't why you overcorrected at the last bend. You did it because the car moved and you wanted to fix it before it finished moving.”
+Nico accepted the hit. “It is.” He paused. “Tires aren't why you overcorrected at the last bend. You did it because the car moved and you wanted to fix it before it finished moving.”
 
 Pang had no answer that would not sound like a denial.
 
-Jolo joined them with two bottles of water and a grin that was trying hard to bring the old mood back. “Good race. Really good race. We got footage. We got contacts. Nobody's funeral today.”
+Jolo joined them with two bottles of water and a grin that was trying hard to bring the old mood back. “Good race. Really good race. Footage, contacts, all four tires.” Then, lower: “Don't tell Ruel about the tires.”
 
 The joke died in the air before it reached the three of them. Jolo looked down at the bottles as if they had betrayed him.
 
@@ -304,11 +304,19 @@ The lesson was not that talent did not matter. It was that talent could be spent
 
 The Ghost Line began with a joke.
 
-They were on the mountain road in the late afternoon, when the light sat low between the trees and the asphalt changed color every time a cloud passed over the sun. They had made three passes already. Pang's best entry came from the first run. The middle section was cleaner on the second. On the third, the exit was fast enough that Jolo leaned back in his seat and said, “There. That's the one.”
+They were on the mountain road in the late afternoon, when the light sat low between the trees and the asphalt changed color every time a cloud passed over the sun. They had made three passes already. On the first, halfway down, Jolo had said, “You're doing the thing. Your mouth goes small. Drive the road, boss. It's right there.” Pang had not answered. On the second, the inside of the bend was still damp from a shower, and Jolo had asked if he felt it. Pang's best entry came from the first run. The middle section was cleaner on the second. On the third, the exit was fast enough that Jolo leaned back in his seat and said, “There. That's the one.”
 
 “Which one?” Pang asked.
 
 “The one we'll pretend you meant to do.”
+
+“My mouth doesn't go small.”
+
+“I have eleven hours of your mouth going small.”
+
+“One more time,” Pang said.
+
+“You said that three times ago.” Jolo pointed at the trees. “Light's gone, boss.”
 
 Pang laughed. They turned around and went back to the start.
 
@@ -580,15 +588,15 @@ His body had healed in uneven patches. A scar climbed from his collar toward his
 
 The car stood beneath the same roof where Jolo had once balanced his phone on a jar of bolts. Ruel had repaired what could be repaired. The bodywork carried dents and replaced panels; the interior smelled of old water and fresh adhesive. The damaged camera card and the small data logger sat in a plastic evidence bag on the workbench. Ruel had kept them because he did not know what else to do with the parts of that night.
 
-“I thought you might want them when you were ready,” he said.
+“Card and logger,” he said. “I haven't opened either.”
 
 Pang looked at the bag. “Did they find the other driver?”
 
-Ruel's expression tightened. “There was no confirmed second car in their report.”
+Ruel's expression tightened. “Report says no second car.”
 
 “They weren't there.”
 
-“No. I wasn't there either.” Ruel spoke carefully, and that care made Pang angrier than an argument would have. “There was a witness who saw lights on the lower road. No one could say they were near you. The official account says the car left the road.”
+“No. Neither was I.” Ruel spoke carefully, and that care made Pang angrier than an argument would have. “A man buying cigarettes saw lights on the lower road. Nobody puts them near you.”
 
 Pang walked around the car. The driver's door had been replaced. The steering wheel was not the one he remembered. He ran his thumb along the repaired seam in the dash. There was a small mark near the center console where Jolo had once struck it with his knuckles to demonstrate a beat for a video edit.
 
@@ -600,7 +608,7 @@ Pang began racing again, slowly at first, then with the same determination that 
 
 But after every run, he asked someone about the crash.
 
-Ruel watched him prepare the car one evening and said, “You can ask what happened. Just don't decide the answer before you find it.”
+Ruel watched him prepare the car one evening. “The car tells you some things,” he said. “Not all of them.”
 
 Pang tightened the strap on his helmet. “I'm not deciding anything.”
 
@@ -616,23 +624,23 @@ The route was short, the other drivers familiar, the weather clear. He told hims
 
 When the run began, he drove too carefully through the first bends. The car followed the road, but he could not stop waiting for the moment the road would disappear. He checked the mirrors where there was nothing to see. He braked early. He finished near the back of the group and climbed out with his jaw clenched.
 
-A younger driver laughed kindly and said, “You'll get it back.”
+A younger driver laughed kindly and said, “You'll get it back, bro.”
 
 Pang nearly hit him.
 
 Instead, he walked to the edge of the staging area and looked at the mountain outline beyond the city. He knew his hands had not forgotten everything. He also knew the car had done exactly what he asked of it. That should have been enough to reassure him. It wasn't.
 
-Nico found him near the food stall. “You looked like you were waiting for someone to appear beside you.”
+Nico found him near the food stall. “You kept checking your mirror. On an empty lane.”
 
 Pang stared at him. “You saw something?”
 
-“No. I saw you checking an empty lane.” Nico bought two bottles of water, offered one, and waited until Pang took it. “I tried the Ghost Line more times than I want to admit.”
+“I saw you looking.” Nico bought two bottles of water, offered one, and waited until Pang took it. “I've chased the Ghost Line more times than I'll admit.”
 
 The name landed between them, suddenly heavy.
 
 “You think it was Ghost?”
 
-“I think the clip is strange.” Nico opened his phone. “I've been comparing the sectors. The line itself is good. Some of the sections are excellent. But the total doesn't behave like a continuous run. I assumed there was a setup trick or a technique I hadn't found.”
+“I think the clip is strange.” Nico opened his phone. “I've been comparing the sectors. The line's good. Some sections are excellent. The total doesn't behave like one run. I assumed there was a setup trick or a technique I hadn't found.”
 
 Pang leaned closer. Nico showed him notes: entry speeds, sector times, brief observations written after repeated attempts. The handwriting was compact and precise. It did not look like a conspiracy. It looked like someone doing the work.
 
@@ -678,23 +686,23 @@ Dante gestured toward an empty chair. “I knew it was a reference video. Everyo
 
 “You called it Ghost Time.”
 
-“Because that is what people called it.” Dante's patience was beginning to thin. “Look, I never told anyone another car forced you off the road. I never arranged for anyone to interfere with your vehicle. I wanted a good event. I wanted people to come. They came because the clip interested them.”
+“Because that is what people called it.” Dante's patience was beginning to thin. “Look— I never said a car pushed you. I never sent anyone near you. I wanted a good event. I wanted people to come. They came because the clip interested them.”
 
 “You knew the truth would make it less interesting.”
 
-Dante studied him, and for the first time the polish fell away from his expression. “You want me to tell you I made the crash happen? I didn't. You want me to say I knew someone would die? I didn't. I arranged a race. You chose to drive.”
+Dante studied him, and for the first time the polish fell away from his expression. “You want me to say I made the crash. I made a race. You drove, my friend.”
 
 Pang felt the answer strike the exact place he had tried to protect. Dante had not absolved himself. He had placed a boundary around his guilt and invited Pang to do the same.
 
 “What did you do after the crash?” Pang asked.
 
-“I kept people from turning it into a public scandal based on rumors. I said it was a tragedy. That was true.”
+“I kept it from turning into a scandal. I said tragedy. Was I wrong?”
 
-“You let the rumors keep going.”
+“You let the rumors run.”
 
-Dante looked away toward the parking lot. “I didn't correct every version of every story. No one can.”
+Dante looked away toward the parking lot. “Which one should I have stopped? There were twelve.”
 
-“No,” Pang said. “But you corrected the ones that cost you money.”
+“The ones that cost you money,” Pang said.
 
 He left before Dante answered. Outside, a group of younger drivers were watching the Ghost Line clip on a phone, arguing over whether the unseen driver had used a different gearbox. Pang stopped at the edge of the circle. For a moment, he saw the scene as he once had: a place where people could make something out of nothing, where a good run meant that the next month might be better than the last.
 

@@ -668,8 +668,8 @@ func _crash(b: Dictionary) -> void:
 		var begin := func(): recorder.begin()
 		time_attack.started.connect(begin, CONNECT_ONE_SHOT)
 		time_attack.restart(false)
-	var cues := [[PASS_TRACK.start_distance + 330.0, "JOLO", "Different here."], [PASS_TRACK.start_distance + 345.0, "PANG", "I know."],
-		[PASS_TRACK.start_distance + 365.0, "JOLO", "Then don't force it."], [entry - 230.0, "JOLO", "Pang."], [entry - 150.0, "JOLO", "Pang, listen."]]
+	var cues := [[PASS_TRACK.start_distance + 330.0, "JOLO", "Feels different here."], [PASS_TRACK.start_distance + 365.0, "JOLO", "It's wet past the sign."],
+		[entry - 230.0, "JOLO", "Pang."], [entry - 150.0, "JOLO", "Pang, it's wet. It's wet."]]
 	var index := PASS_TRACK.nearest_index(session.car.global_position)
 	var lights: HeadlightsRig = null
 	while is_inside_tree():
@@ -768,7 +768,7 @@ func _takeover(entry: float) -> void:
 			weather.grip_scale = 0.55
 			if not warned:
 				warned = true
-				dialogue.subtitle("JOLO", "Drive the road!", 2.0)
+				dialogue.subtitle("JOLO", "Okay. Okay.", 2.0)
 				_warned_at = recorder.frames.size() / GhostLine.STRIDE / GhostLine.HZ
 		var p := session.car.global_position
 		var off := absf(PASS_TRACK.lateral_offset(p, PASS_TRACK.nearest_index(p)))

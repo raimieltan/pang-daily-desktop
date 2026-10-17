@@ -92,7 +92,7 @@ Every featured drive needs a distinct dramatic function. Reuse roads and locatio
 
 **PLAYER EXPERIENCE**  No conventional race objective. Use short sensory fragments from inside the car: the wet road, Jolo framing a shot, a corner entry, a flash of headlights between trees. Do not show a complete, explainable sequence.
 
-**DRAMATIC BEATS**  Jolo says something that sounds like “drive the road.” The protagonist’s hands make a sharp correction. Light moves laterally across the windshield. Impact cuts sound and image. The player does not see a second car enter their lane.
+**DRAMATIC BEATS**  Jolo says it's wet, then “Okay. Okay.” Pang answers nothing. (Pang will later remember Jolo saying something like “drive the road”: his memory splices a dry-day line from S06 into this night.) The protagonist’s hands make a sharp correction. Light moves laterally across the windshield. Impact cuts sound and image. The player does not see a second car enter their lane.
 
 **CLUES / CONTINUITY**  Withhold the final approach speed, the road geometry, and the source of the headlights. The opening should not falsely establish contact or a deliberate attack.
 

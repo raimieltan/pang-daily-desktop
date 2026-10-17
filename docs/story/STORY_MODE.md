@@ -26,6 +26,7 @@ It is reached from the title screen (STORY). It sits beside the racing grind, no
 | The crash | The player drives the night run up to the approach to 8A; from 70 m out the night plays as it happened (too fast for the wet, late brakes, a sharp correction). No button prompt pretends it can be avoided. |
 | Beating the Ghost Line | Allowed, and never dismissed. The line study has a floor (baked passes), so the cut is never a lap anyone could beat by driving the study badly. The public number is Dante's, a little under the cut: beat the car in the clip but not the clock and the board says otherwise ("ahead" lines); beat the clock in public and Dante reposts a time under yours, "Ghost responded" ("beaten" lines), which Act III pays off. Against the cut itself (R3, the sector trials) a beating simply stands. |
 | Language | All dialogue is in English (Oct 17 playtest: the Hiligaynon/Taglish pass read badly and was reverted). The Iloilo setting stays in names, places and signage. |
+| Narration | Ink boxes and page captions are Pang, in the first person, after the crash: confident early, shorter by Act IV. Each act turns on "Here's what I know." with a different ending. The manuscript stays third-person prose; its quoted dialogue matches the game. Jolo in the present is footage only. |
 | Between scenes | Manga pages (`StoryComic`): a beat's `comic` pages play before it and `comic_after` after it, one panel per press, so scene changes and the cold open are bridged by panels instead of hard jumps. Every scene change fades through black; the car's sound is muted while a page is up. |
 | Scoring | Story races record place and time only. The daylight drive has no clock, medal or unlock. No achievement for "beating Ghost" or for forgiveness. |
 
@@ -89,9 +90,9 @@ Frames are `StoryRecorder` samples at 20 Hz: position, rotation, speed, steering
 ## The night run
 
 - Night, rain (ink streaks round the camera, mist, drops and wipers on the glass in hood view), wet road (grip × 0.62, darker tar with sheen in the ruts), worn fronts, the Ghost Line brighter than usual.
-- Jolo's lines come as subtitles at points on the road ("Different here." … "Pang, listen.").
+- Jolo's lines come as subtitles at points on the road ("Feels different here." … "Pang, it's wet. It's wet."); Pang says nothing.
 - From 170 m out, a car's lights move uphill on the leg below 8A (the lower switchback), 12–24° off the nose through the trees.
-- From 70 m out the director takes the wheel: full throttle where the dry practice was already braking, brakes at 24 m, then the wet patch (grip × 0.55) and the correction (hard one way, then the other) under "Drive the road!". It ends on the first hard contact, leaving the road, or 2.6 s after braking: a white frame, the impact, black and silence, a pulse.
+- From 70 m out the director takes the wheel: full throttle where the dry practice was already braking, brakes at 24 m, then the wet patch (grip × 0.55) and the correction (hard one way, then the other) under Jolo's "Okay. Okay.". It ends on the first hard contact, leaving the road, or 2.6 s after braking: a white frame, the impact, black and silence, a pulse.
 - The logger keeps the whole run; the camera file is cut 2.2 s before the logger ends.
 
 ## Investigation
