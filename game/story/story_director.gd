@@ -31,6 +31,7 @@ var music: MusicPlayer
 ## The barangay loop (hub stage).
 var loop: TrackData
 var dialogue: StoryDialogue
+var tint: StoryTint
 var board: EvidenceBoard
 var weather: Weather
 var recorder: StoryRecorder
@@ -53,6 +54,8 @@ func _ready() -> void:
 	add_child(dialogue)
 	# Every scene opens out of black; the first beat lifts it (_reveal).
 	dialogue.black(true)
+	tint = StoryTint.new()
+	add_child(tint)
 	board = EvidenceBoard.new()
 	board.dialogue = dialogue
 	add_child(board)
@@ -145,9 +148,26 @@ func _play(b: Dictionary) -> void:
 
 ## The way into a beat: the stage set up behind the black (or the last page), then the beat's
 ## comic pages, or the black lifting. Act cards lift it themselves; the cold open keeps it.
+## A memory opens on its pages and comes up warm under its period stamp; the first beat back
+## cuts to black on a present-day sound and comes up on NOW.
 func _reveal(b: Dictionary) -> void:
 	var cold: bool = b.get("cold_open", false)
+	var memory := StoryScript.memory_of(StoryMode.beat)
+	tint.set_warm(memory != "")
+	dialogue.set_stamp(memory if memory != "" else ("NOW" if b.has("now") else ""))
 	if b["type"] in ["chapter", "end"]:
+		return
+	if b.has("memory"):
+		await dialogue.comic(b["comic"], "black")
+		await _settle(b)
+		await dialogue.fade(false, 0.5)
+		return
+	if b.has("now"):
+		dialogue.black(true)
+		dialogue.sfx(str(b["now"]))
+		await get_tree().create_timer(0.5).timeout
+		await _settle(b)
+		await dialogue.fade(false, 0.5)
 		return
 	if not cold:
 		await _settle(b)
@@ -185,13 +205,28 @@ func _lines(b: Dictionary, key: String) -> void:
 # --- Stage control ----------------------------------------------------------------------------
 
 
+## The present after the crash: rain and an overcast sky on every talk, evidence and drive-to
+## beat that sets no weather of its own. Drive beats keep theirs (the trials are dry evidence).
+const PRESENT := { "rain": 0.4, "wet": 0.7, "night_value": 0.3 }
+
+
+## Night (0..1), rain and wet for a beat: its own keys, else the present-day default outside a
+## memory for scene beats, else clear.
+static func conditions_for(b: Dictionary, in_memory: bool) -> Dictionary:
+	var own := b.has("rain") or b.has("wet") or b.has("night") or b.has("night_value")
+	var present: bool = not in_memory and not own and str(b.get("type", "")) in ["talk", "evidence", "goto"]
+	var rain := float(b.get("rain", PRESENT["rain"] if present else 0.0))
+	var night := 1.0 if b.get("night", false) else float(b.get("night_value", PRESENT["night_value"] if present else 0.0))
+	return { "night": night, "rain": rain, "wet": float(b.get("wet", PRESENT["wet"] if present else (1.0 if rain > 0.0 else 0.0))) }
+
+
 ## Night, rain and wet road for the beat (talk backdrops included).
 func _conditions(b: Dictionary) -> void:
-	var night: float = 1.0 if b.get("night", false) else float(b.get("night_value", 0.0))
-	MangaArt.apply_night(night)
+	var c := conditions_for(b, StoryScript.memory_of(StoryMode.beat) != "")
+	MangaArt.apply_night(c["night"])
 	if weather:
-		weather.rain = float(b.get("rain", 0.0))
-		weather.wet = float(b.get("wet", 1.0 if weather.rain > 0.0 else 0.0))
+		weather.rain = c["rain"]
+		weather.wet = c["wet"]
 		weather.sheen = 0.0
 		# Worn fronts (Ruel: "near the end"): the car the player has by then, not the one in the clip.
 		weather.grip_scale = float(b.get("grip", 1.0))

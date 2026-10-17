@@ -37,13 +37,28 @@ var _look := {}
 var _scarred := false
 
 
-## Show `who` (strips "(on the clip)"-style notes); false when there is no portrait for them.
+## Show `who`; false when there is no portrait for them (narration, unknown speakers, Jolo in
+## the present: his face is a memory).
 func show_speaker(who: String) -> bool:
-	_look = LOOKS.get(who.strip_edges(), {})
-	_scarred = who == "PANG" and StoryMode.beat >= StoryScript.index_of("a2_card")
+	_look = LOOKS.get(who.strip_edges(), {}) if has_face(who, StoryMode.beat) else {}
+	_scarred = who == "PANG" and scarred_at(StoryMode.beat)
 	visible = not _look.is_empty()
 	queue_redraw()
 	return visible
+
+
+## Pang carries the crash in the present, from the clinic on: not in the prologue (the crash
+## itself) and not inside a memory.
+static func scarred_at(index: int) -> bool:
+	return StoryScript.memory_of(index) == "" and index >= StoryScript.index_of("a1_card")
+
+
+## Jolo's face appears only inside a memory; present-day JOLO lines are footage.
+static func has_face(who: String, index: int) -> bool:
+	var name := who.strip_edges()
+	if not LOOKS.has(name):
+		return false
+	return name != "JOLO" or StoryScript.memory_of(index) != ""
 
 
 func _draw() -> void:

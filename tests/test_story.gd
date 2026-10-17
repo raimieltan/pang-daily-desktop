@@ -147,6 +147,24 @@ func test_old_save_restarts_the_story() -> void:
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
 
 
+func test_present_day_default_only_touches_talk_beats() -> void:
+	var talk := { "id": "x", "type": "talk" }
+	var drive := { "id": "y", "type": "sectors" }
+	var dry_talk := { "id": "z", "type": "talk", "wet": 0.0 }
+	_check(StoryDirector.conditions_for(talk, false)["rain"] > 0.0, "present-day talk gets rain")
+	_check(StoryDirector.conditions_for(talk, true)["rain"] == 0.0, "a memory stays dry")
+	_check(StoryDirector.conditions_for(drive, false)["rain"] == 0.0, "drive beats keep their own conditions")
+	_check(StoryDirector.conditions_for(dry_talk, false)["wet"] == 0.0, "explicit conditions win")
+
+
+func test_scar_only_in_the_present_after_the_prologue() -> void:
+	_check(not StoryPortrait.scarred_at(StoryScript.index_of("s00")), "no scar in the cold open")
+	_check(StoryPortrait.scarred_at(StoryScript.index_of("s14")), "scar at the clinic")
+	_check(not StoryPortrait.scarred_at(StoryScript.index_of("s03")), "no scar inside a memory")
+	_check(not StoryPortrait.has_face("JOLO", StoryScript.index_of("s22")), "Jolo has no face in the present")
+	_check(StoryPortrait.has_face("JOLO", StoryScript.index_of("s03")), "Jolo has a face in a memory")
+
+
 func test_every_storyboard_scene_has_a_beat() -> void:
 	var scenes := {}
 	for b in StoryScript.BEATS:

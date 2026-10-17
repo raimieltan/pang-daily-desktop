@@ -28,6 +28,7 @@ var on_set := Callable()
 var _top: ColorRect
 var _bottom: ColorRect
 var _caption: Label
+var _stamp: Label
 var _panel: PanelContainer
 var _name: Label
 var _text: Label
@@ -69,6 +70,17 @@ func _ready() -> void:
 	_caption.position = Vector2(40, 96)
 	_caption.visible = false
 	add_child(_caption)
+	# The period stamp (MONTHS BEFORE / NOW): top right under the day chip, up for a whole memory.
+	_stamp = Label.new()
+	MangaType.ink(_stamp, 24, MangaType.caption())
+	_stamp.add_theme_color_override("font_color", MangaType.PAPER)
+	_stamp.add_theme_stylebox_override("normal", stamp)
+	_stamp.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+	_stamp.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	_stamp.offset_top = 84
+	_stamp.offset_right = -40
+	_stamp.visible = false
+	add_child(_stamp)
 
 	_panel = PanelContainer.new()
 	_panel.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
@@ -239,6 +251,12 @@ func letterbox(on: bool) -> void:
 func set_caption(text: String) -> void:
 	_caption.text = text
 	_caption.visible = text != ""
+
+
+## The period stamp; "" hides it. play() never clears it.
+func set_stamp(period: String) -> void:
+	_stamp.text = period
+	_stamp.visible = period != ""
 
 
 ## Lines in order, waiting for the player on each (see StoryScript for the specials).
