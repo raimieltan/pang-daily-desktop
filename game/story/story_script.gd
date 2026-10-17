@@ -532,7 +532,7 @@ const BEATS := [
 		"act": "ACT IV", "title": "WHAT HAPPENED ON THE MOUNTAIN", "subtitle": "The evidence rules out the story he wanted." },
 	{ "id": "s11", "scene": "S11", "stage": "hub", "type": "evidence", "spot": "talyer", "place": "RUEL'S TALYER", "when": "THE WEEK OF THE NIGHT RUN", "memory": "THE WEEK OF THE NIGHT RUN",
 		"comic": [[
-			{ "art": "rain", "cap": "The sign at 8A, bent since the rainy season. Pang stood under it in the daylight and could not make the corner look dangerous." },
+			{ "art": "tone", "cap": "The sign at 8A, bent since the rainy season. Pang stood under it in the daylight and could not make the corner look dangerous." },
 			{ "art": "tone", "cap": "The last week came back whole. THE WEEK OF THE NIGHT RUN." },
 			{ "art": "face", "who": "DANTE", "side": "right", "sfx": "phone_buzz", "say": "Night run, Pass 1. Beat Ghost Time and it's yours. One hundred fifty thousand. Sponsors want the footage. Friday." },
 		]],

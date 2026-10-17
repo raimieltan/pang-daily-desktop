@@ -215,7 +215,9 @@ const PRESENT := { "rain": 0.4, "wet": 0.7, "night_value": 0.3 }
 ## Night (0..1), rain and wet for a beat: its own keys, else the present-day default outside a
 ## memory for scene beats before the ending, else clear.
 static func conditions_for(b: Dictionary, in_memory: bool, ending := false) -> Dictionary:
-	var own := b.has("rain") or b.has("wet") or b.has("night") or b.has("night_value")
+	# `night` is only the light: a present-day scene at night still rains. A beat's own rain, wet
+	# or night_value (a chosen time of day) are its own weather.
+	var own := b.has("rain") or b.has("wet") or b.has("night_value")
 	var present: bool = not in_memory and not ending and not own and str(b.get("type", "")) in ["talk", "evidence"]
 	var rain := float(b.get("rain", PRESENT["rain"] if present else 0.0))
 	var night := 1.0 if b.get("night", false) else float(b.get("night_value", PRESENT["night_value"] if present else 0.0))

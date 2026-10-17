@@ -34,6 +34,8 @@ static var results := {}
 ## story has been played to the end.
 static var reached := 0
 static var completed := false
+## True after load_save found a save from another script order and set it aside (the menu says so).
+static var stale := false
 
 
 static func has_save() -> bool:
@@ -46,10 +48,12 @@ static func load_save() -> void:
 	results = {}
 	reached = 0
 	completed = false
+	stale = false
 	if not has_save():
 		return
 	var data = JSON.parse_string(FileAccess.get_file_as_string(save_path))
-	if data is Dictionary and int(data.get("script", 0)) == SCRIPT_VERSION:
+	stale = not (data is Dictionary and int(data.get("script", 0)) == SCRIPT_VERSION)
+	if not stale:
 		beat = int(data.get("beat", 0))
 		record = data.get("record", {})
 		results = data.get("results", {})

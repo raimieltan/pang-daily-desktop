@@ -144,7 +144,12 @@ func test_old_save_restarts_the_story() -> void:
 	StoryMode.save_path = before
 	_check(StoryMode.beat == 0 and StoryMode.record.is_empty() and StoryMode.results.is_empty() and StoryMode.reached == 0,
 		"a save from another script order starts over")
+	_check(StoryMode.stale, "...and says so (the menu shows a notice)")
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
+	StoryMode.save_path = path
+	StoryMode.load_save()
+	StoryMode.save_path = before
+	_check(not StoryMode.stale, "no save, nothing stale")
 
 
 func test_present_day_default_only_touches_talk_beats() -> void:
@@ -155,6 +160,9 @@ func test_present_day_default_only_touches_talk_beats() -> void:
 	_check(StoryDirector.conditions_for(talk, true)["rain"] == 0.0, "a memory stays dry")
 	_check(StoryDirector.conditions_for(drive, false)["rain"] == 0.0, "drive beats keep their own conditions")
 	_check(StoryDirector.conditions_for(dry_talk, false)["wet"] == 0.0, "explicit conditions win")
+	var night_talk := { "id": "n", "type": "talk", "night": true }
+	var c := StoryDirector.conditions_for(night_talk, false)
+	_check(c["rain"] > 0.0 and c["night"] == 1.0, "a present-day scene at night still rains (night only sets the light)")
 	var drive_to := { "id": "g", "type": "goto" }
 	_check(StoryDirector.conditions_for(drive_to, false)["rain"] == 0.0, "a drive-to is a drive: no default rain")
 	_check(StoryDirector.conditions_for(talk, false, true)["rain"] == 0.0, "the ending (Act V) is past the rain")

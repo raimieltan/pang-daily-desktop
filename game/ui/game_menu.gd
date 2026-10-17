@@ -334,6 +334,12 @@ func _open_story() -> void:
 		first = _button(_story_list, "CONTINUE", func(): StoryMode.resume(get_tree()))
 	var fresh := _button(_story_list, "NEW STORY", func(): StoryMode.start_new(get_tree()))
 	first = first if first else fresh
+	if StoryMode.stale:
+		var note := MangaType.label("YOUR SAVE IS FROM AN OLDER VERSION OF THE STORY. IT STARTS OVER.", 20, MangaType.caption())
+		note.add_theme_color_override("font_color", MangaType.RED)
+		note.remove_theme_constant_override("outline_size")
+		note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		_story_list.add_child(note)
 	for act in StoryScript.acts():
 		if saved and int(act[1]) <= StoryMode.reached:
 			var b := _button(_story_list, act[0], StoryMode.play_from.bind(get_tree(), int(act[1])))
