@@ -64,6 +64,8 @@ var differential_lock := 0.0
 var _model  # HandlingModel (untyped to avoid a cyclic class reference)
 var _initialized := false
 var _reverse_timer := 0.0
+## Manual gearbox: the player shifted into neutral (it holds until they shift out).
+var _held_neutral := false
 var _brake_was_released := false
 var _shift_timer := 0.0
 var _upshifting := false
@@ -87,7 +89,7 @@ func reset() -> void:
 	detector.drifting = false
 	engine_rpm = 850.0; gear = 1; clutch = 0.0; axle_torque = 0.0; differential_lock = 0.0
 	_initialized = false
-	_reverse_timer = 0.0; _brake_was_released = false; _shift_timer = 0.0; _front_transfer = 0.0; _rear_transfer = 0.0
+	_reverse_timer = 0.0; _held_neutral = false; _brake_was_released = false; _shift_timer = 0.0; _front_transfer = 0.0; _rear_transfer = 0.0
 	_roll_velocity = 0.0; _pitch_velocity = 0.0; _previous_handbrake = 0.0
 
 
@@ -133,13 +135,17 @@ func step(dt: float, input: VehicleTypes.DriverInput, contact: VehicleTypes.Axle
 	var h := span / steps
 	for f in 4:
 		applied_forces[f] = Vector2.ZERO
+	var shift := input.shift
 	for i in steps:
 		_integrate(h, input, contact)
+		# A shift is one press: only the first substep takes it.
+		input.shift = 0
 		for j in 4:
 			var corner: VehicleTypes.CornerForces = _model.corners[j]
 			var co := cos(corner.steer_angle)
 			var si := sin(corner.steer_angle)
 			applied_forces[j] += Vector2(corner.fx * co - corner.fy * si, corner.fx * si + corner.fy * co) / steps
+	input.shift = shift
 
 
 # Brush-style combined slip: longitudinal force at wheel speed `omega` (the bisection's inner function).
@@ -153,6 +159,48 @@ static func _fx_at(omega: float, radius: float, u: float, peak_slip_ratio: float
 	if demand <= 1e-9:
 		return max_long * sx * 1.5
 	return max_long * sx * saturation / demand
+
+
+## One manual shift through R, N, 1..n. Into reverse only from neutral near a standstill, and a
+## downshift that would throw the engine past its redline is refused (no money shifts).
+func _manual_shift(shift: int, speed: float, engage_below: float, p: Dictionary) -> void:
+	var s: VehicleTypes.HandlingState = _model.state
+	if shift == 0:
+		return
+	var e: Dictionary = p["engine"]
+	var ratios: Array = e["gearRatios"]
+	if shift > 0:
+		if s.reversing:
+			s.reversing = false
+			s.neutral = true
+			_held_neutral = true
+		elif s.neutral:
+			s.neutral = false
+			_held_neutral = false
+			gear = 1
+		elif gear < ratios.size():
+			gear += 1
+			_shift_timer = e["shiftSeconds"]
+			_upshifting = true
+		return
+	if s.reversing:
+		return
+	if s.neutral:
+		if speed < engage_below:
+			s.neutral = false
+			_held_neutral = false
+			s.reversing = true
+		return
+	if gear == 1:
+		s.neutral = true
+		_held_neutral = true
+		return
+	var rpm: float = speed / p["wheel"]["radiusM"] * ratios[gear - 2] * e["finalDrive"] * 60.0 / TAU
+	if rpm > e["redlineRpm"] * 1.02:
+		return
+	gear -= 1
+	_shift_timer = e["shiftSeconds"]
+	_upshifting = false
 
 
 ## Peak lateral acceleration the tires can hold right now (last step's caps), in g.
@@ -211,23 +259,32 @@ func _integrate(dt: float, input: VehicleTypes.DriverInput, contact: VehicleType
 	# Neutral → drive on throttle; → reverse only from a fresh brake press (not one held since spawn).
 	if s.neutral and raw_throttle > 0.1:
 		s.neutral = false
-	var wants_reverse := not s.reversing and raw_brake > 0.5 and raw_throttle < 0.1 and speed < engage_below \
-		and (_brake_was_released or not s.neutral)
-	_reverse_timer = _reverse_timer + dt if wants_reverse else 0.0
-	if wants_reverse and _reverse_timer >= low_speed["reverseDelaySeconds"]:
-		s.reversing = true
-		s.neutral = false
-		_reverse_timer = 0.0
-	if s.reversing and raw_throttle > 0.5 and raw_brake < 0.1 and speed < engage_below:
-		s.reversing = false
+	if input.manual:
+		_manual_shift(input.shift, speed, engage_below, p)
+		# A neutral the player picked holds; the spawn neutral still lets the first throttle go.
+		if _held_neutral:
+			s.neutral = true
+	else:
+		_held_neutral = false
+		var wants_reverse := not s.reversing and raw_brake > 0.5 and raw_throttle < 0.1 and speed < engage_below \
+			and (_brake_was_released or not s.neutral)
+		_reverse_timer = _reverse_timer + dt if wants_reverse else 0.0
+		if wants_reverse and _reverse_timer >= low_speed["reverseDelaySeconds"]:
+			s.reversing = true
+			s.neutral = false
+			_reverse_timer = 0.0
+		if s.reversing and raw_throttle > 0.5 and raw_brake < 0.1 and speed < engage_below:
+			s.reversing = false
+	# The automatic's reverse swaps the pedals (brake drives backwards); a manual's never do.
+	var swap := s.reversing and not input.manual
 	var rear_slip := (absf(wheels[2].slip_ratio) + absf(wheels[3].slip_ratio)) / 2.0
 	var hb: Dictionary = c["handbrake"]
 	var pedals: Dictionary = (c["pedals"] as Dictionary).duplicate()
 	pedals["handbrakeRise"] = hb["engageSmoothing"]
 	pedals["handbrakeFall"] = hb["releaseSmoothing"]
 	assistance.step(dt, input.steer,
-		0.0 if not input.engine_available else (raw_brake if s.reversing else raw_throttle),
-		raw_throttle if s.reversing else raw_brake,
+		0.0 if not input.engine_available else (raw_brake if swap else raw_throttle),
+		raw_throttle if swap else raw_brake,
 		input.handbrake if hb["enabled"] else 0.0, input.device,
 		{ "vx": s.vx, "vy": s.vy, "yaw_rate": yaw, "rear_slip_ratio": rear_slip, "front_axle_m": a, "rear_axle_m": b,
 			"front_peak_slip": atan(PEAK_DEMAND * tan(c["tires"]["frontPeakSlipDeg"] * DEG)), "grip_mu": _lateral_grip_mu(mass) }, p, pedals)
@@ -293,18 +350,27 @@ func _integrate(dt: float, input: VehicleTypes.DriverInput, contact: VehicleType
 		traction_trim = SimMath.smoothstep_(peak_slip * 0.6, peak_slip * 1.6, worst_slip) * 0.95
 	elif tcs != "off":
 		traction_trim = SimMath.smoothstep_(peak_slip, peak_slip * 4.0, worst_slip) * 0.35
+	if s.reversing:
+		# Reverse is a manoeuvre, not a gear to race in: traction control is always on, and the
+		# preset's reverse top speed holds (full reverse power spun the wheels to 40 km/h backwards,
+		# and a wheelspinning axle has no grip left to steer with).
+		traction_trim = maxf(traction_trim, SimMath.smoothstep_(peak_slip * 0.6, peak_slip * 1.6, worst_slip) * 0.95)
+		var reverse_top: float = (c["drive"] as Dictionary).get("reverseTopSpeedKmh", 25.0)
+		traction_trim = maxf(traction_trim, SimMath.smoothstep_(reverse_top * 0.75, reverse_top, speed * 3.6))
 	var throttle := s.throttle * (1.0 - traction_trim)
 	# ESC requests one caliper and trims torque. It cannot directly produce a yaw acceleration.
 	var wanted_yaw := s.vx * tan(s.steer_angle) / L
 	var yaw_error := wanted_yaw - yaw
 	# Dead band: ordinary lane corrections must not trim power, only a real yaw mismatch does.
-	var esc_brake := SimMath.clamp_((absf(yaw_error) - 0.12) * 0.45, 0.0, 0.4) if (p["esc"] and speed > 5.0) else 0.0
+	# Forward only: reversing, a braked front wheel pulls the nose the other way and the "correction"
+	# spun the car (holding lock at 15 km/h in reverse ran yaw to twice the kinematic rate).
+	var esc_brake := SimMath.clamp_((absf(yaw_error) - 0.12) * 0.45, 0.0, 0.4) if (p["esc"] and speed > 5.0 and s.vx > 0.0) else 0.0
 	throttle *= 1.0 - esc_brake
 	_shift_timer = maxf(0.0, _shift_timer - dt)
 	gear = clampi(gear, 1, gear_ratios.size())
 	var final_drive: float = e["finalDrive"]
 	var redline: float = e["redlineRpm"]
-	if not s.reversing and _shift_timer == 0.0 and driven_slip < 0.3:
+	if not input.manual and not s.reversing and _shift_timer == 0.0 and driven_slip < 0.3:
 		var rpm: float = absf(driven_speed) * gear_ratios[gear - 1] * final_drive * 60.0 / TAU
 		if rpm > redline * 0.9 and gear < gear_ratios.size():
 			gear += 1; _shift_timer = e["shiftSeconds"]; _upshifting = true

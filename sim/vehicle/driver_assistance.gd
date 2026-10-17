@@ -95,7 +95,11 @@ func step(dt: float, steering: float, throttle: float, brake_in: float, handbrak
 			SimMath.smoothstep_(st.get("gripLockTaperFromKph", 80.0), st.get("gripLockTaperFullKph", 140.0), speed))
 		var slip_window: float = motion.get("front_peak_slip", 14.5 * SimMath.DEG) * slip_fraction
 		_grip_window = SimMath.lerp_(max_angle, slip_window, gate)
-		target = SimMath.clamp_(target, front_direction - _grip_window, front_direction + _grip_window)
+		# The window centres on where the front axle travels only as the lock gates in: reversing
+		# (vx < 0) front_direction is meaningless and, centred on it, the full rack pulled the wrong
+		# way (holding right in reverse steered left).
+		var centre := front_direction * gate
+		target = SimMath.clamp_(target, centre - _grip_window, centre + _grip_window)
 		# Yaw limiter: past the yaw rate the tires can hold on this path (mu*g/v) the rack backs out of
 		# the turn instead of adding rotation, the steering half of a stability assist. mu is the tires'
 		# live grip with a margin: a fixed, low mu bled lock out of every limit corner (heavy understeer).

@@ -2,6 +2,7 @@ class_name PlayerInput
 extends RefCounted
 ## Keyboard and gamepad → `DriverInput`. Registers its input actions at runtime, so the project
 ## needs no hand-edited InputMap. Keyboard input is digital; the sim's assistance shapes it.
+## With the manual gearbox (GameSettings "transmission") I / O (LB / RB) shift down / up.
 
 const ACTIONS := {
 	"throttle": [KEY_W, KEY_UP],
@@ -15,9 +16,12 @@ const ACTIONS := {
 	"toggle_hud": [KEY_H],
 	"toggle_night": [KEY_N],
 	"flash_lights": [KEY_L],
+	"shift_down": [KEY_I],
+	"shift_up": [KEY_O],
 }
 
 var _last_device := "keyboard"
+var _shift_held := 0
 
 
 static func register_actions() -> void:
@@ -33,7 +37,8 @@ static func register_actions() -> void:
 	_add_axis("brake", JOY_AXIS_TRIGGER_LEFT, 1.0)
 	_add_axis("steer_left", JOY_AXIS_LEFT_X, -1.0)
 	_add_axis("steer_right", JOY_AXIS_LEFT_X, 1.0)
-	for pair in [["handbrake", JOY_BUTTON_A], ["handbrake", JOY_BUTTON_B], ["reset_car", JOY_BUTTON_BACK], ["flash_lights", JOY_BUTTON_Y]]:
+	for pair in [["handbrake", JOY_BUTTON_A], ["handbrake", JOY_BUTTON_B], ["reset_car", JOY_BUTTON_BACK], ["flash_lights", JOY_BUTTON_Y],
+			["shift_down", JOY_BUTTON_LEFT_SHOULDER], ["shift_up", JOY_BUTTON_RIGHT_SHOULDER]]:
 		var b := InputEventJoypadButton.new()
 		b.button_index = pair[1]
 		InputMap.action_add_event(pair[0], b)
@@ -52,6 +57,11 @@ func read() -> VehicleTypes.DriverInput:
 	input.brake = Input.get_action_strength("brake")
 	input.steer = Input.get_action_strength("steer_right") - Input.get_action_strength("steer_left")
 	input.handbrake = Input.get_action_strength("handbrake")
+	input.manual = GameSettings.value("transmission") == "manual"
+	# One shift per press: read on the press, not while the key is held.
+	var held := (1 if Input.is_action_pressed("shift_up") else 0) - (1 if Input.is_action_pressed("shift_down") else 0)
+	input.shift = held if held != _shift_held else 0
+	_shift_held = held
 	# Analog sticks get controller assistance; any key press switches back to keyboard tuning.
 	var analog := Input.get_connected_joypads().size() > 0 and (
 		absf(Input.get_joy_axis(0, JOY_AXIS_LEFT_X)) > 0.15 or Input.get_joy_axis(0, JOY_AXIS_TRIGGER_RIGHT) > 0.05

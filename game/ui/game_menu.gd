@@ -293,6 +293,8 @@ func _build_settings() -> void:
 		func(): _toggle_setting("fullscreen"))
 	_value_button(view, func(): return "VSYNC: " + ("ON" if GameSettings.value("vsync") else "OFF"),
 		func(): _toggle_setting("vsync"))
+	_value_button(view, func(): return "GEARBOX: " + ("MANUAL  (I / O)" if GameSettings.value("transmission") == "manual" else "AUTO"),
+		func(): GameSettings.set_value("transmission", "auto" if GameSettings.value("transmission") == "manual" else "manual"))
 	_value_button(view, _camera_text, _cycle_camera)
 	_value_button(view, _time_text, _toggle_time)
 	var back := _button(column, "BACK", func(): _settings_return.call())

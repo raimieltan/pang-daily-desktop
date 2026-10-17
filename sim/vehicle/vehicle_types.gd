@@ -17,6 +17,10 @@ class DriverInput:
 	var engine_available := true
 	## "keyboard" | "controller" | "wheel" | "ai"
 	var device := "ai"
+	## Manual gearbox (the clutch stays automatic): no automatic shifts, the pedals never swap,
+	## and `shift` picks the gear: +1 up, -1 down, 0 none (one step per press), through R, N, 1..n.
+	var manual := false
+	var shift := 0
 
 	static func make(throttle_: float, brake_: float, steer_: float, handbrake_ := 0.0, device_ := "ai") -> DriverInput:
 		var i := DriverInput.new()

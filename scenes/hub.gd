@@ -20,6 +20,7 @@ var _ring := 0
 var _place := ""
 var _hud: CanvasLayer
 var _toast: Label
+var _hint: Label
 var _prompt: Label
 var _line: Label
 var _toast_time := 0.0
@@ -155,6 +156,10 @@ func _physics_process(_delta: float) -> void:
 
 
 func _process(delta: float) -> void:
+	if _hint:
+		# The gearbox can change in the menu: the shift keys show only with the manual.
+		_hint.text = "E  TALK     L  FLASH LIGHTS     R  RESET     " \
+			+ ("I / O  SHIFT     " if GameSettings.value("transmission") == "manual" else "") + "ESC  MENU"
 	var on := 1 if MangaArt.night > 0.5 else 0
 	if on != _lights_on:
 		_lights_on = on
@@ -302,9 +307,9 @@ func _build_hud() -> void:
 	_prompt.position.y = 118
 	_prompt.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_hud.add_child(_prompt)
-	var hint := MangaType.label("E  TALK     L  FLASH LIGHTS     R  RESET     ESC  MENU", 20, MangaType.caption())
-	hint.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
-	hint.grow_vertical = Control.GROW_DIRECTION_BEGIN
-	hint.position = Vector2(24, -40)
-	_hud.add_child(hint)
+	_hint = MangaType.label("", 20, MangaType.caption())
+	_hint.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
+	_hint.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	_hint.position = Vector2(24, -40)
+	_hud.add_child(_hint)
 	_show_toast(HubLayout.PLACES[HubChallenge.return_to]["name"] if HubLayout.PLACES.has(HubChallenge.return_to) else "BARANGAY")
