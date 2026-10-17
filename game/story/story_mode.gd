@@ -143,6 +143,8 @@ static func unpack(text: String) -> PackedFloat32Array:
 const BAKED_PATH := "res://game/story/baked_passes.json"
 static var baked: Array = []
 static var _baked_loaded := false
+## Off while baking the floor itself (tools/bake_passes.gd): the driven passes are kept as driven.
+static var use_floor := true
 
 
 static func baked_passes() -> Array:
@@ -159,7 +161,7 @@ static func add_pass(label: String, frames: PackedFloat32Array, splits: PackedFl
 	var passes: Array = record.get("passes", [])
 	var entry := { "label": label, "frames": pack(frames), "splits": Array(splits), "time": time }
 	var slot := passes.size()
-	var floor := baked_passes()
+	var floor := baked_passes() if use_floor else []
 	if slot < floor.size() and float(floor[slot]["time"]) < time:
 		entry = { "label": label, "frames": floor[slot]["frames"], "splits": Array(floor[slot]["splits"]),
 			"time": float(floor[slot]["time"]) }

@@ -265,6 +265,11 @@ func test_baked_passes_floor_the_line_study() -> void:
 	_check(StoryMode.unpack(passes[0]["frames"]) == fast["frames"], "...and the baked frames")
 	_check(absf(float(passes[1]["time"]) - quick["time"]) < 1e-6, "a pass quicker than the floor is kept")
 	_check(absf(float(passes[2]["time"]) - slow["time"]) < 1e-6, "a slot with nothing baked keeps what was driven")
+	StoryMode.use_floor = false
+	StoryMode.record = {}
+	StoryMode.add_pass("PASS A", slow["frames"], slow["splits"], slow["time"])
+	_check(absf(float(StoryMode.record["passes"][0]["time"]) - slow["time"]) < 1e-6, "with the floor off (baking) a slow pass is kept")
+	StoryMode.use_floor = true
 	StoryMode.baked = baked_before
 	StoryMode.record = record_before
 
