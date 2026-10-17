@@ -133,6 +133,20 @@ func test_memory_of_walks_the_script() -> void:
 	_check(StoryScript.memory_of(0) == "", "the prologue is not a memory")
 
 
+func test_old_save_restarts_the_story() -> void:
+	var path := "user://test_story_old.json"
+	var f := FileAccess.open(path, FileAccess.WRITE)
+	f.store_string(JSON.stringify({ "beat": 12, "record": { "passes": [1] }, "results": { "s03": 1 }, "reached": 20 }))
+	f.close()
+	var before := StoryMode.save_path
+	StoryMode.save_path = path
+	StoryMode.load_save()
+	StoryMode.save_path = before
+	_check(StoryMode.beat == 0 and StoryMode.record.is_empty() and StoryMode.results.is_empty() and StoryMode.reached == 0,
+		"a save from another script order starts over")
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
+
+
 func test_every_storyboard_scene_has_a_beat() -> void:
 	var scenes := {}
 	for b in StoryScript.BEATS:

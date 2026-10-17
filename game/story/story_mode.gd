@@ -10,6 +10,9 @@ extends RefCounted
 
 ## Where progress is saved (probes point it elsewhere).
 static var save_path := "user://story.json"
+## The beat order the save's position belongs to: a save from another order starts over (its
+## recorded passes meant something else there).
+const SCRIPT_VERSION := 2
 const PASS_SCENE := "res://scenes/touge.tscn"
 const HUB_SCENE := "res://scenes/hub.tscn"
 const PANEL_SCENE := "res://scenes/story_panel.tscn"
@@ -41,10 +44,12 @@ static func load_save() -> void:
 	beat = 0
 	record = {}
 	results = {}
+	reached = 0
+	completed = false
 	if not has_save():
 		return
 	var data = JSON.parse_string(FileAccess.get_file_as_string(save_path))
-	if data is Dictionary:
+	if data is Dictionary and int(data.get("script", 0)) == SCRIPT_VERSION:
 		beat = int(data.get("beat", 0))
 		record = data.get("record", {})
 		results = data.get("results", {})
@@ -56,8 +61,8 @@ static func save() -> void:
 	var f := FileAccess.open(save_path, FileAccess.WRITE)
 	if f == null:
 		return
-	f.store_string(JSON.stringify({ "beat": beat, "record": record, "results": results, "reached": reached,
-		"completed": completed, "date": Time.get_datetime_string_from_system() }))
+	f.store_string(JSON.stringify({ "script": SCRIPT_VERSION, "beat": beat, "record": record, "results": results,
+		"reached": reached, "completed": completed, "date": Time.get_datetime_string_from_system() }))
 	f.close()
 
 
