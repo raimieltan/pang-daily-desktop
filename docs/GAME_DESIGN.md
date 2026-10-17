@@ -220,7 +220,7 @@ Tuning is a small set of sliders that each change something the player can feel 
 - Save up to 3 setups per car (for example "Uphill", "Downhill", "Rain").
 - Changes apply on the next run; a quick test lane sits next to the talyer.
 - Tuning is free; parts that unlock sliders cost money.
-- Build note: each slider maps onto a preset override, the same way the drift tunes do. Today the pause menu only toggles stock / drift tune (T) and stock / street tires (Y).
+- Build note (Oct 17, 2026): built as `CarSetup` (`game/vehicle/car_setup.gd`): nine sliders in steps −3..+3 around stock, laid over the car's physical config (`CarSetup.apply`), three setups a car saved to `user://setups.json`, a TUNING page off the garage and the pause menu with the hint for the slider in focus. Every slider is open until parts exist to gate them. The pause menu still toggles stock / drift tune and stock / street tires.
 
 ## Upgrades and parts
 
@@ -405,7 +405,7 @@ The MVP is one mountain road, the four performance cars, three ladder rivals and
 - [x] Time attack with sector splits, PB ghost, instant restart
 - [ ] SP battle mode — *VS battle built; gauge not*
 - [ ] Local leaderboard per car, direction and condition — *partial: PB per road + car + tune*
-- [ ] 9 tuning sliders, 3 saved setups
+- [x] 9 tuning sliders, 3 saved setups — *no parts gating yet*
 - [ ] 10–15 parts across tires, brakes, suspension, weight, LSD
 - [ ] Tire, brake and cooling wear, with repair at the talyer
 - [ ] Wallet, payouts, transaction log, delivery job as fallback income

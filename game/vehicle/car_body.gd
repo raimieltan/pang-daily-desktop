@@ -34,6 +34,8 @@ var collision_config := {
 signal wall_contact(point: Vector3, normal: Vector3, dv: float, slide: float)
 
 var model: HandlingModel
+## Tuning steps on top of the preset (CarSetup), empty for stock.
+var setup := {}
 var solver: SuspensionSolver
 var contact := VehicleTypes.AxleContact.new()
 ## Returns a `VehicleTypes.DriverInput` for this step. Defaults to no input.
@@ -115,8 +117,18 @@ func toggle_tune() -> void:
 
 func set_preset(id: String) -> void:
 	preset = id
-	model.set_config(HandlingPresets.resolve(id))
+	_apply_config()
 	_update_mass()
+
+
+## The player's setup (CarSetup values) laid over the preset's physical config.
+func set_setup(values: Dictionary) -> void:
+	setup = values.duplicate(true)
+	_apply_config()
+
+
+func _apply_config() -> void:
+	model.set_config(CarSetup.apply(HandlingPresets.physical_config(HandlingPresets.resolve(preset)), setup))
 
 
 ## Fresh, warm tires of a product on dry asphalt (TS `tireResponse` for a new assembly).

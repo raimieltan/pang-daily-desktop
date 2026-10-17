@@ -22,9 +22,9 @@ const FINAL_SCALE := 0.04
 const LSD_LOCK := 0.15
 
 const SLIDERS := [
-	{ "key": "pressure", "label": "TIRE PRESSURE", "hint": "LOWER = MORE GRIP, LAZIER STEERING" },
+	{ "key": "pressure", "label": "TIRE PSI", "hint": "LOWER = MORE GRIP, LAZIER STEERING" },
 	{ "key": "height", "label": "RIDE HEIGHT", "hint": "LOWER = LESS LEAN, SHARPER TURN-IN" },
-	{ "key": "spring", "label": "SPRING STIFFNESS", "hint": "STIFFER = LESS ROLL, QUICKER TO LOAD UP; SKIPS OVER PATCHES" },
+	{ "key": "spring", "label": "SPRINGS", "hint": "STIFFER = LESS ROLL, QUICKER TO LOAD UP; SKIPS OVER PATCHES" },
 	{ "key": "damping", "label": "DAMPING", "hint": "SOFTER SOAKS BUMPS; TOO STIFF = SKIPS OVER PATCHES" },
 	{ "key": "camber", "label": "CAMBER", "hint": "MORE NEGATIVE = MORE CORNER GRIP, LESS BRAKING" },
 	{ "key": "toe", "label": "TOE", "hint": "TOE-OUT = QUICKER TURN-IN, LESS STABLE ON THE STRAIGHT" },

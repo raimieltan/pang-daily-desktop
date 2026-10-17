@@ -55,6 +55,7 @@ func _ready() -> void:
 	car.input_source = _read_input
 	car.preset = car_spec["preset"]
 	add_child(car)
+	car.set_setup(CarSetup.values(car_spec["id"]))
 	car.global_position = _spawn["position"]
 	car.rotation.y = _spawn["heading"]
 	_add_visual()
@@ -143,6 +144,7 @@ func set_car(id: String) -> void:
 		return
 	car_spec = spec
 	car.set_preset(spec["preset"])
+	car.set_setup(CarSetup.values(id))
 	car.set_tire_product(car.tire_product)
 	if visual:
 		car.remove_child(visual)

@@ -31,7 +31,14 @@ var _story_list: VBoxContainer
 var _settings_first: Button
 ## Where BACK on the settings page goes: the title or the pause menu.
 var _settings_return: Callable
-var _bars: Array[InkBar] = []
+var _bars: Array[Control] = []
+## Tuning page: the session car's setup sliders, where BACK goes, the car's name and the hint.
+const SETUP_ROW := 500
+var _tuning := Control.new()
+var _tuning_first: Button
+var _tuning_return: Callable
+var _tuning_car: Label
+var _tuning_hint: Label
 var _opponents_button: Button
 var _rival_button: Button
 var _title_first: Button
@@ -71,6 +78,7 @@ func _ready() -> void:
 	_build_pause()
 	_build_garage()
 	_build_settings()
+	_build_tuning()
 	_build_story()
 	GameSettings.apply_audio()
 	if music:
@@ -136,6 +144,7 @@ func _build_pause() -> void:
 		func(): session.car.toggle_tune())
 	_value_button(left, func(): return "TIRES: " + session.car.tire_product.to_upper(),
 		func(): session.car.set_tire_product("street" if session.car.tire_product == "stock" else "stock"))
+	_button(left, "TUNING", func(): _open_tuning(open_pause))
 	_button(left, "SETTINGS", func(): _open_settings(open_pause))
 	_button(left, "MAIN MENU", _main_menu)
 	_button(left, "QUIT", get_tree().quit)
@@ -195,6 +204,8 @@ func _build_garage() -> void:
 		GameSettings.set_value("sp_rival", (int(GameSettings.value("sp_rival")) + 1) % VsBattle.RIVALS.size()))
 	_rival_button.custom_minimum_size.x = 400
 	_rival_button.focus_entered.connect(func(): _show_card(session.car_spec))
+	var tune := _button(left, "TUNING", func(): _open_tuning(func(): _open_garage(_garage_mode.text, _garage_next)))
+	tune.focus_entered.connect(func(): _show_card(session.car_spec))
 	_button(left, "BACK", open_title)
 
 	# Spec card: turntable in the car shader, a drivetrain stamp, name and blurb in Bangers.
@@ -304,6 +315,89 @@ func _build_settings() -> void:
 	hint.remove_theme_constant_override("outline_size")
 	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	column.add_child(hint)
+
+
+## Tuning (docs/GAME_DESIGN.md "Tuning system"): the nine setup sliders for the session's car,
+## Ruel's plain-words hint for the one in focus, and three saved setups. A change applies at once
+## and is saved; the time-attack category (car + stock/drift tune) is unchanged by a setup.
+func _build_tuning() -> void:
+	_tuning.set_anchors_preset(Control.PRESET_FULL_RECT)
+	add_child(_tuning)
+	var column := _column(_tuning)
+	column.add_child(MangaType.label("TUNING", 84))
+	_tuning_car = _slab("", MangaType.RED)
+	column.add_child(_tuning_car)
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 40)
+	column.add_child(row)
+	var left := VBoxContainer.new()
+	left.add_theme_constant_override("separation", 4)
+	row.add_child(left)
+	var right := VBoxContainer.new()
+	right.add_theme_constant_override("separation", 4)
+	row.add_child(right)
+	_tuning_first = _value_button(left, func(): return CarSetup.slot_name(CarSetup.slot(_tuning_id())), func():
+		CarSetup.set_slot(_tuning_id(), (CarSetup.slot(_tuning_id()) + 1) % CarSetup.SLOTS)
+		_apply_setup())
+	_tuning_first.custom_minimum_size.x = SETUP_ROW
+	_tuning_first.focus_entered.connect(func(): _tuning_hint.text = "THREE SETUPS A CAR. ENTER PICKS THE NEXT ONE.")
+	for i in CarSetup.SLIDERS.size():
+		_setup_row(left if i < 5 else right, CarSetup.SLIDERS[i])
+	var reset := _button(right, "RESET SETUP", func():
+		CarSetup.reset(_tuning_id())
+		_apply_setup())
+	reset.custom_minimum_size.x = SETUP_ROW
+	reset.focus_entered.connect(func(): _tuning_hint.text = "BACK TO STOCK, THIS SETUP ONLY.")
+	_tuning_hint = MangaType.label("", 22, MangaType.caption())
+	_tuning_hint.add_theme_color_override("font_color", MangaType.INK)
+	_tuning_hint.remove_theme_constant_override("outline_size")
+	_tuning_hint.custom_minimum_size = Vector2(SETUP_ROW * 2 + 40, 30)
+	column.add_child(_tuning_hint)
+	var back := _button(column, "BACK", func(): _tuning_return.call())
+	back.focus_entered.connect(func(): _tuning_hint.text = "← →  ADJUST     ENTER  NEXT     ESC  BACK")
+
+
+## One slider: its label and signed steps, a bar of boxes with the current step inked, ← → to
+## move, ENTER to step up (wrapping).
+func _setup_row(parent: Control, slider: Dictionary) -> Button:
+	var key: String = slider["key"]
+	var change := func(v: int) -> void:
+		CarSetup.set_value(_tuning_id(), key, v)
+		_apply_setup()
+	var b := _value_button(parent, func(): return slider["label"], func():
+		var v := CarSetup.steps(CarSetup.values(_tuning_id()), key)
+		change.call(CarSetup.LO if v >= CarSetup.HI else v + 1))
+	b.custom_minimum_size.x = SETUP_ROW
+	var bar := SetupBar.new()
+	bar.button = b
+	bar.value = func() -> int: return CarSetup.steps(CarSetup.values(_tuning_id()), key)
+	b.add_child(bar)
+	_bars.append(bar)
+	b.focus_entered.connect(func():
+		_tuning_hint.text = slider["hint"]
+		bar.queue_redraw())
+	b.focus_exited.connect(bar.queue_redraw)
+	b.gui_input.connect(func(e: InputEvent) -> void:
+		var step := -1 if e.is_action_pressed("ui_left") else (1 if e.is_action_pressed("ui_right") else 0)
+		if step != 0:
+			b.accept_event()
+			change.call(clampi(CarSetup.steps(CarSetup.values(_tuning_id()), key) + step, CarSetup.LO, CarSetup.HI)))
+	return b
+
+
+func _tuning_id() -> String:
+	return session.car_spec["id"]
+
+
+func _apply_setup() -> void:
+	session.car.set_setup(CarSetup.values(_tuning_id()))
+	_refresh()
+
+
+func _open_tuning(back_to: Callable) -> void:
+	_tuning_return = back_to
+	_tuning_car.text = session.car_spec["name"]
+	_show(_tuning, _tuning_first)
 
 
 ## Story mode: "The Ghost Line" (docs/story/STORY_MODE.md). Continue, start over, or replay an act
@@ -517,6 +611,7 @@ func _show(screen: Control, first: Button) -> void:
 	_pause.visible = screen == _pause
 	_garage.visible = screen == _garage
 	_settings.visible = screen == _settings
+	_tuning.visible = screen == _tuning
 	_story.visible = screen == _story
 	_wash.visible = true
 	_refresh()
@@ -530,6 +625,7 @@ func _close() -> void:
 	_pause.visible = false
 	_garage.visible = false
 	_settings.visible = false
+	_tuning.visible = false
 	_story.visible = false
 	_wash.visible = false
 	get_viewport().gui_release_focus()
@@ -650,6 +746,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		open_title()
 	elif _settings.visible:
 		_settings_return.call()
+	elif _tuning.visible:
+		_tuning_return.call()
 	elif not _title.visible:
 		open_pause()
 
@@ -737,6 +835,43 @@ class CarPreview extends SubViewportContainer:
 
 ## A setting's level as a row of slanted ink boxes, filled up to the value. Paper on the lit
 ## (focused) button, ink otherwise.
+## A setup slider's signed steps and boxes, LO..HI left to right, the current step inked and
+## stock marked.
+class SetupBar extends Control:
+	const BOX := Vector2(14, 20)
+	const GAP := 4.0
+	const NUMBER := 48.0
+	var button: Button
+	var value: Callable
+
+	func _ready() -> void:
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
+		var w := NUMBER + (CarSetup.HI - CarSetup.LO + 1) * (BOX.x + GAP)
+		anchor_left = 1.0
+		anchor_right = 1.0
+		anchor_top = 0.5
+		anchor_bottom = 0.5
+		offset_left = -w - 16.0
+		offset_right = -16.0
+		offset_top = -BOX.y / 2.0
+		offset_bottom = BOX.y / 2.0
+
+	func _draw() -> void:
+		var lit := button.has_focus()
+		var ink := MangaType.PAPER if lit else MangaType.INK
+		var v: int = value.call()
+		draw_string(MangaType.caption(), Vector2(0.0, BOX.y - 2.0), "%+d" % v, HORIZONTAL_ALIGNMENT_LEFT, NUMBER - 8.0, 22, ink)
+		for i in range(CarSetup.LO, CarSetup.HI + 1):
+			var x := NUMBER + (i - CarSetup.LO) * (BOX.x + GAP)
+			var r := Rect2(x, 0.0, BOX.x, BOX.y)
+			if i == v:
+				draw_rect(r, ink)
+			else:
+				draw_rect(r, ink, false, 2.0)
+			if i == 0:
+				draw_line(Vector2(x + BOX.x / 2.0, BOX.y + 3.0), Vector2(x + BOX.x / 2.0, BOX.y + 7.0), ink, 2.0)
+
+
 class InkBar extends Control:
 	const BOX := Vector2(18, 22)
 	const GAP := 6.0
