@@ -3,7 +3,8 @@ extends Node3D
 ## Rain on the page: ink streaks falling round the camera (paper streaks at night), a darker, sheened
 ## road (`manga_wet` in the world shader), mist, a rain loop, and less grip for every car on the road.
 ## `wet` 0..1 is the road (grip and sheen); `rain` 0..1 is what is falling. Damp road, no rain: wet
-## only. Grip on a soaked road is WET_GRIP of dry, the step change the story's last night run hinges on.
+## only. From the driver's seat the rain is on the glass too (Windscreen). Grip on a soaked road
+## is WET_GRIP of dry, the step change the story's last night run hinges on.
 
 const WET_GRIP := 0.62
 const RAIN_LOOP := preload("res://assets/audio/ambience/rain_loop.wav")
@@ -24,6 +25,9 @@ var rain := 0.0:
 		_apply_rain()
 ## Extra grip scale on top of the wet road (1 = none); the story's damp middle sector uses it.
 var grip_scale := 1.0
+## The view is from inside a car that is not the chase camera's (a parked-car scene): show the glass.
+var cabin := false
+var windscreen: Windscreen
 var _particles: GPUParticles3D
 var _material: StandardMaterial3D
 var _audio: AudioStreamPlayer
@@ -61,6 +65,8 @@ func _ready() -> void:
 	_audio.stream = CarAudio._looped(RAIN_LOOP)
 	_audio.bus = "Ambience" if AudioServer.get_bus_index("Ambience") >= 0 else "Master"
 	add_child(_audio)
+	windscreen = Windscreen.new()
+	add_child(windscreen)
 	var env_node := get_viewport().find_child("WorldEnvironment", true, false) as WorldEnvironment
 	if env_node == null:
 		for n in get_tree().root.find_children("*", "WorldEnvironment", true, false):
@@ -117,5 +123,11 @@ func _process(_delta: float) -> void:
 		camera = get_viewport().get_camera_3d()
 	if camera:
 		_particles.global_position = camera.global_position + Vector3(0, 9, 0) - camera.global_basis.z * 6.0
+	# Rain on the glass whenever the view is from the driver's seat.
+	var chase := camera as ChaseCamera
+	var hood := chase != null and chase.current and chase.mode == ChaseCamera.Mode.HOOD
+	windscreen.shown = cabin or hood
+	windscreen.rain = rain
+	windscreen.speed = chase.target.linear_velocity.length() if hood and chase.target else 0.0
 	# Ink by day, paper streaks in the headlights at night.
 	_material.albedo_color = Color(MangaType.INK, 0.55).lerp(Color(MangaType.PAPER, 0.5), MangaArt.night)

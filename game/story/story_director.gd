@@ -516,7 +516,6 @@ func _crash(b: Dictionary) -> void:
 		ai.racing = true
 		session.input_filter = func(_i: VehicleTypes.DriverInput) -> VehicleTypes.DriverInput: return ai.input()
 		dialogue.fade(false, 1.2)
-		dialogue.sfx("wiper", -6.0)
 		_fragments()
 	else:
 		await _settle(b)
