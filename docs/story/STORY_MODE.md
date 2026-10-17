@@ -31,7 +31,7 @@ It is reached from the title screen (STORY). It sits beside the racing grind, no
 
 ## Structure
 
-The script is `game/story/story_script.gd` (`StoryScript.BEATS`): 47 beats in play order, every storyboard scene S00–S35 at least once (a unit test enforces it). Each beat is one scene, or one piece of a scene, on a **stage**:
+The script is `game/story/story_script.gd` (`StoryScript.BEATS`): 45 beats in play order, every storyboard scene S00–S35 at least once (a unit test enforces it). **The story is told from after the crash** (Oct 17, 2026 restructure, `docs/superpowers/specs/2026-10-17-story-flashback-restructure-design.md`): the player lives the present and the months before come back as four memories, each triggered by something in the present. The edit (the storyboard's S06 laptop scene) is withheld, so "Ghost is you" and "it never happened" land in Act III with the player's own recorded passes. Each beat is one scene, or one piece of a scene, on a **stage**:
 
 | Stage | Scene | Used for |
 | --- | --- | --- |
@@ -42,16 +42,20 @@ The script is `game/story/story_script.gd` (`StoryScript.BEATS`): 47 beats in pl
 
 `StoryDirector` plays beats while they are on its scene's stage; when the next beat needs another stage, `StoryMode` changes scene and that scene's director carries on. Progress saves after every beat (`user://story.json`).
 
-| Act | Beats | Playable drives |
+| Act | Beats (present · **MEMORY**) | Playable drives |
 | --- | --- | --- |
 | Prologue · The Missing Seconds | S00 cold open (fragments of the night, hood camera, cut to black) | — (authored) |
-| I · Before Ghost | S01–S13 | R1 "Nothing to Lose" (barangay loop, must win), R2 "Nico's Lesson" (Pass 1, 1v1), A Line Study (3 recorded passes), R3 Chase the Composite, R4 Combined-Sector Challenge, R5 The Last Night Run |
-| II · The Return | S14–S20 | R6 First Return (barangay loop, the flinch), R7 Nico Repeats the Test (3 flying sectors) |
-| III · The Ghost Is You | S21–S26 | R8 The Sector Trials (3 sectors under their source conditions, then one continuous run) |
-| IV · What Happened on the Mountain | S27–S31 | — (investigation) |
+| I · The Return | S14, S15 · **MONTHS BEFORE: S01, S02, S03, S04, S05** · S16, S17 · **THE LINE STUDY: S06** · S20 (Dante, suspicion) | R1 "Nothing to Lose", R2 "Nico's Lesson" (memories); R6 First Return (the flinch); A Line Study (3 recorded passes, memory) |
+| II · The Ghost | S18, S19 · **GHOST GOES PUBLIC: S07, S08, S09, S10** · S21, S22 (Ghost is you) | R7 Nico Repeats the Test; R3 Chase the Composite, R4 Combined-Sector Challenge (memories) |
+| III · The Ghost Is You | S23, S24, S25 (it never happened), S26 | R8 The Sector Trials, then one continuous run |
+| IV · What Happened on the Mountain | **THE WEEK OF THE NIGHT RUN: S11, S12, S13** · S27, S28, S29, S30 (Dante, proof), S31 | R5 The Last Night Run (memory) |
 | V · The Road Is Not a Recording | S32–S35 | D1 The Daylight Road (no clock) |
 
-The storyboard's quality gate holds: no stretch of the post-crash investigation goes without a playable drive (S16, S18, S26).
+The data order holds the story order: the Ghost Line is cut from S06's passes, so S06 precedes every chase of it; the crash log read in S28 is recorded in S13. A unit test pins both.
+
+## Memories
+
+The first beat of a memory carries `"memory": <period>` and opens on its comic page (the present-day trigger: the wrench, the clip on Buko's phone, Jolo's camera bag, the bent sign at 8A). Inside a memory the page is warm (`StoryTint`, one multiply wash over the 3D pass and the UI), the period is stamped top right for the whole memory, races included, Jolo has a face and Pang has no scar. The first beat back carries `"now": <sound>`: a hard cut to black on a present-day sound, then the present comes up stamped NOW. `StoryScript.memory_of(index)` derives all of it from the beat index, so a resumed save looks right. In the present, talk and evidence beats with no weather of their own get rain and an overcast sky; drive beats keep theirs (the trials are dry evidence). Jolo's present-day lines are footage ("(on the clip)") and show no portrait.
 
 ## Beat types
 
@@ -138,6 +142,7 @@ A page is 1–4 panels (the layout follows the count). Panel art: `face` (the sp
 
 ## Not built / open
 
-- Comic pages for the transitions in Acts II–V.
+- Comic pages for the non-memory transitions in Acts II–V.
+- Full-colour / watercolour memories: the world is modelled in grey (one lit value per preset; Blender colours are discarded on import), so colour is an art-pipeline project. The warm tint is the cheap version.
 - The parked-car scenes show the view out of the windscreen; there is no car interior or passenger.
 - Story races use the base handling; no tuning or parts in story mode.
