@@ -117,18 +117,40 @@ func split(sector: int, time: float, reference: float) -> void:
 	_split_timer = 3.0
 
 
-func finish(time: float, previous_best: float, record: bool, label := "BEST") -> void:
+## The results card: the time, each sector with its delta to the reference run's sector, the
+## theoretical best from the best sectors ever, and the record or the gap to the best.
+func finish(time: float, previous_best: float, record: bool, label := "BEST", splits := PackedFloat64Array(),
+		ref_splits: Array = [], sectors: Array = []) -> void:
+	_goal_text.text = "\n".join(result_lines(time, splits, ref_splits, sectors, previous_best, record, label))
+	_goal.visible = true
+
+
+static func result_lines(time: float, splits: PackedFloat64Array, ref_splits: Array, sectors: Array,
+		previous_best: float, record: bool, label: String) -> Array:
 	var lines := ["G O A L", "", TimeAttackRun.format_time(time)]
+	for k in splits.size():
+		var s := splits[k] - (splits[k - 1] if k > 0 else 0.0)
+		var line := "S%d  %.3f" % [k + 1, s]
+		if ref_splits.size() > k:
+			var r := float(ref_splits[k]) - (float(ref_splits[k - 1]) if k > 0 else 0.0)
+			var delta := s - r
+			var sign := "+" if delta > 1e-4 else ("−" if delta < -1e-4 else "±")
+			line += "  %s%.3f" % [sign, absf(delta)]
+		lines.append(line)
+	var theoretical := TimeAttackRecords.theoretical(sectors)
+	if theoretical >= 0.0:
+		lines.append("THEORETICAL  " + TimeAttackRun.format_time(theoretical))
 	if record:
 		lines.append("NEW RECORD!" if previous_best > 0.0 else "FIRST RECORD")
 		if previous_best > 0.0:
-			lines.append("−%.3f" % (previous_best - time))
+			lines.append("−%.3f" % absf(previous_best - time))
 	else:
 		lines.append(label + "  " + TimeAttackRun.format_time(previous_best))
+		if previous_best > 0.0:
+			lines.append("+%.3f" % (time - previous_best))
 	lines.append("")
 	lines.append("[ENTER] RUN AGAIN")
-	_goal_text.text = "\n".join(lines)
-	_goal.visible = true
+	return lines
 
 
 ## `frozen` ≥ 0 holds the timer at that time (a decided SP battle).

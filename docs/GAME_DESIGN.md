@@ -377,7 +377,7 @@ The HUD stays minimal during runs; the garage and results screens carry the deta
 - Top right: current time, sector number *(built)*
 - Bottom right: speed (km/h), gear, RPM *(built, speedometer)*
 - Bottom left: warning lights for tires, brakes, temperature *(not built)*
-- VS battle: position *(built)*; SP battle: both SP gauges at the top, rival name *(not built)*
+- VS battle: position *(built)*; SP battle: both SP gauges at the top, rival name *(built: `SpGauge`, draining toward the centre)*
 
 **Screens**
 
@@ -417,7 +417,7 @@ The MVP is one mountain road, the four performance cars, three ladder rivals and
 
 1. **M0 Feel.** One car on a grey-box road. Gate: driving one corner 20 times in a row is fun. *Built; gate not formally playtested.*
 2. **M1 Road.** First mountain road, night lighting, downhill + uphill. Gate: a full run feels memorable and learnable. *Mostly built: downhill only.*
-3. **M2 Times.** Splits, PB ghost, results screen, instant restart. Gate: "one more run" happens without prompting. *Mostly built: results screen is thin.*
+3. **M2 Times.** Splits, PB ghost, results screen, instant restart. Gate: "one more run" happens without prompting. *Built: the GOAL card shows the time, each sector with its delta to the best run, the theoretical best (quickest sectors ever, kept per track and car), and the record or the gap to it.*
 4. **M3 Tune.** Sliders, parts, PI, garage. Gate: testers can feel each slider change. *Next.*
 5. **M4 Cost.** Wallet, payouts, wear, repairs, Marketplace. Gate: testers make a repair-vs-upgrade choice and care.
 6. **M5 Rivals.** SP battles, rivals 1–3, KYO and talyer hubs with lines. Gate: beating BUKO feels earned.

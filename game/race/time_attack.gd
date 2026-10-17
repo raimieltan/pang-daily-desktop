@@ -151,7 +151,8 @@ func _physics_process(delta: float) -> void:
 				hud.split(k, run.splits[k], float(ref[k]) if k < ref.size() else -1.0)
 			"finish":
 				var record := records and TimeAttackRecords.submit(track_id, _car_id(), run.time, run.splits, _record)
-				hud.finish(run.time, float(best.get("time", -1.0)), record, best_label)
+				var sectors: Array = TimeAttackRecords.submit_sectors(track_id, _car_id(), run.splits) if records else []
+				hud.finish(run.time, float(best.get("time", -1.0)), record, best_label, run.splits, best.get("splits", []), sectors)
 				finished.emit(run.time, record)
 	if run.phase == TimeAttackRun.Phase.RUNNING:
 		_sample_clock += delta

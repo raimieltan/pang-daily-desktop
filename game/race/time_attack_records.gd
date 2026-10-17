@@ -3,7 +3,8 @@ extends RefCounted
 ## Local best times and ghosts (user://), per track and car. A ghost is the car's pose sampled at
 ## `GHOST_HZ`: position (3) + rotation quaternion (4) floats per frame.
 
-const DIR := "user://time_attack/"
+## Where records live; probes point it elsewhere so they never touch the player's times.
+static var DIR := "user://time_attack/"
 const GHOST_HZ := 20.0
 
 
@@ -39,6 +40,56 @@ static func submit(track_id: String, car_id: String, time: float, splits: Packed
 	g.store_buffer(ghost.to_byte_array())
 	g.close()
 	return true
+
+
+# --- Best sectors -----------------------------------------------------------------------------
+## The quickest time ever driven through each sector, kept across every finished run (not only
+## records); their sum is the theoretical best on the results card.
+
+const SECTORS := 4
+
+
+static func merge_sectors(prev: Array, splits: PackedFloat64Array) -> Array:
+	if splits.size() < SECTORS:
+		return prev
+	var own := []
+	for k in SECTORS:
+		own.append(splits[k] - (splits[k - 1] if k > 0 else 0.0))
+	if prev.size() != SECTORS:
+		return own
+	var out := []
+	for k in SECTORS:
+		out.append(minf(float(prev[k]), own[k]))
+	return out
+
+
+static func theoretical(sectors: Array) -> float:
+	if sectors.size() < SECTORS:
+		return -1.0
+	var sum := 0.0
+	for s in sectors:
+		sum += float(s)
+	return sum
+
+
+static func load_sectors(track_id: String, car_id: String) -> Array:
+	var path := DIR + _key(track_id, car_id) + ".sectors.json"
+	if not FileAccess.file_exists(path):
+		return []
+	var data = JSON.parse_string(FileAccess.get_file_as_string(path))
+	return data if data is Array else []
+
+
+## Folds a finished run's splits into the stored best sectors; returns the result.
+static func submit_sectors(track_id: String, car_id: String, splits: PackedFloat64Array) -> Array:
+	var sectors := merge_sectors(load_sectors(track_id, car_id), splits)
+	if sectors.size() == SECTORS:
+		DirAccess.make_dir_recursive_absolute(DIR)
+		var f := FileAccess.open(DIR + _key(track_id, car_id) + ".sectors.json", FileAccess.WRITE)
+		if f:
+			f.store_string(JSON.stringify(sectors))
+			f.close()
+	return sectors
 
 
 ## Ghost pose at `t` seconds into the run, interpolated; empty when past the end.
