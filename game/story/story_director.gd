@@ -304,6 +304,10 @@ func _hold(on: bool) -> void:
 		session.input_filter = Callable()
 		_leave_cabin()
 		session.camera.current = true
+		# The gauges are hidden when a story scene loads (the intro and the menu own them), so the
+		# clean feed's "restore" after dialogue restored them hidden: a drive beat shows them.
+		session.gauges.visible = true
+		session.day_night.visible = true
 
 
 func _leave_cabin() -> void:
