@@ -828,8 +828,9 @@ func build_gantry(parent: Node3D, owner: Node, distance: float, label: String, c
 	text.modulate = MangaArt.PAPER
 	text.outline_modulate = MangaArt.INK
 	text.outline_size = 24
+	# The root's -Z runs down the road, so the cars arrive on its +Z side, where a Label3D reads
+	# as it is. The map scene is baked (tools/build_map.gd): a change here needs a rebuild.
 	text.position = Vector3(0, 4.9, 0.1)
-	text.rotation.y = PI   # face oncoming cars
 	root.add_child(text)
 	text.owner = owner
 
