@@ -62,8 +62,8 @@ The build covers the driving, the first road, time attack, SP battles, a drivabl
 | Art | Manga-panel look: B&W screentone world, coloured cars, ink skids, smoke, sparks | `game/art/`, `docs/ART_DIRECTION.md` |
 | Trailer | Movie Maker capture tooling and a Remotion edit for a 30 s vertical trailer | `trailer/` |
 | Barangay hub | Drivable neighbourhood: Kyo Coffee (parked rivals to challenge), Ruel's talyer (swap cars), cruising rivals to flash, the road up to Pass 1 | `scenes/hub.gd`, `game/world/` |
-| Weather | Rain (ink streaks, mist, rain loop), wet road look (`manga_wet`) and wet grip (× 0.62) on every car; used by story mode, no toggle in free modes yet | `game/world/weather.gd` |
-| Story mode | "The Ghost Line": 47 beats over S00–S35, dialogue, phone feed, act cards, recorded practice passes cut into the Ghost Line, flying sector trials, the authored night run, evidence board, daylight ending; headless end-to-end probe | `game/story/`, `docs/story/STORY_MODE.md` |
+| Weather | Rain (ink streaks, mist, rain loop), wet road look (`manga_wet`) and wet grip (× 0.62) on every car; rain on the windscreen with wipers in hood view; used by story mode, no toggle in free modes yet | `game/world/weather.gd`, `game/world/windscreen.gd` |
+| Story mode | "The Ghost Line": 47 beats over S00–S35, dialogue, phone feed, act cards, recorded practice passes cut into the Ghost Line, flying sector trials, the authored night run, evidence board, daylight ending; speaker portraits; 3D rooms (clinic, rented room, Jolo's home); Hiligaynon/Taglish dialogue; headless end-to-end probe | `game/story/`, `scenes/story_room.gd`, `docs/story/STORY_MODE.md` |
 
 **Partial**
 
@@ -421,7 +421,7 @@ The MVP is one mountain road, the four performance cars, three ladder rivals and
 4. **M3 Tune.** Sliders, parts, PI, garage. Gate: testers can feel each slider change. *Next.*
 5. **M4 Cost.** Wallet, payouts, wear, repairs, Marketplace. Gate: testers make a repair-vs-upgrade choice and care.
 6. **M5 Rivals.** SP battles, rivals 1–3, KYO and talyer hubs with lines. Gate: beating BUKO feels earned.
-7. **M6 Polish.** Sound, camera feel, rain, trailer capture. Gate: ready for a public demo. *Done early: car audio, cameras, replays, trailer capture and edit. Missing: rain.*
+7. **M6 Polish.** Sound, camera feel, rain, trailer capture. Gate: ready for a public demo. *Done early: car audio, cameras, replays, trailer capture and edit, rain (story mode only so far).*
 
 **Out of scope for MVP:** online leaderboards and ghosts, multiplayer, walking, police, open world, a second story, drag and point-to-point, car buying, a longer Pass 1. (Story mode "The Ghost Line" is built; it is outside the MVP loop.)
 

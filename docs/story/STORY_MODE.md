@@ -21,7 +21,7 @@ It is reached from the title screen (STORY). It sits beside the racing grind, no
 | The mechanic | Ruel runs the talyer everywhere in the game; he replaces Tito Jun (hub sign, place name and NPC line renamed). |
 | Nico | A new rival for the story only: Dalagan GSR in pearl white, AI skill 0.97. He is not in the VS/SP ladder. |
 | Existing cast | KAPITAN, TISOY, BUKO, ATE LIZA (and RJ, a meet regular) are the scene: they race the meets, post in the group chat and tell the rumours. JUNJUN does not appear. |
-| Rooms the game does not build | The rented room, the parked car, Jolo's family home and the group chat play on paper panels (`scenes/story_panel.tscn`), not built 3D sets. |
+| Rooms | The clinic, the rented room and Jolo's family home are small 3D sets (`scenes/story_room.tscn`, built by `tools/world_builders/build-story-rooms.py`). The parked-car scenes play from the driver's seat outside Pang's home, drops on the glass. Act cards, the group chat and the S19 memory montage stay on paper panels (`scenes/story_panel.tscn`). |
 | Walking | None. "Playable exploration" scenes are drive-to objectives in the barangay plus dialogue at the place. |
 | The crash | The player drives the night run up to the approach to 8A; from 70 m out the night plays as it happened (too fast for the wet, late brakes, a sharp correction). No button prompt pretends it can be avoided. |
 | Beating the Ghost Line | Allowed. If the player's run beats it, "beaten" lines replace the usual ones (Dante: "Unofficial… Ghost Time stands."); the story never tells the player they failed when they did not. |
@@ -34,8 +34,9 @@ The script is `game/story/story_script.gd` (`StoryScript.BEATS`): 47 beats in pl
 | Stage | Scene | Used for |
 | --- | --- | --- |
 | `pass` | `scenes/touge.tscn` (Pass 1) | Races, practice, the Ghost Line runs, sector trials, the night run, the overlook, the daylight drive |
-| `hub` | `scenes/hub.tscn` (the barangay) | The talyer, Kyo Coffee, the gas-station meet, the meet loop races, drive-to objectives |
-| `panel` | `scenes/story_panel.tscn` (paper page) | Act cards, the group chat, rooms with no 3D set |
+| `hub` | `scenes/hub.tscn` (the barangay) | The talyer, Kyo Coffee, the gas-station meet, the meet loop races, drive-to objectives, the parked car (`cabin`: from the driver's seat) |
+| `room` | `scenes/story_room.tscn` (a small set) | The clinic and the rented room (S14, cut between with `["~set", name]`), Jolo's family home (S32) |
+| `panel` | `scenes/story_panel.tscn` (paper page) | Act cards, the group chat, the memory montage (S19) |
 
 `StoryDirector` plays beats while they are on its scene's stage; when the next beat needs another stage, `StoryMode` changes scene and that scene's director carries on. Progress saves after every beat (`user://story.json`).
 
@@ -55,7 +56,7 @@ The storyboard's quality gate holds: no stretch of the post-crash investigation 
 | Type | What the player does | Built from |
 | --- | --- | --- |
 | `chapter` | Reads an act card | `StoryDialogue.chapter` |
-| `talk` | Reads dialogue (speech panels, ink narration boxes, or the phone feed); the car is parked and a fixed camera frames the place | `StoryDialogue.play`, `StoryDirector.SPOT_VIEWS` |
+| `talk` | Reads dialogue (speech panels with the speaker's portrait, ink narration boxes, or the phone feed); the car is parked and a fixed camera frames the place | `StoryDialogue.play`, `StoryPortrait`, `StoryDirector.SPOT_VIEWS`, `StoryRoom.SETS` |
 | `goto` | Drives to a barangay place (objective with distance) | `HubLayout.PLACES` areas |
 | `race` | VS race on Pass 1 or one lap of the barangay loop against a story field | `VsBattle.field_override` |
 | `practice` | Three timed passes under labelled conditions, each recorded | `TimeAttack` (`records = false`), `StoryRecorder` |
@@ -80,7 +81,7 @@ Frames are `StoryRecorder` samples at 20 Hz: position, rotation, speed, steering
 
 ## The night run
 
-- Night, rain (ink streaks round the camera, mist), wet road (grip × 0.62, darker tar with sheen in the ruts), worn fronts, the Ghost Line brighter than usual.
+- Night, rain (ink streaks round the camera, mist, drops and wipers on the glass in hood view), wet road (grip × 0.62, darker tar with sheen in the ruts), worn fronts, the Ghost Line brighter than usual.
 - Jolo's lines come as subtitles at points on the road ("Different here." … "Pang, listen.").
 - From 170 m out, a car's lights move uphill on the leg below 8A (the lower switchback), 12–24° off the nose through the trees.
 - From 70 m out the director takes the wheel: full throttle where the dry practice was already braking, brakes at 24 m, then the wet patch (grip × 0.55) and the correction (hard one way, then the other) under "Drive the road!". It ends on the first hard contact, leaving the road, or 2.6 s after braking: a white frame, the impact, black and silence, a pulse.
@@ -116,6 +117,9 @@ Synthesized by `tools/audio/make_story_sfx.py` (all original): `assets/audio/sto
 | `game/story/story_script.gd` | The beats and their lines |
 | `game/story/story_director.gd` | Plays beats on a stage (races, practice, trials, crash, daylight, evidence) |
 | `game/story/story_dialogue.gd` | Speech panels, narration, phone feed, act cards, cuts, SFX |
+| `game/story/story_portrait.gd` | Speaker portraits, ink busts drawn in code (`tools/portrait_sheet.gd` renders them all) |
+| `scenes/story_room.tscn`, `tools/world_builders/build-story-rooms.py` | The room stage and its sets |
+| `game/world/windscreen.gd` | Rain on the glass and wipers in hood view |
 | `game/story/evidence_board.gd` | Evidence cards and questions |
 | `game/story/ghost_line.gd` | The composite |
 | `game/story/story_recorder.gd`, `story_ghost.gd`, `story_course.gd` | Recording, the ghost car, where 8A and the lower road are |
@@ -126,10 +130,12 @@ Synthesized by `tools/audio/make_story_sfx.py` (all original): `assets/audio/sto
 | `tests/probe_story.gd` | The whole story headless, AI driving: `godot --headless --fixed-fps 120 --path . -s res://tests/probe_story.gd [-- beat_id]` |
 | `tools/story_shot.gd` | Screenshots from any beat (needs a window) |
 
+## Language
+
+The cast code-switches the way people in Iloilo do: Ruel, Jolo, the regulars, the witness and Jolo's parents speak Hiligaynon in casual and emotional lines; Dante speaks Taglish; Nico and the evidence (sectors, loggers, cards) stay in English. Lines the story leans on ("Drive the road!", "The road won't be the same twice") stay as the manuscript has them. The Hiligaynon has not been checked by a native speaker yet.
+
 ## Not built / open
 
-- Character art: speakers are named on ink slabs; there are no portraits.
-- Jolo's family home, the clinic and the parked car are paper panels, not 3D sets.
-- Wiper and in-car rain on the glass in hood view.
-- Taglish/Hiligaynon: most lines follow the English manuscript; only the barangay regulars speak Hiligaynon/Taglish. A localisation pass is open.
+- A native Hiligaynon speaker's pass over the dialogue.
+- The parked-car scenes show the view out of the windscreen; there is no car interior or passenger.
 - Story races use the base handling; no tuning or parts in story mode.
