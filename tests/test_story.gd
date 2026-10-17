@@ -274,6 +274,30 @@ func test_baked_passes_floor_the_line_study() -> void:
 	StoryMode.record = record_before
 
 
+## The floor ships: three baked passes, each a whole run of Pass 1 (4 splits, frames to match), quick
+## enough that the cut over them is a target and not a lap.
+func test_the_baked_floor_is_shipped() -> void:
+	var baked_before := StoryMode.baked
+	StoryMode.baked = []
+	StoryMode._baked_loaded = false
+	var floor := StoryMode.baked_passes()
+	_check(floor.size() == 3, "three baked passes (got %d)" % floor.size())
+	var sources: Array = []
+	for p in floor:
+		var frames := StoryMode.unpack(p["frames"])
+		var splits := PackedFloat64Array(p["splits"])
+		_check(splits.size() == 4 and float(p["time"]) > 60.0 and float(p["time"]) < 95.0,
+			"a whole pass with 4 splits in 60..95 s (got %.1f)" % float(p["time"]))
+		_check(absf(frames.size() / GhostLine.STRIDE - float(p["time"]) * GhostLine.HZ) < GhostLine.HZ,
+			"frames cover the pass at %d Hz" % int(GhostLine.HZ))
+		sources.append({ "label": p["label"], "frames": frames, "splits": splits, "time": float(p["time"]) })
+	if floor.size() == 3:
+		var g := GhostLine.composite(sources)
+		_check(g.valid() and g.time < 90.0, "the cut over the floor is under 1:30 (got %.1f)" % g.time)
+	StoryMode.baked = baked_before
+	StoryMode._baked_loaded = false
+
+
 ## Dante's number: the posted GHOST TIME is the cut's time with something taken off, and beating
 ## it in public moves it under the run that beat it ("Ghost responded").
 func test_posted_ghost_time_is_shorter_than_the_cut() -> void:

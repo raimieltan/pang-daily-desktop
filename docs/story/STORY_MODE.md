@@ -24,7 +24,7 @@ It is reached from the title screen (STORY). It sits beside the racing grind, no
 | Rooms | The clinic, the rented room and Jolo's family home are small 3D sets (`scenes/story_room.tscn`, built by `tools/world_builders/build-story-rooms.py`). The parked-car scenes play from the driver's seat outside Pang's home, drops on the glass. Act cards, the group chat and the S19 memory montage stay on paper panels (`scenes/story_panel.tscn`). |
 | Walking | None. "Playable exploration" scenes are drive-to objectives in the barangay plus dialogue at the place. |
 | The crash | The player drives the night run up to the approach to 8A; from 70 m out the night plays as it happened (too fast for the wet, late brakes, a sharp correction). No button prompt pretends it can be avoided. |
-| Beating the Ghost Line | Allowed. If the player's run beats it, "beaten" lines replace the usual ones (Dante: "Unofficial… Ghost Time stands."); the story never tells the player they failed when they did not. |
+| Beating the Ghost Line | Allowed, and never dismissed. The line study has a floor (baked passes), so the cut is never a lap anyone could beat by driving the study badly. The public number is Dante's, a little under the cut: beat the car in the clip but not the clock and the board says otherwise ("ahead" lines); beat the clock in public and Dante reposts a time under yours, "Ghost responded" ("beaten" lines), which Act III pays off. Against the cut itself (R3, the sector trials) a beating simply stands. |
 | Language | All dialogue is in English (Oct 17 playtest: the Hiligaynon/Taglish pass read badly and was reverted). The Iloilo setting stays in names, places and signage. |
 | Between scenes | Manga pages (`StoryComic`): a beat's `comic` pages play before it and `comic_after` after it, one panel per press, so scene changes and the cold open are bridged by panels instead of hard jumps. Every scene change fades through black; the car's sound is muted while a page is up. |
 | Scoring | Story races record place and time only. The daylight drive has no clock, medal or unlock. No achievement for "beating Ghost" or for forgiveness. |
@@ -79,7 +79,8 @@ Jolo's "COMPOSITE LINE STUDY — BEST SECTORS / NOT ONE RUN" is `GhostLine.compo
 
 - Pass 1 is split into 4 equal sectors (as in time attack). For each sector the fastest pass is taken; if that leaves fewer than three passes in the cut, the cheapest swaps bring in the others (a best-of that is one pass is not a composite).
 - The frames are cut together back to back: the clip looks continuous, but at each join the car steps sideways, the speed trace steps, and the logger clock (time into the source pass) resets. Those are the seams the player finds in S18 and S25.
-- GHOST TIME is the sum of the chosen sectors. It is the target in R3, R4 and the night run, and the reference in the sector trials.
+- The cut's time is the sum of the chosen sectors: the target in R3 and the reference in Nico's tests and the sector trials. GHOST TIME as posted is Dante's number, the cut less `StoryMode.POSTED_CUT` (3%), its splits scaled to it: the target at R4 and on the night run, the `{ghost_time}` token, and the GHOST row of the challenge board. The car in the clip always drives the cut, so at R4 you can finish ahead of it and still be behind the clock. Beating the posted time at R4 reposts it `REPOST_MARGIN` under your run (`StoryMode.repost`, kept in the record), and the night run chases that.
+- The floor: `game/story/baked_passes.json` holds three passes an AI drove on the limit (`tools/bake_passes.gd`). `StoryMode.add_pass` keeps a recorded pass only if it is quicker than the baked pass in its slot; otherwise the baked driving goes in under the player's label. The evidence (raw clips, the steering match, the sign) reads the record, so it stays consistent whichever passes are in it.
 - The pass conditions are part of the evidence: Pass A dry with the 8A chevron board straight; Pass B with damp patches (sheen only, no grip loss) and the board bent on its post; Pass C dry in low sun. The board is a prop on the outside of 8A (`StoryDirector.SignAt8A`), bent from Pass B on.
 - By R3 the car's front tires are worn (grip × 0.95, Ruel says so before the run): the car the player has then is not the one in the clip.
 
@@ -128,6 +129,7 @@ Synthesized by `tools/audio/make_story_sfx.py` (all original): `assets/audio/sto
 | `game/world/windscreen.gd` | Rain on the glass and wipers in hood view |
 | `game/story/evidence_board.gd` | Evidence cards and questions |
 | `game/story/ghost_line.gd` | The composite |
+| `game/story/baked_passes.json`, `tools/bake_passes.gd` | The line study's floor and the tool that bakes it: `godot --headless --fixed-fps 120 --path . -s res://tools/bake_passes.gd -- [skill]` |
 | `game/story/story_recorder.gd`, `story_ghost.gd`, `story_course.gd` | Recording, the ghost car, where 8A and the lower road are |
 | `tools/audio/make_story_sfx.py` | Synthesizes the story's sounds |
 | `game/world/weather.gd` | Rain, wet road, mist, wet grip (usable outside the story) |
