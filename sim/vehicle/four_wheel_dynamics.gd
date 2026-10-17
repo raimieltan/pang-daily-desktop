@@ -266,7 +266,7 @@ func _integrate(dt: float, input: VehicleTypes.DriverInput, contact: VehicleType
 			s.neutral = true
 	else:
 		_held_neutral = false
-		var wants_reverse := not s.reversing and raw_brake > 0.5 and raw_throttle < 0.1 and speed < engage_below \
+		var wants_reverse := not input.hold and not s.reversing and raw_brake > 0.5 and raw_throttle < 0.1 and speed < engage_below \
 			and (_brake_was_released or not s.neutral)
 		_reverse_timer = _reverse_timer + dt if wants_reverse else 0.0
 		if wants_reverse and _reverse_timer >= low_speed["reverseDelaySeconds"]:
@@ -276,7 +276,7 @@ func _integrate(dt: float, input: VehicleTypes.DriverInput, contact: VehicleType
 		if s.reversing and raw_throttle > 0.5 and raw_brake < 0.1 and speed < engage_below:
 			s.reversing = false
 	# The automatic's reverse swaps the pedals (brake drives backwards); a manual's never do.
-	var swap := s.reversing and not input.manual
+	var swap := s.reversing and not input.manual and not input.hold
 	var rear_slip := (absf(wheels[2].slip_ratio) + absf(wheels[3].slip_ratio)) / 2.0
 	var hb: Dictionary = c["handbrake"]
 	var pedals: Dictionary = (c["pedals"] as Dictionary).duplicate()

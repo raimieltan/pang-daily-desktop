@@ -116,6 +116,7 @@ func _filter_input(input: VehicleTypes.DriverInput) -> VehicleTypes.DriverInput:
 	if active and (run == null or run.phase == TimeAttackRun.Phase.COUNTDOWN):
 		input.brake = 1.0
 		input.handbrake = 0.0
+		input.hold = true
 	return input
 
 

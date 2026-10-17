@@ -263,6 +263,7 @@ func _hold(on: bool) -> void:
 			i.brake = 1.0
 			i.steer = 0.0
 			i.handbrake = 0.0
+			i.hold = true
 			return i
 	else:
 		session.input_filter = Callable()
@@ -519,6 +520,7 @@ func _flying_sector(k: int) -> float:
 	session.input_filter = func(i: VehicleTypes.DriverInput) -> VehicleTypes.DriverInput:
 		if standing and run.phase == TimeAttackRun.Phase.COUNTDOWN:
 			i.brake = 1.0
+			i.hold = true
 		return i
 	_ghost_car = _ghost_car if _ghost_car else _make_ghost_car()
 	var index := t.nearest_index(session.car.global_position)

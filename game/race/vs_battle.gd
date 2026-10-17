@@ -218,6 +218,7 @@ func _filter_input(input: VehicleTypes.DriverInput) -> VehicleTypes.DriverInput:
 		input.throttle = minf(input.throttle, 1.0)
 		input.brake = 1.0
 		input.handbrake = 0.0
+		input.hold = true
 	return _roll_cap(input, session.car, run.progress - drivers[0].distance if run and drivers.size() > 0 else 0.0)
 
 

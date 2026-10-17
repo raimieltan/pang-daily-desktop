@@ -74,3 +74,20 @@ func test_steering_follows_the_key_in_reverse() -> void:
 		_run(m, 1.5, 0.0, 1.0, -1.0)
 		_check(m.state.vx < 0.0, "%s: holding lock in reverse does not whip the car round" % preset)
 		_check(m.state.vx > -26.0 / 3.6, "%s: reverse stays under its top speed (%.1f km/h)" % [preset, -m.state.vx * 3.6])
+
+
+## A scene or countdown holding the brake after the player has been driving: the car stops and
+## stays stopped (the automatic used to read it as a reverse request and back away at full power).
+func test_a_held_brake_never_reverses_the_car() -> void:
+	for manual in [false, true]:
+		var m := HandlingModel.new(HandlingPresets.resolve("fwd_sport_hatch"))
+		var contact := VehicleTypes.AxleContact.grounded()
+		_run(m, 2.0, 1.0, 0.0, 0.0, manual)
+		_run(m, 0.3, 0.0, 0.0, 0.0, manual)
+		for n in roundi(6.0 / DT):
+			var i := VehicleTypes.DriverInput.make(0.0, 1.0, 0.0, 0.0, "keyboard")
+			i.manual = manual
+			i.hold = true
+			m.step(DT, i, contact)
+		_check(not m.state.reversing and absf(m.state.vx) < 0.5,
+			"manual=%s: held brake keeps the car stopped (reversing %s, %.1f km/h)" % [manual, m.state.reversing, m.state.vx * 3.6])
