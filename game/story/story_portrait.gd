@@ -53,12 +53,13 @@ static func scarred_at(index: int) -> bool:
 	return StoryScript.memory_of(index) == "" and index >= StoryScript.index_of("a1_card")
 
 
-## Jolo's face appears only inside a memory; present-day JOLO lines are footage.
+## Jolo's face appears only while he is alive: inside a memory, and in the prologue (the crash
+## night itself); present-day JOLO lines are footage.
 static func has_face(who: String, index: int) -> bool:
 	var name := who.strip_edges()
 	if not LOOKS.has(name):
 		return false
-	return name != "JOLO" or StoryScript.memory_of(index) != ""
+	return name != "JOLO" or StoryScript.memory_of(index) != "" or index < StoryScript.index_of("a1_card")
 
 
 func _draw() -> void:

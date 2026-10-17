@@ -205,16 +205,17 @@ func _lines(b: Dictionary, key: String) -> void:
 # --- Stage control ----------------------------------------------------------------------------
 
 
-## The present after the crash: rain and an overcast sky on every talk, evidence and drive-to
-## beat that sets no weather of its own. Drive beats keep theirs (the trials are dry evidence).
+## The present after the crash: rain and an overcast sky on every talk and evidence beat that
+## sets no weather of its own, until Act V. Drive beats (drive-to included) keep theirs: the
+## trials are dry evidence.
 const PRESENT := { "rain": 0.4, "wet": 0.7, "night_value": 0.3 }
 
 
 ## Night (0..1), rain and wet for a beat: its own keys, else the present-day default outside a
-## memory for scene beats, else clear.
-static func conditions_for(b: Dictionary, in_memory: bool) -> Dictionary:
+## memory for scene beats before the ending, else clear.
+static func conditions_for(b: Dictionary, in_memory: bool, ending := false) -> Dictionary:
 	var own := b.has("rain") or b.has("wet") or b.has("night") or b.has("night_value")
-	var present: bool = not in_memory and not own and str(b.get("type", "")) in ["talk", "evidence", "goto"]
+	var present: bool = not in_memory and not ending and not own and str(b.get("type", "")) in ["talk", "evidence"]
 	var rain := float(b.get("rain", PRESENT["rain"] if present else 0.0))
 	var night := 1.0 if b.get("night", false) else float(b.get("night_value", PRESENT["night_value"] if present else 0.0))
 	return { "night": night, "rain": rain, "wet": float(b.get("wet", PRESENT["wet"] if present else (1.0 if rain > 0.0 else 0.0))) }
@@ -222,7 +223,7 @@ static func conditions_for(b: Dictionary, in_memory: bool) -> Dictionary:
 
 ## Night, rain and wet road for the beat (talk backdrops included).
 func _conditions(b: Dictionary) -> void:
-	var c := conditions_for(b, StoryScript.memory_of(StoryMode.beat) != "")
+	var c := conditions_for(b, StoryScript.memory_of(StoryMode.beat) != "", StoryMode.beat >= StoryScript.index_of("a5_card"))
 	MangaArt.apply_night(c["night"])
 	if weather:
 		weather.rain = c["rain"]
@@ -304,10 +305,14 @@ func _hold(on: bool) -> void:
 		session.input_filter = Callable()
 		_leave_cabin()
 		session.camera.current = true
-		# The gauges are hidden when a story scene loads (the intro and the menu own them), so the
-		# clean feed's "restore" after dialogue restored them hidden: a drive beat shows them.
-		session.gauges.visible = true
-		session.day_night.visible = true
+		_show_drive_hud()
+
+
+## The gauges are hidden when a story scene loads (the intro and the menu own them), so the
+## clean feed's "restore" after dialogue restored them hidden: a drive beat shows them.
+func _show_drive_hud() -> void:
+	session.gauges.visible = true
+	session.day_night.visible = true
 
 
 func _leave_cabin() -> void:
@@ -556,6 +561,7 @@ func _flying_sector(k: int) -> float:
 	hud.visible = true
 	hud.show_run({ "time": _ghost.sector_time(k) }, "GHOST S%d" % (k + 1))
 	session.set_clean_feed(false)
+	_show_drive_hud()
 	session.input_filter = func(i: VehicleTypes.DriverInput) -> VehicleTypes.DriverInput:
 		if standing and run.phase == TimeAttackRun.Phase.COUNTDOWN:
 			i.brake = 1.0

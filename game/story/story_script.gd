@@ -232,8 +232,8 @@ const BEATS := [
 		] },
 	{ "id": "s06", "scene": "S06", "stage": "pass", "type": "practice", "title": "A LINE STUDY", "memory": "THE LINE STUDY",
 		"comic": [[
-			{ "art": "black", "cap": "Buko's phone, face up on the table at Kyo. The clip again. The passenger-side angle, low on the glass. Pang knew that angle." },
-			{ "art": "tone", "cap": "Jolo's camera on the dash of his own car, a Tuesday in the dry, THE LINE STUDY. It began with a joke." },
+			{ "art": "black", "cap": "Buko's phone, face up on the table at Kyo. The clip again. A passenger-side angle, low on the glass, the road coming up through the rain on the lens." },
+			{ "art": "tone", "cap": "Rain on glass. Pang looked at it until something older came up instead: a Tuesday in the dry, months before. THE LINE STUDY. It began with a joke." },
 			{ "art": "face", "who": "JOLO", "side": "left", "say": "Three passes. I'm rolling the whole time. Drive it like nobody's watching." },
 			{ "art": "face", "who": "PANG", "side": "right", "say": "You're literally watching." },
 		]],
@@ -305,7 +305,7 @@ const BEATS := [
 	{ "id": "s07", "scene": "S07", "stage": "panel", "type": "talk", "style": "phone", "memory": "GHOST GOES PUBLIC",
 		"comic": [[
 			{ "art": "black", "cap": "Jolo's camera bag, where he left it under the bench. The strap still set to his shoulder." },
-			{ "art": "tone", "cap": "By the next afternoon, the clip had a different name. Dante had posted it, and someone in the comments called the driver Ghost." },
+			{ "art": "tone", "cap": "By the next afternoon Dante had posted a clip: a reference pace, an anonymous driver. Someone in the comments called him Ghost." },
 			{ "art": "tone", "cap": "THE WEEK GHOST WENT PUBLIC." },
 		]],
 		"place": "PASS 1 RUNNERS (PRIVATE GROUP)", "when": "THE NEXT AFTERNOON", "lines": [
@@ -317,8 +317,8 @@ const BEATS := [
 		["BUKO", "Ghost. Okay. Anyone trying to beat it?"],
 		["DANTE", "Saturday. Pass 1. Sector targets on the board. Bring your best."],
 		["~place", "KYO COFFEE · LATER"],
-		["JOLO", "Dante took the notes off."],
-		["PANG", "What notes? It looks good."],
+		["JOLO", "Dante took something off it."],
+		["PANG", "Off what? It looks good."],
 		["JOLO", "That's not the point."],
 		["PANG", "Then what is?"],
 		["", "Jolo watched the clip a second time and did not answer."],
@@ -535,7 +535,7 @@ const BEATS := [
 			{ "art": "face", "who": "JOLO", "side": "right", "say": "We're here." },
 		]] },
 	{ "id": "s13", "scene": "S13", "stage": "pass", "type": "crash", "title": "THE LAST NIGHT RUN", "grip": 0.95 },
-	{ "id": "s27", "scene": "S27", "stage": "pass", "type": "evidence", "at": "overlook", "place": "PASS 1 · ABOVE 8A", "when": "DAYLIGHT", "now": "wiper",
+	{ "id": "s27", "scene": "S27", "stage": "pass", "type": "evidence", "at": "overlook", "place": "PASS 1 · ABOVE 8A", "when": "DAYLIGHT", "now": "wiper", "night_value": 0.0, "wet": 0.0,
 		"before": [
 			["NICO", "From here, the lower section runs behind that ridge. A car on it would be hidden for most of the bend, then its lights would show through the gap."],
 			["WITNESS", "I was leaving the sari-sari store. A car went up the lower road. I saw the lights in the trees. I didn't see it come up to the top bend."],
@@ -600,7 +600,7 @@ const BEATS := [
 			["NICO", "It may cost you more than the races did."],
 			["PANG", "I know that too."],
 		] },
-	{ "id": "s30", "scene": "S30", "stage": "hub", "type": "talk", "spot": "kyo", "place": "KYO COFFEE", "when": "LATE SUN", "lines": [
+	{ "id": "s30", "scene": "S30", "stage": "hub", "type": "talk", "spot": "kyo", "place": "KYO COFFEE", "when": "LATE SUN", "night_value": 0.3, "wet": 0.0, "lines": [
 		["", "The folder was open on the table between them: v1, with its title card. Dante did not pretend not to recognise it."],
 		["PANG", "A target no one could complete."],
 		["DANTE", "People wanted something impossible. A driver who could not be found, a number nobody could touch. I gave the scene what it was asking for."],

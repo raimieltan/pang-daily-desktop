@@ -155,6 +155,24 @@ func test_present_day_default_only_touches_talk_beats() -> void:
 	_check(StoryDirector.conditions_for(talk, true)["rain"] == 0.0, "a memory stays dry")
 	_check(StoryDirector.conditions_for(drive, false)["rain"] == 0.0, "drive beats keep their own conditions")
 	_check(StoryDirector.conditions_for(dry_talk, false)["wet"] == 0.0, "explicit conditions win")
+	var drive_to := { "id": "g", "type": "goto" }
+	_check(StoryDirector.conditions_for(drive_to, false)["rain"] == 0.0, "a drive-to is a drive: no default rain")
+	_check(StoryDirector.conditions_for(talk, false, true)["rain"] == 0.0, "the ending (Act V) is past the rain")
+	for id in ["s27", "s30"]:
+		var beat: Dictionary = StoryScript.BEATS[StoryScript.index_of(id)]
+		_check(StoryDirector.conditions_for(beat, false)["rain"] == 0.0, "%s is dry by its own data" % id)
+
+
+func test_the_entry_pages_keep_the_twist() -> void:
+	# Before the backup folder (s21) no caption or line may tie the clip to Pang's own car.
+	var stop := StoryScript.index_of("s21")
+	for i in stop:
+		var b: Dictionary = StoryScript.BEATS[i]
+		for page in b.get("comic", []):
+			for panel in page:
+				for key in ["cap", "say"]:
+					var t: String = str(panel.get(key, "")).to_lower()
+					_check(not ("knew that angle" in t) and not ("different name" in t), "%s: page gives the clip away: %s" % [b["id"], t])
 
 
 func test_scar_only_in_the_present_after_the_prologue() -> void:
@@ -163,6 +181,7 @@ func test_scar_only_in_the_present_after_the_prologue() -> void:
 	_check(not StoryPortrait.scarred_at(StoryScript.index_of("s03")), "no scar inside a memory")
 	_check(not StoryPortrait.has_face("JOLO", StoryScript.index_of("s22")), "Jolo has no face in the present")
 	_check(StoryPortrait.has_face("JOLO", StoryScript.index_of("s03")), "Jolo has a face in a memory")
+	_check(StoryPortrait.has_face("JOLO", StoryScript.index_of("s00")), "Jolo has a face in the cold open (he is alive)")
 
 
 func test_every_storyboard_scene_has_a_beat() -> void:
