@@ -362,6 +362,7 @@ func subtitle(who: String, text: String, seconds := 3.5) -> void:
 func chapter(act: String, title: String, sub: String) -> void:
 	_card_act.text = act
 	_card_title.text = title
+	_fit_title(title)
 	_card_sub.text = sub
 	_card.modulate.a = 0.0
 	_card.visible = true
@@ -374,6 +375,17 @@ func chapter(act: String, title: String, sub: String) -> void:
 		await advanced
 	await create_tween().tween_property(_card, "modulate:a", 0.0, 0.4).finished
 	_card.visible = false
+
+
+## Shrink the act title until it fits the page with a margin ("WHAT HAPPENED ON THE MOUNTAIN" at
+## 84 px is wider than the 1152 px canvas).
+func _fit_title(title: String) -> void:
+	var font := _card_title.get_theme_font("font")
+	var size := 84
+	while size > 40 and font.get_string_size(title, HORIZONTAL_ALIGNMENT_LEFT, -1, size).x + size / 3.0 > 1040.0:
+		size -= 2
+	_card_title.add_theme_font_size_override("font_size", size)
+	_card_title.add_theme_constant_override("outline_size", maxi(6, size / 6))
 
 
 ## Fade the page to black (or back).
