@@ -75,7 +75,7 @@ func test_comic_pages_are_well_formed() -> void:
 						_check(StoryDialogue.SFX.has(p["sfx"]), "%s: sound %s exists" % [where, p["sfx"]])
 					if p.has("side"):
 						_check(p["side"] in ["left", "right"], "%s: side %s" % [where, p["side"]])
-		if b.get("cold_open", false) or b["stage"] == "panel":
+		if b.get("cold_open", false) or b["stage"] == "panel" or b.has("memory"):
 			for page in b.get("comic", []):
 				for p in page:
 					_check(p.get("art", "") != "snap", "%s: no scene to freeze behind the page" % b["id"])
@@ -92,6 +92,45 @@ func test_comic_layouts_fit_the_page() -> void:
 		for i in rects.size():
 			for j in range(i + 1, rects.size()):
 				_check(not rects[i].intersects(rects[j]), "%d-panel rects %d and %d apart" % [n, i, j])
+
+
+func test_the_order_keeps_the_twist() -> void:
+	var i := StoryScript.index_of
+	_check(i.call("s06e") == -1, "the laptop scene is withheld")
+	for id in ["s18", "s08", "s09", "s26"]:
+		_check(i.call("s06") < i.call(id), "%s needs the passes from s06" % id)
+	for id in ["s27", "s28", "s29"]:
+		_check(i.call("s13") < i.call(id), "%s needs the crash log from s13" % id)
+	_check(i.call("s14") < i.call("s01"), "the clinic comes before the first memory")
+	_check(i.call("s20") < i.call("s21") and i.call("s21") < i.call("s30"), "Dante: suspicion, the files, proof")
+	for b in StoryScript.BEATS:
+		if b["id"] == "s06":
+			for p in b["passes"]:
+				_check(not ("8A" in p["label"]), "s06 labels do not mention the sign")
+
+
+func test_memories_open_and_close() -> void:
+	var open := ""
+	var count := 0
+	for b in StoryScript.BEATS:
+		if b.has("memory"):
+			_check(open == "", "%s: memory opens while %s is open" % [b["id"], open])
+			_check(b.has("comic"), "%s: a memory opens on a comic page" % b["id"])
+			open = b["id"]
+			count += 1
+		if b.has("now"):
+			_check(open != "", "%s: now with no memory open" % b["id"])
+			_check(StoryDialogue.SFX.has(b["now"]), "%s: now sound exists" % b["id"])
+			open = ""
+	_check(open == "", "the last memory closes")
+	_check(count == 4, "four memories (got %d)" % count)
+
+
+func test_memory_of_walks_the_script() -> void:
+	_check(StoryScript.memory_of(StoryScript.index_of("s03")) == "MONTHS BEFORE", "s03 is in the first memory")
+	_check(StoryScript.memory_of(StoryScript.index_of("s16")) == "", "s16 is the present")
+	_check(StoryScript.memory_of(StoryScript.index_of("s13")) != "", "the night run is a memory")
+	_check(StoryScript.memory_of(0) == "", "the prologue is not a memory")
 
 
 func test_every_storyboard_scene_has_a_beat() -> void:
