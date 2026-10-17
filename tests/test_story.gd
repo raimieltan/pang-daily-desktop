@@ -163,6 +163,24 @@ func test_present_day_default_only_touches_talk_beats() -> void:
 		_check(StoryDirector.conditions_for(beat, false)["rain"] == 0.0, "%s is dry by its own data" % id)
 
 
+## No hard jumps: a beat that starts somewhere new (after an act card, on another stage, or at
+## another place in the barangay) opens on comic pages, unless the beat before it left on pages,
+## or the beat is a memory's entry or the NOW cut back (which bridge themselves). Act cards, gotos,
+## the end and paper-panel beats are pages of their own.
+func test_scene_changes_are_bridged_by_pages() -> void:
+	var prev := {}
+	for b in StoryScript.BEATS:
+		var skip: bool = b["type"] in ["chapter", "end", "goto"] or b["stage"] == "panel" or b.has("memory") or b.has("now")
+		if not skip and not prev.is_empty():
+			var spot_prev: String = str(prev.get("spot", prev.get("place", ""))) if prev["type"] != "chapter" else ""
+			var spot: String = str(b.get("spot", ""))
+			var changes: bool = prev["type"] == "chapter" or prev["stage"] != b["stage"] \
+				or (spot != "" and spot_prev != "" and spot != spot_prev)
+			var bridged: bool = b.has("comic") or prev.has("comic_after")
+			_check(not changes or bridged, "%s starts somewhere new without pages (after %s)" % [b["id"], prev["id"]])
+		prev = b
+
+
 func test_the_entry_pages_keep_the_twist() -> void:
 	# Before the backup folder (s21) no caption or line may tie the clip to Pang's own car.
 	var stop := StoryScript.index_of("s21")

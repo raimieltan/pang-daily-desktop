@@ -63,6 +63,10 @@ const BEATS := [
 	{ "id": "a1_card", "scene": "S14", "stage": "panel", "type": "chapter",
 		"act": "ACT I", "title": "THE RETURN", "subtitle": "Grief, rumours, and a name nobody can place." },
 	{ "id": "s14", "scene": "S14", "stage": "room", "type": "talk", "set": "clinic", "place": "THE CLINIC", "when": "AFTER THE CRASH",
+		"comic": [[
+			{ "art": "white", "cap": "The clinic. A ceiling he learned by heart, a window that showed weather and nothing else." },
+			{ "art": "tone", "cap": "Twenty-three days. Nobody said the name Jolo in the room, so it was in the room all the time." },
+		]],
 		"lines": [
 		["", "His body had healed in uneven patches. A scar climbed from his collar toward his shoulder."],
 		["~set", "rented_room"],
@@ -77,6 +81,10 @@ const BEATS := [
 		["RUEL", "The car's at the shop. So is the camera card. And the logger. Come when you're ready."],
 	] },
 	{ "id": "s15", "scene": "S15", "stage": "hub", "type": "evidence", "spot": "talyer", "place": "RUEL'S TALYER", "when": "AFTER THE CRASH",
+		"comic": [[
+			{ "art": "tone", "cap": "Ruel's talyer, the first time back. The car under a tarp in the far bay. On the bench, in a sandwich bag: a cracked phone card and the logger." },
+			{ "art": "face", "who": "RUEL", "side": "right", "say": "Take your time. They've waited this long." },
+		]],
 		"before": [
 			["RUEL", "I thought you might want them when you were ready."],
 			["PANG", "Did they find the other driver?"],
@@ -272,6 +280,10 @@ const BEATS := [
 	{ "id": "a2_card", "scene": "S18", "stage": "panel", "type": "chapter",
 		"act": "ACT II", "title": "THE GHOST", "subtitle": "A line nobody can finish, and the one who posted it." },
 	{ "id": "s18", "scene": "S18", "stage": "pass", "type": "sectors", "title": "NICO REPEATS THE TEST",
+		"comic": [[
+			{ "art": "road", "cap": "Pass 1, a weekday morning. Nico's GSR at the top with a notebook on the roof. No crowd, no board." },
+			{ "art": "face", "who": "NICO", "side": "right", "say": "Flying start into each one. I call the sector, you drive it, I write it down." },
+		]],
 		"before": [["NICO", "Flying sectors. I'll put the ghost on each one. Match it, then we look at the joins."]],
 		"trials": [
 			{ "sector": 0, "label": "SECTOR 1", "wet": 0.0, "night": 0.0, "note": ["NICO", "Close. That's the easy part. Now the middle."] },
@@ -433,7 +445,12 @@ const BEATS := [
 	# ===================================================================== ACT III  ·  THE GHOST IS YOU
 	{ "id": "a3_card", "scene": "S23", "stage": "panel", "type": "chapter",
 		"act": "ACT III", "title": "THE GHOST IS YOU", "subtitle": "The clip is yours. Then: it never happened." },
-	{ "id": "s23", "scene": "S23", "stage": "hub", "type": "talk", "spot": "talyer", "night": true, "place": "RUEL'S TALYER", "when": "AFTER CLOSING", "lines": [
+	{ "id": "s23", "scene": "S23", "stage": "hub", "type": "talk", "spot": "talyer", "night": true, "place": "RUEL'S TALYER", "when": "AFTER CLOSING",
+		"comic": [[
+			{ "art": "black", "cap": "After closing. Ruel's laptop on the bench, the backup drive beside it. GHOST_LINE/v1, the title card still on." },
+			{ "art": "tone", "cap": "Jolo's voice came out of the small speaker as if from the next room." },
+		]],
+		"lines": [
 		["JOLO", "(on the clip) Pang. Pang. Don't lift there. Okay, lift there."],
 		["PANG", "(on the clip) Make up your mind."],
 		["JOLO", "(on the clip) I'm the camera. The camera doesn't have a mind."],
@@ -445,7 +462,11 @@ const BEATS := [
 		["RUEL", "The clock under the video. It doesn't count like one run."],
 	] },
 	{ "id": "s24", "scene": "S24", "stage": "hub", "type": "talk", "spot": "home", "cabin": true, "glass": 0.35,
-		"place": "THE CAR, PARKED", "when": "AFTER THE CHALLENGE · ANOTHER ANGLE", "night": true, "lines": [
+		"place": "THE CAR, PARKED", "when": "AFTER THE CHALLENGE · ANOTHER ANGLE", "night": true,
+		"comic": [[
+			{ "art": "rain", "cap": "He drove home and did not go in. The phone on the passenger seat, the other folder open: the same night, from the dash." },
+		]],
+		"lines": [
 		["", "Ruel found it in a separate folder: the same night in the car, filmed from the dash."],
 		["", "On Jolo's phone, readable now: COMPOSITE LINE STUDY — BEST SECTORS / NOT ONE RUN."],
 		["JOLO", "There is something about the clip I should've—"],
@@ -459,6 +480,10 @@ const BEATS := [
 		["", "Ruel did not defend Jolo. He did not accuse him either."],
 	] },
 	{ "id": "s25", "scene": "S25", "stage": "hub", "type": "evidence", "spot": "talyer", "place": "RUEL'S TALYER", "when": "THE PROJECT TIMELINE",
+		"comic": [[
+			{ "art": "tone", "cap": "Nico brought a projector. The timeline of v3_FINAL went up on the shutter, every cut marked in tape." },
+			{ "art": "face", "who": "NICO", "side": "right", "say": "Don't watch the car. Watch the numbers under it." },
+		]],
 		"before": [["NICO", "Play it through. Watch the numbers, not the car."]],
 		"cards": [
 			{ "kind": "clip", "title": "GHOST_LINE_COMPOSITE · TIMELINE" },
@@ -482,6 +507,9 @@ const BEATS := [
 			["NICO", "Because you weren't trying to beat yourself. You were trying to beat an edit, with a number on it that even the edit never did."],
 		] },
 	{ "id": "s26", "scene": "S26", "stage": "pass", "type": "sectors", "title": "THE SECTOR TRIALS", "connect": true,
+		"comic": [[
+			{ "art": "road", "cap": "Pass 1, dry, new fronts. Nico's sheet clipped to the dash: each sector under its own conditions, then the whole road in one go." },
+		]],
 		"before": [["NICO", "Each piece under its own conditions, like the source passes. Then all of it, in one go, on today's road."]],
 		"trials": [
 			{ "sector": 0, "label": "SECTOR 1  ·  DRY (PASS A)", "wet": 0.0, "night": 0.0 },
@@ -571,6 +599,10 @@ const BEATS := [
 			["RUEL", "Then we read the logger."],
 		] },
 	{ "id": "s28", "scene": "S28", "stage": "hub", "type": "evidence", "spot": "talyer", "place": "RUEL'S TALYER", "when": "THE LOGGER",
+		"comic": [[
+			{ "art": "tone", "cap": "Back down the mountain in daylight. Ruel wired the logger to the bench and the last 160 metres came up as four lines." },
+			{ "art": "face", "who": "RUEL", "side": "right", "say": "Read it like a road. Left to right." },
+		]],
 		"cards": [{ "kind": "logger", "title": "LOGGER · THE NIGHT RUN · THE LAST 160 M" }],
 		"question": "What does the logger show going into 8A?",
 		"options": [
@@ -611,7 +643,12 @@ const BEATS := [
 			["NICO", "It may cost you more than the races did."],
 			["PANG", "I know that too."],
 		] },
-	{ "id": "s30", "scene": "S30", "stage": "hub", "type": "talk", "spot": "kyo", "place": "KYO COFFEE", "when": "LATE SUN", "night_value": 0.3, "wet": 0.0, "lines": [
+	{ "id": "s30", "scene": "S30", "stage": "hub", "type": "talk", "spot": "kyo", "place": "KYO COFFEE", "when": "LATE SUN", "night_value": 0.3, "wet": 0.0,
+		"comic": [[
+			{ "art": "tone", "cap": "Kyo Coffee, late sun. Dante's table. The folder went down on it before anyone said hello." },
+			{ "art": "face", "who": "DANTE", "side": "right", "say": "Sit. You've got the look of a man with a USB stick." },
+		]],
+		"lines": [
 		["", "The folder was open on the table between them: v1, with its title card. Dante did not pretend not to recognise it."],
 		["PANG", "A target no one could complete."],
 		["DANTE", "People wanted something impossible. A driver who could not be found, a number nobody could touch. I gave the scene what it was asking for."],
@@ -642,7 +679,12 @@ const BEATS := [
 	# ===================================================================== ACT V
 	{ "id": "a5_card", "scene": "S32", "stage": "panel", "type": "chapter",
 		"act": "ACT V", "title": "THE ROAD IS NOT A RECORDING", "subtitle": "Responsibility without absolution." },
-	{ "id": "s32", "scene": "S32", "stage": "room", "type": "talk", "set": "jolo_home", "place": "JOLO'S FAMILY HOME", "when": "AFTERNOON", "lines": [
+	{ "id": "s32", "scene": "S32", "stage": "room", "type": "talk", "set": "jolo_home", "place": "JOLO'S FAMILY HOME", "when": "AFTERNOON",
+		"comic": [[
+			{ "art": "tone", "cap": "Jolo's family home, two barangays over. A street of concrete and dogs. He brought the files on a drive and the notes on paper." },
+			{ "art": "black", "cap": "He knocked once and waited." },
+		]],
+		"lines": [
 		["", "Jolo's mother opened the door and looked at him for a long time before stepping aside."],
 		["", "The house smelled of rice and laundry soap. A fan clicked in the corner. A photograph of Jolo smiled toward a camera he had probably set up himself."],
 		["PANG", "I brought the original files."],
@@ -673,6 +715,10 @@ const BEATS := [
 		["NICO", "Because we've both spent too long turning every drive into a measurement."],
 	] },
 	{ "id": "s34", "scene": "S34", "stage": "pass", "type": "daylight", "title": "THE DAYLIGHT ROAD",
+		"comic": [[
+			{ "art": "face", "who": "NICO", "side": "left", "say": "No timer." },
+			{ "art": "face", "who": "PANG", "side": "right", "say": "No timer." },
+		]],
 		"before": [["", "A weekday morning. A delivery truck uphill. A family on a motorcycle. The asphalt changed texture where repairs had been made. Nothing was the same as it had been."]],
 		"after": [
 			["NICO", "That's it?"],
@@ -680,7 +726,12 @@ const BEATS := [
 			["", "He had not defeated the corner. He had not undone the night. He had simply made a different decision when the road asked him to."],
 		] },
 	{ "id": "s35", "scene": "S35", "stage": "hub", "type": "talk", "spot": "talyer", "night": true, "rain": 0.4, "wet": 0.6,
-		"place": "RUEL'S TALYER", "when": "EPILOGUE · THE RAINS RETURN", "lines": [
+		"place": "RUEL'S TALYER", "when": "EPILOGUE · THE RAINS RETURN",
+		"comic": [[
+			{ "art": "rain", "cap": "The rains came back the way they always did: in the afternoon, all at once." },
+			{ "art": "tone", "cap": "The garage was full again." },
+		]],
+		"lines": [
 		["", "The garage was full again. Someone was looking for a used sensor. Someone else was arguing about coilovers on Philippine roads."],
 		["KID", "Has anyone beaten the Ghost Line yet?"],
 		["", "A few people laughed. Someone said a driver came within a tenth. Someone said the whole thing was fake, which started a familiar argument about what fake meant when every part of the footage had been real."],
