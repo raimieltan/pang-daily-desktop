@@ -6,7 +6,7 @@ extends RefCounted
 var errors: Array[String] = []
 
 const TYPES := ["chapter", "talk", "goto", "race", "practice", "attack", "sectors", "crash", "daylight", "evidence", "end"]
-const STAGES := ["pass", "hub", "panel"]
+const STAGES := ["pass", "hub", "room", "panel"]
 
 
 func _check(ok: bool, message: String) -> void:
@@ -27,12 +27,16 @@ func test_beats_are_well_formed() -> void:
 				"%s: drives on a stage with a road" % id)
 		if b["type"] == "goto":
 			_check(b["stage"] == "hub" and HubLayout.PLACES.has(b["place"]), "%s: goto a hub place" % id)
+		if b["stage"] == "room":
+			_check(StoryRoom.SETS.has(b.get("set", "")), "%s: room set %s exists" % [id, b.get("set")])
 		if b.has("spot"):
 			_check(b["stage"] == "hub" and HubLayout.PLACES.has(b["spot"]), "%s: spot is a hub place" % id)
 		for key in ["lines", "before", "after", "win", "lose", "beaten"]:
 			for line in b.get(key, []):
 				var wait: bool = line is Array and line.size() == 2 and line[0] == "~wait" and (line[1] is float or line[1] is int)
 				_check(wait or (line is Array and line.size() == 2 and line[0] is String and line[1] is String), "%s.%s: [speaker, text]" % [id, key])
+				if line is Array and line.size() == 2 and line[0] == "~set":
+					_check(b["stage"] == "room" and StoryRoom.SETS.has(line[1]), "%s: ~set %s is a room set" % [id, line[1]])
 				if line is Array and line.size() == 2 and line[0] == "~sfx":
 					_check(StoryDialogue.SFX.has(line[1]), "%s: sound %s exists" % [id, line[1]])
 		if b.has("question"):

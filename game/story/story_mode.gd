@@ -2,7 +2,7 @@ class_name StoryMode
 extends RefCounted
 ## Story mode ("The Ghost Line", docs/story/STORY_MODE.md): where the player is in StoryScript.BEATS,
 ## what the story has recorded about their driving, and the hand-off between the scenes a beat
-## needs (Pass 1, the barangay, or a paper panel). Saved locally after every beat.
+## needs (Pass 1, the barangay, a room, or a paper panel). Saved locally after every beat.
 ##
 ## The record is the point: the practice passes the player drives in "A Line Study" become the
 ## Ghost Line they chase, the crash run becomes the logger they read, the sector trials become the
@@ -13,6 +13,7 @@ static var save_path := "user://story.json"
 const PASS_SCENE := "res://scenes/touge.tscn"
 const HUB_SCENE := "res://scenes/hub.tscn"
 const PANEL_SCENE := "res://scenes/story_panel.tscn"
+const ROOM_SCENE := "res://scenes/story_room.tscn"
 ## Pang's car: the EG hatch in paint gone between blue and grey (manuscript, chapter one).
 const CAR_ID := "eg_hatch"
 const CAR_PAINT := Color(0.46, 0.52, 0.58)
@@ -89,6 +90,8 @@ static func scene_for(b: Dictionary) -> String:
 			return PASS_SCENE
 		"hub":
 			return HUB_SCENE
+		"room":
+			return ROOM_SCENE
 	return PANEL_SCENE
 
 

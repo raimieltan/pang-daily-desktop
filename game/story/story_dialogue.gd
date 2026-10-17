@@ -21,6 +21,9 @@ const SFX := {
 ## Auto-advance after this many seconds per line (tests and probes); 0 waits for the player.
 static var auto_advance := 0.0
 
+## Called with a set name on a ["~set", name] line (the room stage cuts to that room).
+var on_set := Callable()
+
 var _top: ColorRect
 var _bottom: ColorRect
 var _caption: Label
@@ -245,6 +248,11 @@ func play(lines: Array, place := "", when := "", style := "") -> void:
 					phone = false
 					letterbox(true)
 				set_caption(line[1])
+				continue
+			"~set":
+				if on_set.is_valid():
+					await cut()
+					on_set.call(line[1])
 				continue
 			"~wait":
 				_panel.visible = false

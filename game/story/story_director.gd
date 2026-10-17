@@ -4,7 +4,8 @@ extends Node
 ## another stage (then StoryMode changes scene and that scene's director carries on).
 ##
 ## Stages: "pass" (scenes/touge.gd: session, time attack, VS battle, intro, music), "hub"
-## (scenes/hub.gd: session on the barangay loop) and "panel" (scenes/story_panel.gd: paper only).
+## (scenes/hub.gd: session on the barangay loop), "room" (scenes/story_room.gd: a small set, no
+## car) and "panel" (scenes/story_panel.gd: paper only).
 ## The scene hands its parts over before adding the director.
 
 const PASS_TRACK := preload("res://maps/touge_01/track.res")
@@ -21,6 +22,8 @@ const SPOT_VIEWS := {
 }
 
 var stage := "panel"
+## The room stage's scene (sets and their camera).
+var room: StoryRoom
 var session: DriveSession
 var time_attack: TimeAttack
 var vs_battle: VsBattle
@@ -41,6 +44,8 @@ var _view: Camera3D
 var _sign: SignAt8A
 ## Logger time (s) when Jolo shouted, for where the camera file breaks off.
 var _warned_at := -1.0
+## A scene is being played from the driver's seat of the parked car.
+var _cabin := false
 
 
 func _ready() -> void:
@@ -159,11 +164,24 @@ func _conditions(b: Dictionary) -> void:
 		weather.grip_scale = float(b.get("grip", 1.0))
 
 
-## Park the car where the scene happens and keep it there; the HUD goes.
+## Park the car where the scene happens and keep it there; the HUD goes. A "cabin" scene plays
+## from the driver's seat, looking out through the glass.
 func _settle(b: Dictionary) -> void:
+	if room:
+		room.show_set(str(b.get("set", "")))
+		dialogue.on_set = room.show_set
 	if session == null:
 		return
 	_hold(true)
+	_leave_cabin()
+	if b.get("cabin", false) and b.has("spot"):
+		var p: Vector3 = HubLayout.PLACES[b["spot"]]["spawn"]
+		await _place({ "position": HubLayout.pos(p.x, p.y, 0.3), "heading": HubLayout.yaw(p.z) })
+		_cabin = true
+		session.camera.current = true
+		session.camera.mode = ChaseCamera.Mode.HOOD
+		weather.windscreen.residue = float(b.get("glass", 0.0))
+		return
 	if stage == "hub" and b.has("spot"):
 		var s: Vector3 = HubLayout.PLACES[b["spot"]]["spawn"]
 		await _place({ "position": HubLayout.pos(s.x, s.y, 0.3), "heading": HubLayout.yaw(s.z) })
@@ -215,7 +233,15 @@ func _hold(on: bool) -> void:
 			return i
 	else:
 		session.input_filter = Callable()
+		_leave_cabin()
 		session.camera.current = true
+
+
+func _leave_cabin() -> void:
+	if _cabin:
+		_cabin = false
+		session.camera.mode = ChaseCamera.Mode.CHASE
+		weather.windscreen.residue = 0.0
 
 
 func _mute_car(on: bool) -> void:

@@ -1,12 +1,14 @@
 class_name StoryScript
 extends RefCounted
 ## "The Ghost Line", beat by beat, in play order (docs/story/GHOST_LINE_STORYBOARD.md). Each beat
-## is one storyboard scene (or a piece of one) on a stage: "pass" (Pass 1), "hub" (the barangay)
-## or "panel" (a paper page, for rooms the game does not build). StoryDirector plays them.
+## is one storyboard scene (or a piece of one) on a stage: "pass" (Pass 1), "hub" (the barangay),
+## "room" (a small set: StoryRoom.SETS) or "panel" (a paper page: act cards, the group chat,
+## memories). StoryDirector plays them.
 ##
 ## Beat types:
 ##   chapter   act card                         act, title, subtitle
-##   talk      dialogue                         place, when, lines; night, rain, wet, spot / at
+##   talk      dialogue                         place, when, lines; night, rain, wet, spot / at / set;
+##                                              cabin (from the parked car's seat), glass (drops on it)
 ##   goto      drive to a hub place             place (HubLayout.PLACES key), prompt
 ##   race      VS race (finishing order)        course ("pass" | "loop"), field, require_win, trauma
 ##   practice  A Line Study: recorded passes    passes [{ label, wet, night, note }]
@@ -18,7 +20,8 @@ extends RefCounted
 ##   end       credits, back to the title
 ##
 ## Lines are [speaker, text]; speaker "" is narration. Specials: ["~sfx", name], ["~cut", ""]
-## (a hard black cut), ["~place", caption] (the caption changes mid-scene), ["~wait", seconds].
+## (a hard black cut), ["~place", caption] (the caption changes mid-scene), ["~wait", seconds],
+## ["~set", name] (cut to another room on the room stage).
 ## Text may use {tokens} filled from the player's own record (StoryDirector.tokens()).
 ## Field drivers: [name, CarRoster id, paint hex, AI skill].
 
@@ -214,7 +217,8 @@ const BEATS := [
 			["PANG", "Then make it add up."],
 			["NICO", "That's what I've been doing."],
 		] },
-	{ "id": "s10", "scene": "S10", "stage": "panel", "type": "talk", "place": "THE CAR, PARKED", "when": "AFTER MIDNIGHT", "night": true,
+	{ "id": "s10", "scene": "S10", "stage": "hub", "type": "talk", "spot": "home", "cabin": true, "glass": 0.35,
+		"place": "THE CAR, PARKED", "when": "AFTER MIDNIGHT", "night": true,
 		"lines": [
 		["", "Jolo sat in the passenger seat with his phone open. The project notes were on the screen."],
 		["JOLO", "There is something about the clip I should've—"],
@@ -265,9 +269,11 @@ const BEATS := [
 	# ===================================================================== ACT II
 	{ "id": "a2_card", "scene": "S14", "stage": "panel", "type": "chapter",
 		"act": "ACT II", "title": "THE RETURN", "subtitle": "Grief, rumours, and the need for a culprit." },
-	{ "id": "s14", "scene": "S14", "stage": "panel", "type": "talk", "place": "A RENTED ROOM", "when": "MONTHS LATER",
+	{ "id": "s14", "scene": "S14", "stage": "room", "type": "talk", "set": "clinic", "place": "THE CLINIC", "when": "AFTER THE CRASH",
 		"lines": [
 		["", "His body had healed in uneven patches. A scar climbed from his collar toward his shoulder."],
+		["~set", "rented_room"],
+		["~place", "A RENTED ROOM  ·  MONTHS LATER"],
 		["", "He still woke at sounds that had no place in the room: rain against a window, a wiper dragging over glass."],
 		["~sfx", "wiper"],
 		["", "Bills. Messages from people asking questions. Silence where Jolo should be."],
@@ -423,7 +429,7 @@ const BEATS := [
 			["PANG", "Jolo uploaded it anonymously. He wanted people to see it."],
 			["RUEL", "It appears that way."],
 		] },
-	{ "id": "s23", "scene": "S23", "stage": "panel", "type": "talk", "place": "RUEL'S TALYER", "when": "AFTER CLOSING", "lines": [
+	{ "id": "s23", "scene": "S23", "stage": "hub", "type": "talk", "spot": "talyer", "night": true, "place": "RUEL'S TALYER", "when": "AFTER CLOSING", "lines": [
 		["JOLO", "(on the clip) Pang. Pang. Don't lift there. Okay, lift there."],
 		["PANG", "(on the clip) Make up your mind."],
 		["JOLO", "(on the clip) I'm the camera. The camera doesn't have a mind."],
@@ -434,7 +440,8 @@ const BEATS := [
 		["PANG", "What?"],
 		["RUEL", "The clock under the video. It doesn't count like one run."],
 	] },
-	{ "id": "s24", "scene": "S24", "stage": "panel", "type": "talk", "place": "THE CAR, PARKED", "when": "AFTER THE CHALLENGE · ANOTHER ANGLE", "night": true, "lines": [
+	{ "id": "s24", "scene": "S24", "stage": "hub", "type": "talk", "spot": "home", "cabin": true, "glass": 0.35,
+		"place": "THE CAR, PARKED", "when": "AFTER THE CHALLENGE · ANOTHER ANGLE", "night": true, "lines": [
 		["", "Ruel found it in a separate folder: the same night in the car, filmed from the dash."],
 		["", "On Jolo's phone, readable now: COMPOSITE LINE STUDY — BEST SECTORS / NOT ONE RUN."],
 		["JOLO", "There is something about the clip I should've—"],
@@ -586,7 +593,7 @@ const BEATS := [
 	# ===================================================================== ACT V
 	{ "id": "a5_card", "scene": "S32", "stage": "panel", "type": "chapter",
 		"act": "ACT V", "title": "THE ROAD IS NOT A RECORDING", "subtitle": "Responsibility without absolution." },
-	{ "id": "s32", "scene": "S32", "stage": "panel", "type": "talk", "place": "JOLO'S FAMILY HOME", "when": "AFTERNOON", "lines": [
+	{ "id": "s32", "scene": "S32", "stage": "room", "type": "talk", "set": "jolo_home", "place": "JOLO'S FAMILY HOME", "when": "AFTERNOON", "lines": [
 		["", "Jolo's mother opened the door and looked at him for a long time before stepping aside."],
 		["", "The house smelled of rice and laundry soap. A fan clicked in the corner. A photograph of Jolo smiled toward a camera he had probably set up himself."],
 		["PANG", "I brought the original files."],
