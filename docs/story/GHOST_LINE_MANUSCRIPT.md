@@ -362,7 +362,7 @@ By the next afternoon, the clip had a different name.
 
 Dante had posted it to a private group, then to another group, then to the account used to announce his events. The notes had vanished. The title card had been removed. The caption called it a reference pace set by an anonymous driver, a line so clean that nobody in the local scene had been able to match it. Someone in the comments called the unseen driver Ghost. The name stuck because it was short, mysterious, and easy to put on a poster.
 
-Jolo found out at a coffee shop while he was checking messages for a cheap set of wheels. A video had been reposted with a new overlay: a total time, a sequence of sector targets, and the words \*\*GHOST TIME\*\*. The figure was the combined best-sector time from their separate practice runs. It looked precise enough to be official.
+Jolo found out at a coffee shop while he was checking messages for a cheap set of wheels. A video had been reposted with a new overlay: a total time, a sequence of sector targets, and the words \*\*GHOST TIME\*\*. The figure was almost the combined best-sector time from their separate practice runs. Almost: it sat a touch under the sum in his own notes, as if someone had rounded it toward the impossible before putting it up. It looked precise enough to be official.
 
 He watched it twice. On the second pass, he noticed the missing title card.
 

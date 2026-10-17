@@ -29,7 +29,7 @@ The scene order below is the intended order of player experience. The chronology
 ## **The non-negotiable narrative rules**
 
 * Ghost is not a hidden super-driver. The first reveal identifies the protagonist as the driver in the footage; the second proves the benchmark is a composite that no one completed in one run.  
-* The benchmark must be concrete. Jolo’s edit combines the fastest recorded sectors and implies a synthetic combined pace. Dante markets that target as an unofficial legend, not as a formally certified record.  
+* The benchmark must be concrete. Jolo’s edit combines the fastest recorded sectors and implies a synthetic combined pace. Dante markets that target as an unofficial legend, not as a formally certified record. The GHOST TIME he posts is trimmed a shade under the composite's sum; a driver who beats the posted number in public gets a lower repost ("Ghost responded"), never an acknowledgement.  
 * The crash is not solved by a magical clue. Road geometry, surviving camera footage, a damaged data logger, and a witness each add limited evidence. Together they make the lower-switchback explanation more credible than the imagined rival.  
 * Jolo is loving but culpable in a human way. Give him a visible moment when he starts to tell the truth, sees what the opportunity means to his friend, and chooses silence.  
 * Dante is an exploiter, not a mastermind. He deliberately misrepresents the benchmark and protects his event, but there is no evidence he arranged the crash.  
@@ -237,7 +237,7 @@ Every featured drive needs a distinct dramatic function. Reuse roads and locatio
 
 **DRAMATIC BEATS**  Nico’s notes show that several drivers can match individual sections but no one reproduces the sequence at the advertised pace. Dante turns this failure into more hype: the benchmark becomes “unbeatable” precisely because no complete run can satisfy it.
 
-**CLUES / CONTINUITY**  One leaderboard labels the target “combined best sectors” briefly before the promotional overlay replaces the wording with “GHOST TIME.” This is a fair, missable clue.
+**CLUES / CONTINUITY**  One leaderboard labels the target “combined best sectors” briefly before the promotional overlay replaces the wording with “GHOST TIME.” This is a fair, missable clue. A second one: Nico's sector sums never quite reach the posted total, because the posted total is under the sum the sectors were cut from.
 
 **EXIT / TRANSITION**  After the event, Jolo sees the protagonist staring at the benchmark and begins to tell him something.
 
