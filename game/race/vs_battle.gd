@@ -192,6 +192,9 @@ func make_rival(spec: Dictionary, lane: float, pose: Dictionary) -> Array:
 	visual.paint_color = spec["paint"]
 	visual.car = car
 	car.add_child(visual)
+	var audio := RivalAudio.new()
+	audio.car = car
+	car.add_child(audio)
 	car.place(pose["position"], pose["heading"])
 	return [car, driver]
 

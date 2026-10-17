@@ -9,6 +9,7 @@ const SUITES := [
 	preload("res://tests/test_story.gd"),
 	preload("res://tests/test_gearbox.gd"),
 	preload("res://tests/test_tuning.gd"),
+	preload("res://tests/test_rival_audio.gd"),
 ]
 
 var failures := 0
