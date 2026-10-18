@@ -54,7 +54,6 @@ const BEATS := [
 			[
 				{ "art": "black", "cap": "There's no sound for the hit. I've tried to find one." },
 				{ "art": "lights", "cap": "Headlights. Rain going white. Jolo saying something like \"drive the road.\"" },
-				{ "art": "face", "who": "PANG", "side": "right", "cap": "I don't know what I saw." },
 				{ "art": "black", "cap": "In my head the lights always get to the corner. Then nothing." },
 			],
 		] },
@@ -82,11 +81,9 @@ const BEATS := [
 	] },
 	{ "id": "s15", "scene": "S15", "stage": "hub", "type": "evidence", "spot": "talyer", "place": "RUEL'S TALYER", "when": "AFTER THE CRASH",
 		"comic": [[
-			{ "art": "tone", "cap": "Ruel's talyer, the first time back. The car under a tarp in the far bay. On the bench, in a sandwich bag: Jolo's cracked phone card and the logger." },
-			{ "art": "face", "who": "RUEL", "side": "right", "say": "Sit. They've waited this long." },
+			{ "art": "tone", "cap": "Ruel's talyer, the first time back. The car under a tarp. On the bench, in a sandwich bag: Jolo's cracked phone card and the logger." },
 		]],
 		"before": [
-			["RUEL", "Card and logger. I haven't opened either."],
 			["PANG", "Did they find the other driver?"],
 			["RUEL", "Report says no second car."],
 			["PANG", "They weren't there."],
@@ -98,7 +95,6 @@ const BEATS := [
 			{ "kind": "text", "title": "DATA LOGGER", "body": "The small logger Jolo wired under the dash.\nSpeed · brake · steering · 20 Hz.\nIntact. Nobody has read it yet." },
 		],
 		"after": [
-			["RUEL", "The car tells you some things. Not all of them."],
 			["PANG", "I want to know who was beside us."],
 			["RUEL", "Twenty hertz. The boy wanted fifty. I said twenty."],
 		] },
@@ -113,8 +109,6 @@ const BEATS := [
 		["JOLO", "You're staring at it again."],
 		["PANG", "Thinking."],
 		["JOLO", "Twenty minutes, boss. Hood's still up."],
-		["PANG", "I'm deciding."],
-		["JOLO", "That's thinking with your arms crossed."],
 		["RUEL", "When the philosophers are done. Ten-millimeter."],
 		["RUEL", "Fronts are near the end. And I don't like the pedal."],
 		["PANG", "They're not done."],
@@ -130,8 +124,6 @@ const BEATS := [
 		["RUEL", "It's an invoice."],
 	],
 		"comic_after": [[
-			{ "art": "face", "who": "JOLO", "side": "left", "say": "Tonight goes good, we do the tires. Promise." },
-			{ "art": "face", "who": "RUEL", "side": "right", "say": "Write it on the bill." },
 			{ "art": "snap", "fx": "KSHK", "sfx": "shutter", "cap": "Jolo took a picture of the three of us anyway. Ruel's frowning in it. Ruel's frowning in all of them." },
 		]] },
 	{ "id": "s02", "scene": "S02", "stage": "hub", "type": "goto", "place": "gas", "night": true,
@@ -139,7 +131,6 @@ const BEATS := [
 		"comic": [[
 			{ "art": "snap", "cap": "THAT NIGHT" },
 			{ "art": "face", "who": "JOLO", "side": "left", "say": "Entry's paid. Five hundred. Don't make me explain that to my mother." },
-			{ "art": "face", "who": "PANG", "side": "right", "say": "Where?" },
 			{ "art": "face", "who": "JOLO", "side": "left", "say": "Bahandi Fuels, then the loop behind the warehouses. My cousin knows a guy." },
 		]] },
 	{ "id": "s03", "scene": "S03", "stage": "hub", "type": "race", "course": "loop", "night": true,
@@ -161,16 +152,14 @@ const BEATS := [
 	{ "id": "s04t", "scene": "S04", "stage": "hub", "type": "talk", "spot": "kyo", "night": true,
 		"place": "KYO COFFEE", "when": "PAST MIDNIGHT", "lines": [
 		["", "Dante's thing wasn't speed. He made you feel the next room had saved you a seat."],
-		["DANTE", "Look— people want to watch you. Small car. No budget. Driver who makes it work."],
+		["DANTE", "Look— people want to watch you. Small car. No budget. You."],
 		["PANG", "I just drive."],
-		["DANTE", "Everybody just drives. The ones who last have a story."],
 		["", "A clean, expensive car rolls onto the apron. Nico gets out and looks at our tires before he looks at me."],
 		["NICO", "What are those, two seasons old?"],
 		["PANG", "Three."],
 		["NICO", "You drove well."],
 		["PANG", "But."],
 		["NICO", "But you found time you won't find twice. Not on those."],
-		["NICO", "That's still good driving. It isn't ready."],
 		["DANTE", "Pang. Nico. Pass 1, Saturday, before the light goes. Settle it there."],
 	],
 		"comic_after": [[
@@ -207,7 +196,6 @@ const BEATS := [
 		"after": [
 			["", "RJ laughed, kindly. That was worse."],
 			["RJ", "You'll get it back, bro."],
-			["RUEL", "It's not the setup."],
 			["PANG", "Car's rusty. I'm rusty."],
 			["RUEL", "The car did what you asked."],
 			["RJ", "Bro. Somebody said there was another car up there that night. Beside you. Ask at Kyo."],
@@ -237,14 +225,13 @@ const BEATS := [
 		"wrong": ["RUEL", "That's one version. Put it next to the other two."],
 		"after": [
 			["NICO", "You kept checking your mirror. On an empty lane."],
-			["PANG", "You saw something?"],
-			["NICO", "I saw you looking. I've chased the Ghost Line more times than I'll admit."],
+			["NICO", "I've chased the Ghost Line more times than I'll admit."],
 			["NICO", "The line's good. Some sections are excellent. The total doesn't behave like one run."],
 			["NICO", "Drive it with me. Sector by sector. Then tell me it's one run."],
 		] },
 	{ "id": "s06", "scene": "S06", "stage": "pass", "type": "practice", "title": "A LINE STUDY", "memory": "THE LINE STUDY",
 		"comic": [[
-			{ "art": "black", "cap": "Buko's phone, face up on the table at Kyo. The clip again. Passenger side, low on the glass, rain on the lens." },
+			{ "art": "black", "cap": "Buko's phone, face up at Kyo. The clip again. Rain on the lens." },
 			{ "art": "tone", "cap": "I looked at the rain until something older came up. A dry Tuesday, months before. THE LINE STUDY." },
 			{ "art": "face", "who": "JOLO", "side": "left", "say": "Three passes. I'm rolling the whole time." },
 			{ "art": "face", "who": "PANG", "side": "right", "say": "You're always rolling." },
@@ -273,13 +260,11 @@ const BEATS := [
 	{ "id": "s20", "scene": "S20", "stage": "hub", "type": "talk", "spot": "kyo", "night": true, "place": "KYO COFFEE", "when": "DANTE'S TABLE", "now": "phone_buzz", "lines": [
 		["PANG", "Who's Ghost?"],
 		["DANTE", "If I knew, I'd sell tickets to him. Coffee?"],
-		["PANG", "You posted the clip. You put a time on it. You ran an event off it. You don't know who drove."],
+		["PANG", "You posted it. You put a time on it. You don't know who drove."],
 		["DANTE", "Somebody sends it, I post it. That's the job. Did anybody want me asking?"],
 		["PANG", "Did you have a car out there that night? Lower road. Keeping the time safe."],
 		["DANTE", "No. I never said a car pushed you. I never sent anyone near you."],
 		["DANTE", "Look— you want me to say I made the crash. I made a race. You drove, my friend."],
-		["PANG", "And after?"],
-		["DANTE", "I kept it from turning into a scandal. I said tragedy. Was I wrong?"],
 		["PANG", "You let the rumours run."],
 		["DANTE", "Which one should I have stopped? There were twelve."],
 		["PANG", "The ones that cost you money."],
@@ -293,13 +278,12 @@ const BEATS := [
 	{ "id": "s18", "scene": "S18", "stage": "pass", "type": "sectors", "title": "NICO REPEATS THE TEST",
 		"comic": [[
 			{ "art": "road", "cap": "Pass 1, a weekday morning. Nico's GSR at the top, a notebook on the roof. No crowd. No board." },
-			{ "art": "face", "who": "NICO", "side": "right", "say": "Flying start into each. I call it, you drive it, I write it down." },
 		]],
 		"before": [["NICO", "Ghost's on every sector. Match him. Then we look at the joins."]],
 		"trials": [
-			{ "sector": 0, "label": "SECTOR 1", "wet": 0.0, "night": 0.0, "note": ["NICO", "Close. That's the easy one. Now the middle."] },
+			{ "sector": 0, "label": "SECTOR 1", "wet": 0.0, "night": 0.0 },
 			{ "sector": 1, "label": "SECTOR 2", "wet": 0.0, "night": 0.0, "note": ["NICO", "You came in with sector one's speed. Ghost didn't. Ghost came in from somewhere else."] },
-			{ "sector": 2, "label": "SECTOR 3", "wet": 0.0, "night": 0.0, "note": ["NICO", "That's three. Now the clock."] },
+			{ "sector": 2, "label": "SECTOR 3", "wet": 0.0, "night": 0.0 },
 		],
 		"after_cards": [{ "kind": "notes", "title": "NICO'S NOTES" }],
 		"after": [
@@ -322,7 +306,6 @@ const BEATS := [
 		["DANTE", "Nobody cares about the notes."],
 		["~place", "RUEL'S TALYER · A WEEK LATER · THE OLD WHEEL"],
 		["JOLO", "Same shirt, Pang. I wore it twice. You keep putting me in it."],
-		["", "Every one of them felt like last night. Every one had a detail that didn't fit."],
 		["", "I started writing things down. Dates. Shirts. Which wheel."],
 		["~cut", ""],
 		["~sfx", "phone_buzz"],
@@ -330,18 +313,13 @@ const BEATS := [
 	{ "id": "s07", "scene": "S07", "stage": "panel", "type": "talk", "style": "phone", "memory": "GHOST GOES PUBLIC",
 		"comic": [[
 			{ "art": "black", "cap": "Jolo's camera bag, under the bench where he left it. The strap still set to his shoulder." },
-			{ "art": "tone", "cap": "The next afternoon Dante posted a clip. Reference pace. No name. By dinner the comments had named him Ghost." },
 			{ "art": "tone", "cap": "THE WEEK GHOST WENT PUBLIC." },
 		]],
 		"place": "PASS 1 RUNNERS (PRIVATE GROUP)", "when": "THE NEXT AFTERNOON", "lines": [
 		["DANTE", "Reference pace from an anonymous driver. Nobody on this island has matched it. GHOST TIME {ghost_time}."],
 		["BUKO", "so who's ghost"],
 		["KAPITAN", "ex pro. my cousin says japan"],
-		["TISOY", "sequential box. has to be"],
-		["BUKO", "its a hatch. listen to it"],
 		["ATE LIZA", "Whoever he is, he lifts before 8A. Nobody lifts before 8A."],
-		["TISOY", "ghost lol"],
-		["DANTE", "Saturday. Pass 1. Sector targets on the board. Bring your best."],
 		["~place", "KYO COFFEE · LATER"],
 		["JOLO", "Dante took something off it."],
 		["PANG", "Off what? It looks good."],
@@ -355,7 +333,7 @@ const BEATS := [
 	{ "id": "s08", "scene": "S08", "stage": "pass", "type": "attack", "title": "CHASE THE COMPOSITE", "grip": 0.95,
 		"comic": [[
 			{ "art": "road", "cap": "I'd watched it so often the line was on the road before the road was." },
-			{ "art": "face", "who": "RUEL", "side": "right", "say": "Fronts are near the end. You'll feel it in the brakes. Don't come back and tell me the car changed." },
+			{ "art": "face", "who": "RUEL", "side": "right", "say": "Fronts are near the end. Don't come back and tell me the car changed." },
 		]],
 		"beaten": [
 			["JOLO", "You— beat it."],
@@ -365,8 +343,6 @@ const BEATS := [
 			["JOLO", "...Okay."],
 		],
 		"after": [
-			["JOLO", "Better than last time."],
-			["PANG", "Not enough."],
 			["JOLO", "It's a clip, boss. You don't have to make it nervous."],
 			["PANG", "It has a time."],
 			["JOLO", "About the clip. There's something I—"],
@@ -399,7 +375,7 @@ const BEATS := [
 			["PANG", "Everybody up here watched me beat it."],
 			["~sfx", "phone_buzz"],
 			["NICO", "Look at the board."],
-			["", "A new number under GHOST TIME. Three tenths under mine. Posted a minute ago. Caption: Ghost responded."],
+			["", "A new number under GHOST TIME. Three tenths under mine. Caption: Ghost responded."],
 			["PANG", "Nobody was on the mountain. Nobody passed me."],
 			["DANTE", "Then you'll want the bigger night. Bigger prize. Beat it when it counts."],
 			["NICO", "That number went up a minute ago. Nobody was on the road a minute ago."],
@@ -411,9 +387,6 @@ const BEATS := [
 			["NICO", "Sector one wants one entry. The middle was a different surface. I can drive every piece. They don't add up."],
 		],
 		"after": [
-			["PANG", "What?"],
-			["NICO", "It doesn't behave like one run."],
-			["PANG", "Meaning."],
 			["NICO", "Sector one wants one entry. The middle was recorded on a different surface. The exit's from a pass with a different rhythm."],
 			["NICO", "I can drive every piece. They don't add up."],
 			["PANG", "Then make them add up."],
@@ -505,7 +478,6 @@ const BEATS := [
 			{ "art": "rain", "cap": "I drove home and didn't go in. Phone on the passenger seat. The other folder open: the same night, from the dash." },
 		]],
 		"lines": [
-		["", "Ruel found it in a separate folder. The same night in the car, filmed from the dash."],
 		["", "On Jolo's phone, readable now: COMPOSITE LINE STUDY — BEST SECTORS / NOT ONE RUN."],
 		["JOLO", "There is something about the clip I should've—"],
 		["PANG", "I know. I know it's hard. If I get the middle clean, the rest follows."],
@@ -523,7 +495,6 @@ const BEATS := [
 			{ "art": "face", "who": "NICO", "side": "right", "say": "Don't watch the car. Watch the numbers under it." },
 		]],
 		"before": [
-			["NICO", "Play it through."],
 			["NICO", "Clouds. The light changed."],
 			["PANG", "Look at the sign."],
 			["NICO", "Somebody hit it between takes."],
@@ -549,7 +520,6 @@ const BEATS := [
 			["NICO", "Two runs. Maybe."],
 			["PANG", "Look at the clock at the second join."],
 			["NICO", "...Three."],
-			["", "Jolo's notes, under the first version of the edit: COMPOSITE LINE STUDY — BEST SECTORS / NOT ONE RUN."],
 			["", "Best entry. Cleanest middle. Fastest exit. Three different days. Every piece of it was me."],
 			["NICO", "Cut's {cut_time}. Poster says {ghost_time}."],
 			["PANG", "Somebody rounded."],
@@ -561,7 +531,7 @@ const BEATS := [
 		] },
 	{ "id": "s26", "scene": "S26", "stage": "pass", "type": "sectors", "title": "THE SECTOR TRIALS", "connect": true,
 		"comic": [[
-			{ "art": "road", "cap": "Pass 1, dry, new fronts. Nico's sheet clipped to the dash: each sector under its own conditions, then the whole road in one go." },
+			{ "art": "road", "cap": "Pass 1, dry, new fronts. Nico's sheet clipped to the dash." },
 		]],
 		"before": [["NICO", "Each piece under its own conditions, like the source passes. Then the whole road. One go. Today."]],
 		"trials": [
@@ -571,7 +541,6 @@ const BEATS := [
 		],
 		"after_cards": [{ "kind": "trials", "title": "CONTROLLED TEST · NICO'S SHEET" }],
 		"beaten": [
-			["NICO", "You beat the number. Today. New fronts. One road."],
 			["NICO", "It still never happened as one run. Not on the days it says."],
 			["NICO", "You did the middle. You did the exit. Different days."],
 			["NICO", "One road. One go. ...Write that down."],
@@ -613,8 +582,6 @@ const BEATS := [
 		"lines": [
 		["PANG", "We've driven there before."],
 		["RUEL", "Dry. Slower. Different week."],
-		["PANG", "That's the test."],
-		["RUEL", "Tuesday was dry."],
 		["JOLO", "We should pull out."],
 		["PANG", "You got us in."],
 		["JOLO", "I got us an invitation. I didn't order the rain."],
@@ -638,7 +605,7 @@ const BEATS := [
 	{ "id": "s13", "scene": "S13", "stage": "pass", "type": "crash", "title": "THE LAST NIGHT RUN", "posted": true, "grip": 0.95 },
 	{ "id": "s27", "scene": "S27", "stage": "pass", "type": "evidence", "at": "overlook", "place": "PASS 1 · ABOVE 8A", "when": "DAYLIGHT", "now": "wiper", "night_value": 0.0, "wet": 0.0,
 		"before": [
-			["NICO", "Lower road runs behind that ridge. A car down there is hidden most of the bend. Then the lights come through the gap."],
+			["NICO", "Lower road's behind that ridge. A car down there is hidden most of the bend. Then its lights come through the gap."],
 			["WITNESS", "I was leaving the sari-sari store. Two cigarettes and a Coke. A car went up the lower road."],
 			["WITNESS", "Lights in the trees. I didn't see it reach the top bend."],
 			["WITNESS", "Sorry. I thought the police knew more than me."],
@@ -710,13 +677,10 @@ const BEATS := [
 			["PANG", "I post the files. All of them."],
 			["NICO", "Half of them won't believe it. I'm being generous."],
 			["PANG", "I know."],
-			["NICO", "It'll cost you more than the races did."],
-			["PANG", "I know that too."],
 		] },
 	{ "id": "s30", "scene": "S30", "stage": "hub", "type": "talk", "spot": "kyo", "place": "KYO COFFEE", "when": "LATE SUN", "night_value": 0.3, "wet": 0.0,
 		"comic": [[
 			{ "art": "tone", "cap": "Kyo Coffee, late sun. Dante's table. The folder went down on it before anyone said hello." },
-			{ "art": "face", "who": "DANTE", "side": "right", "say": "Sit. You've got the look of a man with a USB stick." },
 		]],
 		"lines": [
 		["DANTE", "Coffee? I'm getting coffee."],
@@ -738,12 +702,11 @@ const BEATS := [
 		["DANTE", "Then you're braver than me. Sugar?"],
 	] },
 	{ "id": "s31", "scene": "S31", "stage": "panel", "type": "talk", "style": "phone", "place": "PASS 1 RUNNERS (PRIVATE GROUP)", "when": "A WEEK LATER", "lines": [
-		["NICO", "Sector notes, repeat tests, and the source files. The Ghost Line is a composite of separate passes. Every sector is real. The total was never one run, and the posted time is shorter than even the total. That is what the evidence supports. Nothing past it."],
+		["NICO", "Sector notes, repeat tests, source files. The Ghost Line is a composite of separate passes. Every sector is real. It was never one run, and the posted time is shorter than even the cut. That is all the evidence supports."],
 		["ATE LIZA", "I told you that sign was bent."],
 		["KAPITAN", "fake notes. legend is legend"],
 		["BUKO", "so who's ghost"],
 		["TISOY", "read the post"],
-		["KAPITAN", "my cousin says still a good challenge"],
 		["DANTE", "(left the group)"],
 		["DANTE", "(rejoined the group)"],
 		["", "Forty-one people read it. Buko asked again on Thursday."],
@@ -782,8 +745,7 @@ const BEATS := [
 		["PANG", "I won't ask you to forgive me."],
 		["JOLO'S FATHER", "Good."],
 	] },
-	{ "id": "s33", "scene": "S33", "stage": "hub", "type": "goto", "place": "kyo", "prompt": "THE BARANGAY  ·  WEEKS LATER",
-		"lines": [["", "Weeks later. The talyer, Kyo, the gas station. Saturdays kept happening."]] },
+	{ "id": "s33", "scene": "S33", "stage": "hub", "type": "goto", "place": "kyo", "prompt": "THE BARANGAY  ·  WEEKS LATER" },
 	{ "id": "s33t", "scene": "S33", "stage": "hub", "type": "talk", "spot": "kyo", "place": "KYO COFFEE", "when": "WEEKS LATER", "lines": [
 		["KAPITAN", "Still a legend, Pang. I don't care about your notes."],
 		["ATE LIZA", "Good that you said it. Sit. Eat first."],
@@ -808,12 +770,11 @@ const BEATS := [
 		"place": "RUEL'S TALYER", "when": "EPILOGUE · THE RAINS RETURN",
 		"comic": [[
 			{ "art": "rain", "cap": "The rains came back the way they always do. Afternoon, all at once." },
-			{ "art": "tone", "cap": "The talyer was full again." },
 		]],
 		"lines": [
 		["", "Somebody wanted a used sensor. Somebody else was wrong about coilovers."],
 		["KID", "Has anyone beaten the Ghost Line yet?"],
-		["", "A few people laughed. Someone said a guy got within a tenth. Someone said it was fake. Ate Liza said it wasn't, exactly. That took a while."],
+		["", "Someone said a guy got within a tenth. Someone said it was fake. Ate Liza said it wasn't, exactly. That took a while."],
 		["KID", "So nobody ever beat it?"],
 		["PANG", "Who does your tires?"],
 		["KID", "They're fine."],

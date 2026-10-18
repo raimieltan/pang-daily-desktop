@@ -106,10 +106,6 @@ He was sitting on an upside-down plastic pail beside the car, eating a pan de sa
 
 “Twenty minutes, boss. Hood's still up.”
 
-“I'm deciding.”
-
-“That's thinking with your arms crossed.”
-
 Ruel leaned over the engine bay. He did not smile, but the corner of his mouth moved. “When the philosophers are done. Ten-millimeter.”
 
 Pang passed it over. The car was old enough that every repair seemed to uncover another repair. Its paint had faded into a color that could not decide whether it was blue or gray. The driver's seat had a split seam. A strip of black tape held one side of the console together. The engine, which Pang knew by sound better than he knew most people's voices, had been rebuilt in pieces over years of overtime and favors.
@@ -212,11 +208,9 @@ The difference mattered. Pang felt it land.
 
 Jolo handled the practical side. He asked about entry fees, the rules at the next event, and whether there would be a media pass for the runs. He turned every introduction into a possible future. Dante never promised much outright. He offered access, which was more powerful because it looked like a gift and behaved like a loan.
 
-“Look— people want to watch you,” Dante told Pang. “Small car. No budget. Driver who makes it work.”
+“Look— people want to watch you,” Dante told Pang. “Small car. No budget. You.”
 
 “I just drive.”
-
-“Everybody just drives. The ones who last have a story.”
 
 Pang could hear the salesmanship in it, but he also understood the appeal. For years, money had been the wall between what he knew how to do and what he was allowed to attempt. Dante seemed to know where the wall had a door.
 
@@ -228,7 +222,7 @@ Nico nodded, as though that confirmed something. “You drove well.”
 
 The compliment sounded more insulting than an insult would have. Pang asked whether Nico wanted to say something else.
 
-“But you found time you won't find twice. Not on those.” Nico's tone remained even. “That's still good driving. It isn't ready.”
+“But you found time you won't find twice. Not on those.” Nico's tone remained even.
 
 Jolo made a small sound that was supposed to be a cough.
 
@@ -422,11 +416,7 @@ Pang's real car did not feel like that. It loaded its front tires, changed balan
 
 He sat in the car after the run, hands still on the wheel.
 
-“Better than last time,” Jolo said from the passenger seat.
-
-“Not enough.”
-
-“It's a clip, boss. You don't have to make it nervous.”
+“It's a clip, boss,” Jolo said from the passenger seat. “You don't have to make it nervous.”
 
 Pang gave him a look. “It has a time.”
 
@@ -438,13 +428,7 @@ Jolo looked away. “I know.”
 
 At the next event, Dante displayed the Ghost target across a tall screen beside the staging area. Drivers queued to attempt individual sectors. They could win one and still fail the total, because the total assumed that the best entry, middle, and exit could all be combined in a single pass. Nico ran two controlled attempts and matched one of the sector times, then stopped to review his notes.
 
-“What?” Pang asked when Nico returned.
-
-“It doesn't behave like one run.”
-
-“Meaning.”
-
-“It means the first sector rewards one kind of entry. The middle was recorded with a different surface condition, and the exit comes from a pass with a different rhythm. I can reproduce each piece. I can't make the whole thing add up.”
+“Sector one wants one entry,” he said when Pang reached him. “The middle was recorded on a different surface. The exit's from a pass with a different rhythm. I can drive every piece. They don't add up.”
 
 Pang looked at the leaderboard. A small line of text beneath the official overlay still read \*\*COMBINED BEST SECTORS\*\*. It disappeared when the next promotional slide came up.
 
@@ -499,10 +483,6 @@ The sky over Iloilo had been heavy all afternoon. By dusk, the mountains had dis
 “We've driven there before,” Pang said.
 
 “Dry. Slower. Different week.”
-
-“That's the test.”
-
-“Tuesday was dry,” Ruel said.
 
 Jolo said little while they checked the car. When Ruel left to answer a call, Jolo walked with Pang around the front bumper and spoke so quietly that the rain filled the gaps between his words.
 
@@ -604,7 +584,7 @@ His body had healed in uneven patches. A scar climbed from his collar toward his
 
 The car stood beneath the same roof where Jolo had once balanced his phone on a jar of bolts. Ruel had repaired what could be repaired. The bodywork carried dents and replaced panels; the interior smelled of old water and fresh adhesive. The damaged camera card and the small data logger sat in a plastic evidence bag on the workbench. Ruel had kept them because he did not know what else to do with the parts of that night.
 
-“Card and logger,” he said. “I haven't opened either.”
+“Sit,” he said. “They've waited this long.”
 
 Pang looked at the bag. “Did they find the other driver?”
 
@@ -891,9 +871,7 @@ Nico nodded once. “Half of them won't believe it. I'm being generous.”
 
 “I know.”
 
-“It'll cost you more than the races did.”
-
-Pang capped the marker. “I know that too.”
+Pang capped the marker.
 
 For the first time since the crash, he was not searching for an answer that could return him to the person he had been before it. He was trying to describe what had happened without giving himself a better role in it.
 
