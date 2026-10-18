@@ -65,7 +65,7 @@ const BEATS := [
 		"enter": { "sound": "rain", "loop": true, "db": -16.0, "lead": 1.0 },
 		"comic": [[
 			{ "art": "white", "cap": "The clinic. I learned the ceiling. The window did weather and nothing else." },
-			{ "art": "tone", "cap": "Twenty-three days. Nobody said Jolo's name in there, so it was in there all the time." },
+			{ "art": "snap", "cap": "Twenty-three days. Nobody said Jolo's name in there, so it was in there all the time." },
 		]],
 		"lines": [
 		["", "The scar goes from my collar to my shoulder. It itches before rain."],
@@ -83,7 +83,7 @@ const BEATS := [
 	{ "id": "s15", "scene": "S15", "stage": "hub", "type": "evidence", "spot": "talyer", "place": "RUEL'S TALYER", "when": "AFTER THE CRASH",
 		"exit": { "cut": true },
 		"comic": [[
-			{ "art": "tone", "cap": "Ruel's talyer, the first time back. The car under a tarp. On the bench, in a sandwich bag: Jolo's cracked phone card and the logger." },
+			{ "art": "snap", "cap": "Ruel's talyer, the first time back. The car under a tarp. On the bench, in a sandwich bag: Jolo's cracked phone card and the logger." },
 		]],
 		"before": [
 			["PANG", "Did they find the other driver?"],
@@ -360,7 +360,7 @@ const BEATS := [
 		"label_clue": true, "posted": true, "night_value": 0.55, "grip": 0.95,
 		"comic": [
 			[
-				{ "art": "tone", "cap": "THE NEXT SATURDAY · A CROWD AT THE TOP OF PASS 1" },
+				{ "art": "snap", "cap": "THE NEXT SATURDAY · A CROWD AT THE TOP OF PASS 1" },
 				{ "art": "face", "who": "DANTE", "side": "right", "say": "Ghost Time is on the board. Beat the sectors, beat the legend. Next driver!" },
 			],
 			[
@@ -466,7 +466,7 @@ const BEATS := [
 		"enter": { "sound": "crickets", "loop": true, "db": -14.0, "lead": 1.0 },
 		"comic": [[
 			{ "art": "black", "cap": "After closing. Ruel's laptop on the bench, the backup drive beside it. GHOST_LINE/v1, title card still on." },
-			{ "art": "tone", "cap": "Jolo's voice came out of the little speaker like he was in the next bay." },
+			{ "art": "snap", "cap": "Jolo's voice came out of the little speaker like he was in the next bay." },
 		]],
 		"lines": [
 		["JOLO", "(on the clip) Say something for the people."],
@@ -502,7 +502,7 @@ const BEATS := [
 	] },
 	{ "id": "s25", "scene": "S25", "stage": "hub", "type": "evidence", "spot": "talyer", "place": "RUEL'S TALYER", "when": "THE PROJECT TIMELINE",
 		"comic": [[
-			{ "art": "tone", "cap": "Nico brought a projector. v3_FINAL went up on the shutter, every cut marked in tape." },
+			{ "art": "snap", "cap": "Nico brought a projector. v3_FINAL went up on the shutter, every cut marked in tape." },
 			{ "art": "face", "who": "NICO", "side": "right", "say": "Don't watch the car. Watch the numbers under it." },
 		]],
 		"before": [
@@ -646,7 +646,7 @@ const BEATS := [
 	{ "id": "s28", "scene": "S28", "stage": "hub", "type": "evidence", "spot": "talyer", "place": "RUEL'S TALYER", "when": "THE LOGGER",
 		"exit": { "tail": 2.0, "fade": 0.6 },
 		"comic": [[
-			{ "art": "tone", "cap": "Back down the mountain in daylight. Ruel wired the logger to the bench and the last 160 metres came up as four lines." },
+			{ "art": "snap", "cap": "Back down the mountain in daylight. Ruel wired the logger to the bench and the last 160 metres came up as four lines." },
 			{ "art": "face", "who": "RUEL", "side": "right", "say": "Read it like a road. Left to right." },
 		]],
 		"cards": [{ "kind": "logger", "title": "LOGGER · THE NIGHT RUN · THE LAST 160 M" }],
@@ -697,7 +697,7 @@ const BEATS := [
 	{ "id": "s30", "scene": "S30", "stage": "hub", "type": "talk", "spot": "kyo", "place": "KYO COFFEE", "when": "LATE SUN", "night_value": 0.3, "wet": 0.0,
 		"exit": { "cut": true },
 		"comic": [[
-			{ "art": "tone", "cap": "Kyo Coffee, late sun. Dante's table. The folder went down on it before anyone said hello." },
+			{ "art": "snap", "cap": "Kyo Coffee, late sun. Dante's table. The folder went down on it before anyone said hello." },
 		]],
 		"lines": [
 		["DANTE", "Coffee? I'm getting coffee."],
@@ -737,7 +737,7 @@ const BEATS := [
 		"enter": { "sound": "dog", "db": -10.0, "lead": 0.8 },
 		"exit": { "tail": 2.5, "fade": 1.2 },
 		"comic": [[
-			{ "art": "tone", "cap": "Jolo's family home, two barangays over. Concrete and dogs. The files on a drive, the notes on paper." },
+			{ "art": "snap", "cap": "Jolo's family home, two barangays over. Concrete and dogs. The files on a drive, the notes on paper." },
 			{ "art": "black", "cap": "I knocked once and waited." },
 		]],
 		"lines": [

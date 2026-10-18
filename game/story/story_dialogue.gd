@@ -479,9 +479,12 @@ func comic(pages: Array, out := "fade") -> void:
 	var from_black := is_black()
 	_comic.snap = null
 	# Headless runs never draw a frame to freeze ("snap" panels fall back to screentone).
-	if not from_black and DisplayServer.get_name() != "headless":
-		await RenderingServer.frame_post_draw
-		_comic.snap = ImageTexture.create_from_image(get_viewport().get_texture().get_image())
+	if DisplayServer.get_name() != "headless":
+		if not from_black:
+			await RenderingServer.frame_post_draw
+			_comic.snap = ImageTexture.create_from_image(get_viewport().get_texture().get_image())
+		else:
+			_comic.snap = await _render_scene()
 	_comic.visible = true
 	_comic.modulate.a = 1.0 if from_black else 0.0
 	# The page is the scene now: the car behind it goes quiet (music carries on).
@@ -512,6 +515,33 @@ func comic(pages: Array, out := "fade") -> void:
 		_comic.visible = false
 	for i in muted:
 		AudioServer.set_bus_mute(i, false)
+
+
+## The 3D scene as the current camera sees it, rendered off screen: a page that comes up out
+## of black (a scene change) still has the place behind it to freeze. Null with no 3D camera.
+func _render_scene() -> ImageTexture:
+	var cam := get_viewport().get_camera_3d()
+	if cam == null:
+		return null
+	var sv := SubViewport.new()
+	sv.size = get_viewport().get_visible_rect().size
+	sv.world_3d = get_viewport().find_world_3d()
+	sv.render_target_update_mode = SubViewport.UPDATE_ONCE
+	var c := Camera3D.new()
+	c.fov = cam.fov
+	c.near = cam.near
+	c.far = cam.far
+	c.compositor = cam.compositor
+	c.environment = cam.environment
+	sv.add_child(c)
+	add_child(sv)
+	c.global_transform = cam.global_transform
+	c.current = true
+	await RenderingServer.frame_post_draw
+	await RenderingServer.frame_post_draw
+	var img := sv.get_texture().get_image()
+	sv.queue_free()
+	return ImageTexture.create_from_image(img) if img else null
 
 
 ## Mute the car's buses that are not muted already; returns the ones it muted.

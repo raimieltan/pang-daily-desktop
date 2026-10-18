@@ -6,7 +6,7 @@ extends Control
 ## A page is an Array of panels (1–4; the layout follows the count). A panel is a Dictionary:
 ##   art   "face" (the speaker's portrait) | "snap" (the scene behind the page, frozen) | "speed"
 ##         (focus lines) | "rain" | "wipers" | "lights" (headlights in the dark) | "road" (a night
-##         road in perspective) | "tone" (screentone) | "black" | "white"
+##         road in perspective) | "tone" (screentone round a clear centre) | "black" | "white"
 ##   who   speaker (the face for "face"; a name tag on the bubble otherwise)
 ##   say   speech bubble text        cap   caption box text        fx   a big sound word
 ##   side  "left" | "right": where the face sits (default alternates)
@@ -162,12 +162,12 @@ class PanelArt extends Control:
 			"black":
 				draw_rect(r, INK)
 			"white":
-				draw_rect(r, PAPER)
+				_vignette(r, 0.18, false)
 			"snap":
 				if snap:
 					_snap(r)
 				else:
-					_tone(r, 0.0)
+					_vignette(r)
 			"speed":
 				draw_rect(r, PAPER)
 				_speed(r)
@@ -188,7 +188,7 @@ class PanelArt extends Control:
 				_tone(r, 0.5)
 				_speed_soft(r)
 			_:
-				_tone(r, 0.0)
+				_vignette(r)
 
 	func _snap(r: Rect2) -> void:
 		# Centre crop of the frozen scene at the panel's aspect.
@@ -218,6 +218,25 @@ class PanelArt extends Control:
 					draw_circle(Vector2(x, y), rad, Color(INK, 0.25))
 					x += step
 			y += step
+
+	## A caption panel with nothing to show: screentone thickening toward the frame round a clear
+	## centre, and a few soft lines drawn in, so it reads as a drawn mood, not an empty box.
+	func _vignette(r: Rect2, ink := 0.55, lines := true) -> void:
+		draw_rect(r, PAPER)
+		var c := r.get_center()
+		var reach := r.size.length() * 0.5
+		var step := 10.0
+		var y := 0.0
+		while y < r.size.y:
+			var x := fmod(y / step, 2.0) * step * 0.5
+			while x < r.size.x:
+				var k := clampf(Vector2(x, y).distance_to(c) / reach * 1.35 - 0.3, 0.0, 1.0)
+				if k > 0.05:
+					draw_circle(Vector2(x, y), 3.6 * k, Color(INK, ink))
+				x += step
+			y += step
+		if lines:
+			_speed_soft(r)
 
 	## Focus lines: ink wedges from the frame toward a clear centre.
 	func _speed(r: Rect2) -> void:
