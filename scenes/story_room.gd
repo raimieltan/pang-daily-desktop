@@ -3,7 +3,7 @@ extends Node3D
 ## Story mode's room stage: the small rooms of the story (the clinic, Pang's rented room, Jolo's
 ## family home), built in Blender by tools/world_builders/build-story-rooms.py, lit by their own
 ## lamps and framed from the open side like a panel. A beat names its set ("set"); a "~set" line
-## cuts to another mid-scene. Esc leaves the story for the title (progress is saved every beat).
+## cuts to another mid-scene. Esc pauses (StoryPause).
 
 ## glb, the camera's eye and aim (layout units: x east, y up, z north), fov, and the room's lamps
 ## [position, colour, energy, range].
@@ -50,10 +50,6 @@ func _ready() -> void:
 	director.room = self
 	add_child(director)
 
-
-func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("hub_menu"):
-		StoryMode.quit_to_title(get_tree())
 
 
 ## Build set `name` (no-op if it is already up).

@@ -93,6 +93,9 @@ func _ready() -> void:
 	garage = StoryGarage.new()
 	garage.car_changed.connect(_fit_car)
 	add_child(garage)
+	# Pass 1 has the game menu's pause; every other stage gets the story's own.
+	if stage != "pass":
+		add_child(StoryPause.new())
 	if session:
 		weather = Weather.new()
 		weather.camera = session.camera

@@ -3,7 +3,7 @@ extends Node3D
 ## Rivals parked at Kyo: pull up beside one and press E. Rivals cruising the loop: get behind one
 ## and flash your lights (L). Either way the SP battle runs on Pass 1, then E brings you back here.
 ## The talyer's bays swap your car (Ruel); the east end of the main road heads up to Pass 1.
-## Esc: the title menu. R: back onto the loop.
+## Esc: the title menu (in story mode, the story's pause menu). R: back onto the loop.
 
 const CHALLENGE_REACH := 7.5
 const FLASH_REACH := 40.0
@@ -246,10 +246,8 @@ func _update_prompt(at: Vector2) -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if _leaving:
 		return
+	# In the story, Esc is the story's pause menu (StoryPause, added by the director).
 	if StoryMode.active:
-		if event.is_action_pressed("hub_menu"):
-			_leaving = true
-			StoryMode.quit_to_title(get_tree())
 		return
 	if event.is_action_pressed("interact") and _action.is_valid():
 		_action.call()

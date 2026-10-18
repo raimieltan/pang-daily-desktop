@@ -31,6 +31,7 @@ It is reached from the title screen (STORY). It sits beside the racing grind, no
 | Scoring | Purses and grids are real (see Money, parts and free roam). The final (R19) pays nothing; its result card is a photo of the car and the place, no time. No achievement for "beating Ghost" or for forgiveness. |
 | Money in story mode (Oct 18) | Story mode has money, wear and parts. This reverses "no money, wear or ladder" for the story only; the grind's economy is unchanged and shares no wallet with it. |
 | Free roam (Oct 18) | The progression is played in free-roam sections, not menus: "this is still a racing game." The shop and Kapitan's board are places you drive to; the story continues when you drive into the NEXT place and press E. Design: `docs/superpowers/specs/2026-10-18-story-free-roam-design.md`. |
+| Pause (Oct 18) | Esc pauses on every stage: Pass 1 uses the game menu's pause; the barangay, the rooms and the pages use the story's own (`StoryPause`: resume, quit to title). Before, Esc there quit straight to the title. |
 | Two cars (Oct 18) | The memory car (before the crash) and the present car (after) are separate builds with separate wallets and ledgers. `StoryMode.timeline(index)` decides which. |
 | The crash stays fixed (Oct 18) | The night run keeps its wet grip, the patch and the takeover whatever is on the car. The rain set is the only part that could matter, and it can't arrive before the night run. |
 | After the story | Not built yet: "Pang's EG" in the grind garage. |

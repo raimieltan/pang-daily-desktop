@@ -1,7 +1,7 @@
 extends Node
 ## Story mode's paper stage: rooms the game does not build (a rented room, Jolo's family home, the
 ## group chat, act cards) play on a manga page, a screentone wash with ink panel borders.
-## Esc leaves the story for the title (progress is saved after every beat).
+## Esc pauses (StoryPause).
 
 
 func _ready() -> void:
@@ -24,10 +24,6 @@ func _ready() -> void:
 	director.stage = "panel"
 	add_child(director)
 
-
-func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("hub_menu"):
-		StoryMode.quit_to_title(get_tree())
 
 
 ## Paper, a dot screentone fading down the page, and three ink panel frames.
