@@ -110,12 +110,18 @@ func surface_grip() -> float:
 	return lerpf(1.0, WET_GRIP, wet) * grip_scale
 
 
+## A car on the rain set keeps more of its grip on a wet road; a damp patch under one car
+## (CarBody.surface_scale) is that car's alone.
+func grip_for(body: CarBody) -> float:
+	var wet_grip := CarParts.RAIN_WET_GRIP if body.on_rain_set() else WET_GRIP
+	return lerpf(1.0, wet_grip, wet) * grip_scale * body.surface_scale
+
+
 func _physics_process(_delta: float) -> void:
-	var grip := surface_grip()
 	for car in get_tree().get_nodes_in_group(&"cars"):
 		var body := car as CarBody
 		if body and body.model:
-			body.model.surface_grip = grip
+			body.model.surface_grip = grip_for(body)
 
 
 func _process(_delta: float) -> void:

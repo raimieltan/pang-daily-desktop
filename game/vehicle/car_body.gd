@@ -36,6 +36,10 @@ signal wall_contact(point: Vector3, normal: Vector3, dv: float, slide: float)
 var model: HandlingModel
 ## Tuning steps on top of the preset (CarSetup), empty for stock.
 var setup := {}
+## Parts and tire wear under the setup (CarParts), empty for a showroom car.
+var build := {}
+## Extra grip on top of the road's (Weather): a damp patch under this car alone.
+var surface_scale := 1.0
 var solver: SuspensionSolver
 var contact := VehicleTypes.AxleContact.new()
 ## Returns a `VehicleTypes.DriverInput` for this step. Defaults to no input.
@@ -127,8 +131,21 @@ func set_setup(values: Dictionary) -> void:
 	_apply_config()
 
 
+## Parts and wear (CarParts build) laid under the setup; mass can change with them.
+func set_build(b: Dictionary) -> void:
+	build = b.duplicate(true)
+	_apply_config()
+	_update_mass()
+
+
+## On the rain set (CarParts): Weather gives it its own wet grip.
+func on_rain_set() -> bool:
+	return CarParts.has(build, "rain_set")
+
+
 func _apply_config() -> void:
-	model.set_config(CarSetup.apply(HandlingPresets.physical_config(HandlingPresets.resolve(preset)), setup))
+	var physical := HandlingPresets.physical_config(HandlingPresets.resolve(preset))
+	model.set_config(CarSetup.apply(CarParts.apply(physical, build), setup))
 
 
 ## Fresh, warm tires of a product on dry asphalt (TS `tireResponse` for a new assembly).
