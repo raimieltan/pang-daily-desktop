@@ -5,7 +5,8 @@ extends RefCounted
 
 var errors: Array[String] = []
 
-const TYPES := ["chapter", "talk", "goto", "race", "practice", "attack", "sectors", "crash", "daylight", "evidence", "end"]
+const TYPES := ["chapter", "talk", "goto", "race", "practice", "attack", "sectors", "crash", "daylight", "evidence", "end",
+	"roam", "test", "trial", "final"]
 const STAGES := ["pass", "hub", "room", "panel"]
 
 
@@ -22,19 +23,27 @@ func test_beats_are_well_formed() -> void:
 		ids[id] = true
 		_check(b.get("type", "") in TYPES, "%s: known type %s" % [id, b.get("type")])
 		_check(b.get("stage", "") in STAGES, "%s: known stage %s" % [id, b.get("stage")])
-		if b["type"] in ["race", "practice", "attack", "sectors", "crash", "daylight"]:
+		if b["type"] in ["race", "practice", "attack", "sectors", "crash", "daylight", "trial", "final"]:
 			_check(b["stage"] == "pass" or (b["type"] == "race" and b.get("course", "") == "loop" and b["stage"] == "hub"),
 				"%s: drives on a stage with a road" % id)
+		if b["type"] == "test":
+			_check((b.get("kind") == "shakedown" and b["stage"] == "hub") or (b.get("kind") == "lights" and b["stage"] == "pass"),
+				"%s: a shakedown in the barangay or the lights test on the pass" % id)
+		if b["type"] == "roam":
+			_check(b["stage"] == "hub" and HubLayout.PLACES.has(b.get("next", "")), "%s: roam to a hub place" % id)
+			for e in b.get("events", []):
+				_check(e in ["sprints", "mountain"], "%s: known roam event %s" % [id, e])
 		if b["type"] == "goto":
 			_check(b["stage"] == "hub" and HubLayout.PLACES.has(b["place"]), "%s: goto a hub place" % id)
 		if b["stage"] == "room":
 			_check(StoryRoom.SETS.has(b.get("set", "")), "%s: room set %s exists" % [id, b.get("set")])
 		if b.has("spot"):
 			_check(b["stage"] == "hub" and HubLayout.PLACES.has(b["spot"]), "%s: spot is a hub place" % id)
-		for key in ["lines", "before", "after", "win", "lose", "beaten", "ahead"]:
+		for key in ["lines", "before", "after", "win", "lose", "beaten", "ahead", "heat_lines", "between", "after_lap", "lifted", "chased"]:
 			for line in b.get(key, []):
 				var wait: bool = line is Array and line.size() == 2 and line[0] == "~wait" and (line[1] is float or line[1] is int)
-				_check(wait or (line is Array and line.size() == 2 and line[0] is String and line[1] is String), "%s.%s: [speaker, text]" % [id, key])
+				var cond: bool = line is Array and line.size() == 3 and line[2] is String
+				_check(wait or (line is Array and (line.size() == 2 or cond) and line[0] is String and line[1] is String), "%s.%s: [speaker, text(, condition)]" % [id, key])
 				if line is Array and line.size() == 2 and line[0] == "~set":
 					_check(b["stage"] == "room" and StoryRoom.SETS.has(line[1]), "%s: ~set %s is a room set" % [id, line[1]])
 				if line is Array and line.size() == 2 and line[0] == "~sfx":
@@ -45,8 +54,11 @@ func test_beats_are_well_formed() -> void:
 			_check(b["answer"].size() >= pick, "%s: enough right answers to pick %d" % [id, pick])
 			for a in b["answer"]:
 				_check(int(a) >= 0 and int(a) < n, "%s: answer %d is an option" % [id, a])
-		for e in b.get("field", []):
-			_check(e.size() == 4 and CarRoster.get_car(e[1])["id"] == e[1], "%s: field entry %s" % [id, e])
+		var entries: Array = b.get("field", []) + (b.get("heat", []) if b["type"] == "race" else [])
+		for cond in b.get("field_if", {}):
+			entries.append_array(b["field_if"][cond])
+		for e in entries:
+			_check(e is Array and e.size() == 4 and CarRoster.get_car(e[1])["id"] == e[1], "%s: field entry %s" % [id, e])
 	_check(StoryScript.BEATS[StoryScript.BEATS.size() - 1]["type"] == "end", "the story ends on an end beat")
 	_check(StoryScript.acts().size() == 6, "prologue and five acts (got %d)" % StoryScript.acts().size())
 
@@ -415,3 +427,168 @@ func test_fatal_bend_is_hairpin_8a() -> void:
 	_check(absf(StoryCourse.fatal_entry() - 823.05) < 0.1, "8A starts at ~823 m (got %.2f)" % StoryCourse.fatal_entry())
 	var lower := StoryCourse.lower_leg()
 	_check(lower.x >= StoryCourse.fatal_exit() and lower.y > lower.x, "the lower switchback is further down the road")
+
+
+# --- Money, parts and free roam (docs/story/STORY_MODE.md) --------------------------------------
+
+
+func test_every_progression_card_has_a_beat() -> void:
+	var scenes := {}
+	for b in StoryScript.BEATS:
+		scenes[b["scene"]] = true
+	for card in ["S04A", "S04B", "S05A", "S09A", "S11A", "S15A", "S20A", "S23A", "S27A", "S33A", "S33B", "S34A"]:
+		_check(scenes.has(card), "%s is in the script" % card)
+	_check(StoryScript.BEATS.size() == 65, "65 beats (got %d)" % StoryScript.BEATS.size())
+
+
+func test_progression_order() -> void:
+	var i := StoryScript.index_of
+	_check(i.call("s34") < i.call("s34a"), "the recce before the final")
+	for b in StoryScript.BEATS:
+		var at := StoryScript.index_of(b["id"])
+		if StoryMode.timeline(at) == "memory" and (b["type"] == "roam" or b.get("garage", false)):
+			_check(at < i.call("s12"), "%s: every memory purchase stop comes before s12" % b["id"])
+	_check(StoryMode.timeline(i.call("s05a")) == "memory" and StoryMode.timeline(i.call("s15a")) == "present", "timelines follow the memories")
+	_check(StoryMode.timeline(i.call("s00")) == "memory", "the cold open drives the memory car")
+	for id in ["s26", "s27a"]:
+		_check(StoryScript.BEATS[i.call(id)].get("snapshot", "") == "s06", "%s runs on the line-study snapshot" % id)
+
+
+func _with_fresh_progress(f: Callable) -> void:
+	var saved := [StoryMode.beat, StoryMode.cars, StoryMode.wallets, StoryMode.ledgers, StoryMode.commitments, StoryMode.rep, StoryMode.once, StoryMode.snapshot, StoryMode.results]
+	StoryMode.reset_progress()
+	StoryMode.results = {}
+	f.call()
+	StoryMode.beat = saved[0]
+	StoryMode.cars = saved[1]
+	StoryMode.wallets = saved[2]
+	StoryMode.ledgers = saved[3]
+	StoryMode.commitments = saved[4]
+	StoryMode.rep = saved[5]
+	StoryMode.once = saved[6]
+	StoryMode.snapshot = saved[7]
+	StoryMode.results = saved[8]
+
+
+## The critical path is affordable with no optional races at last place: every required entry in
+## the months before is covered by the required purses at the worst finish.
+func test_critical_path_is_affordable() -> void:
+	var earned := int(StoryMode.START_WALLET["memory"])
+	var due := 0
+	for i in StoryScript.BEATS.size():
+		var b: Dictionary = StoryScript.BEATS[i]
+		if StoryMode.timeline(i) != "memory":
+			continue
+		due += int(b.get("entry", 0)) + int(b.get("off_list", 0))
+		if b.has("purse"):
+			var places: int = 1 + b.get("field", []).size()
+			var last: int = places if b["type"] == "race" else 99
+			# R1 must be won (require_win).
+			earned += StoryBoard.payout(b["purse"], 1 if b.get("require_win", false) else last, b.get("kind", ""))
+	_check(earned >= due, "memory: purses at last place (%d) cover the required entries (%d)" % [earned, due])
+
+
+func test_required_entries_never_block() -> void:
+	_with_fresh_progress(func():
+		StoryMode.beat = StoryScript.index_of("s05a")
+		StoryMode.wallets["memory"] = 100
+		_check(StoryMode.pay_entry(1500, true, "THE MOUNTAIN"), "a required entry goes through when broke")
+		_check(StoryMode.wallet() == 100 and StoryMode.commitments_total() == 1500, "...and Jolo covers it")
+		_check(not StoryMode.pay_entry(500, false), "an optional entry needs the cash")
+		StoryMode.beat = StoryScript.index_of("s16")
+		_check(StoryMode.pay_entry(500, true) and StoryMode.owed("present") == 38500, "in the present it goes on Ruel's bill"))
+
+
+## The rain set can't be fitted in the months before, for any purchase sequence; in the present it
+## goes on the bill.
+func test_rain_set_never_arrives_in_time() -> void:
+	_with_fresh_progress(func():
+		StoryMode.wallets["memory"] = 1000000
+		for i in StoryScript.index_of("s13") + 1:
+			StoryMode.beat = i
+			if StoryMode.timeline(i) != "memory":
+				continue
+			for it in StoryShop.ITEMS:
+				StoryShop.buy(it["id"], i)
+			_check(not CarParts.has(StoryMode.cars["memory"], "rain_set"), "no rain set on the memory car at %s" % StoryScript.BEATS[i]["id"])
+		StoryMode.beat = StoryScript.index_of("s15b")
+		_check(StoryShop.status("rain_set") == StoryShop.Status.BUY, "the present rain set is in the corner")
+		_check(StoryShop.buy("rain_set") and StoryMode.owed() == 38000 + 16000, "fitted at cost, on the bill"))
+
+
+## Fronts fitted at s04a are under 0.3 by s12 on the critical path: the night run is on worn fronts.
+func test_fronts_from_s04a_are_worn_by_s12() -> void:
+	var km := 0.0
+	for i in range(StoryScript.index_of("s04a"), StoryScript.index_of("s12")):
+		var b: Dictionary = StoryScript.BEATS[i]
+		if StoryMode.timeline(i) != "memory":
+			continue
+		match b["type"]:
+			"race":
+				var laps := float(b.get("laps", 1))
+				var runs := 2.0 if b.has("heat") else 1.0
+				km += runs * laps * (StoryMode.LOOP_KM if b.get("course", "") == "loop" else StoryMode.PASS_KM)
+			"practice":
+				km += b["passes"].size() * StoryMode.PASS_KM
+			"attack":
+				km += StoryMode.PASS_KM
+			"sectors":
+				km += b["trials"].size() * StoryMode.PASS_KM * 0.35 + (StoryMode.PASS_KM if b.get("connect", false) else 0.0)
+	var build := CarParts.new_build()
+	CarParts.charge(build, km)
+	_check(CarParts.wear(build, "front") < 0.3, "fronts at %.2f after %.1f km (want < 0.3)" % [CarParts.wear(build, "front"), km])
+
+
+func test_parts_change_the_car() -> void:
+	var physical := HandlingPresets.physical_config(HandlingPresets.resolve("fwd_sport_hatch"))
+	var build := CarParts.new_build()
+	var stock := CarParts.apply(physical, build)
+	_check(is_equal_approx(float(stock["tires"]["frontGrip"]), float(physical["tires"]["frontGrip"])), "new tires: stock grip")
+	CarParts.fit(build, "header")
+	CarParts.fit(build, "wheels")
+	var built := CarParts.apply(physical, build)
+	_check(float(built["mechanical"]["engine"]["torqueNm"]) > float(physical["mechanical"]["engine"]["torqueNm"]), "the header adds torque")
+	_check(float(built["chassis"]["massKg"]) < float(physical["chassis"]["massKg"]), "light wheels take mass off")
+	CarParts.charge(build, 100.0)
+	var worn := CarParts.apply(physical, build)
+	_check(absf(float(worn["tires"]["frontGrip"]) / float(built["tires"]["frontGrip"]) - CarParts.WORN_GRIP) < 1e-4, "dead fronts keep 0.95 of the grip")
+	CarParts.fit(build, "front_tires")
+	_check(CarParts.wear(build, "front") == 1.0 and CarParts.wear(build, "rear") < 1.0, "new fronts reset the fronts only")
+	_check(CarParts.rating(build) == 4, "BR adds up (got %d)" % CarParts.rating(build))
+
+
+func test_memory_events_run_once_per_roam() -> void:
+	_with_fresh_progress(func():
+		var i := StoryScript.index_of("s04b")
+		StoryMode.beat = i
+		var b: Dictionary = StoryScript.BEATS[i]
+		var events := StoryBoard.events(b)
+		_check(events.size() == 4, "four regulars race at the gas station (got %d)" % events.size())
+		StoryMode.once[StoryBoard.once_key("s04b", events[0]["id"])] = true
+		_check(StoryBoard.events(b)[0]["done"], "a sprint run in the past stays run")
+		var j := StoryScript.index_of("s17")
+		StoryMode.beat = j
+		var present := StoryBoard.events(StoryScript.BEATS[j])
+		_check(present.size() == 6, "present roams add the mountain events (got %d)" % present.size())
+		StoryMode.beat = StoryScript.index_of("s33r")
+		_check(StoryBoard.events(StoryScript.BEATS[StoryMode.beat]).filter(func(e): return e["id"] == "sprint_tisoy").is_empty(),
+			"after S31 Tisoy won't race unless Pang beat him for the clip")
+		StoryMode.set_flag("won:TISOY")
+		_check(not StoryBoard.events(StoryScript.BEATS[StoryMode.beat]).filter(func(e): return e["id"] == "sprint_tisoy").is_empty(),
+			"...and will if he did"))
+
+
+func test_conditional_lines() -> void:
+	_with_fresh_progress(func():
+		StoryMode.beat = StoryScript.index_of("s12")
+		StoryMode.wallets["memory"] = 20000
+		var lines := StoryDirector.spoken([["A", "always"], ["B", "rich", "cash:16000"], ["C", "broke", "!cash:16000"]])
+		_check(lines.size() == 2 and lines[1][1] == "rich", "conditions pick the line (got %s)" % [lines]))
+
+
+func test_payouts() -> void:
+	_check(StoryBoard.payout([5000, 3000, 1500], 2) == 3000, "second pays the second purse")
+	_check(StoryBoard.payout([5000, 3000, 1500], 4) == 1000, "below the places listed: ₱1,000")
+	_check(StoryBoard.payout([2000], 2, "sprint") == 0, "a lost sprint pays nothing")
+	_check(StoryBoard.clock_pay(70.0, [[71.0, 8000], [74.0, 5000]]) == 8000 and StoryBoard.clock_pay(73.0, [[71.0, 8000], [74.0, 5000]]) == 5000,
+		"the clock pays the best band beaten")

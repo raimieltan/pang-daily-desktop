@@ -47,6 +47,15 @@ var _sign: SignAt8A
 var _warned_at := -1.0
 ## A scene is being played from the driver's seat of the parked car.
 var _cabin := false
+## The hub scene (hub stage): it spawns the regulars parked at the gas station during free roam.
+var hub: Node
+## The road the current drive is on (probes put their AI on it).
+var drive_track: TrackData
+## The talyer's garage and Kapitan's board (free roam, and talk beats with "garage").
+var garage: StoryGarage
+var _prompt: Label
+var _money: Label
+var _toast_left := 0.0
 
 
 func _ready() -> void:
@@ -68,6 +77,22 @@ func _ready() -> void:
 	layer.layer = 13
 	layer.add_child(_objective)
 	add_child(layer)
+	_prompt = MangaType.label("", 28)
+	_prompt.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
+	_prompt.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	_prompt.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	_prompt.position.y = -150
+	_prompt.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	layer.add_child(_prompt)
+	_money = MangaType.label("", 24, MangaType.caption())
+	_money.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+	_money.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	_money.position = Vector2(-24, 124)
+	_money.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	layer.add_child(_money)
+	garage = StoryGarage.new()
+	garage.car_changed.connect(_fit_car)
+	add_child(garage)
 	if session:
 		weather = Weather.new()
 		weather.camera = session.camera
@@ -93,6 +118,18 @@ func _exit_tree() -> void:
 func _run() -> void:
 	await get_tree().process_frame
 	await get_tree().process_frame
+	if not StoryMode.side.is_empty():
+		# A mountain event picked off Kapitan's board: run it here, then back to the roam.
+		if StoryMode.side.get("stage", "pass") == stage:
+			await _side_event(StoryMode.side)
+		StoryMode.side = {}
+		StoryMode.roam_from = "gas"
+		if not is_inside_tree():
+			return
+		if not dialogue.is_black():
+			await dialogue.fade(true, 0.45)
+		StoryMode.goto(get_tree(), StoryMode.beat)
+		return
 	while StoryMode.active and is_inside_tree():
 		var b := StoryMode.current()
 		if b.get("stage", "panel") != stage:
@@ -114,13 +151,17 @@ func _run() -> void:
 
 func _play(b: Dictionary) -> void:
 	_conditions(b)
+	_fit_car()
 	await _reveal(b)
 	match b["type"]:
 		"chapter":
 			await dialogue.chapter(b["act"], b["title"], b.get("subtitle", ""))
 		"talk":
 			await _settle(b)
-			await dialogue.play(b["lines"], b.get("place", ""), b.get("when", ""), b.get("style", ""))
+			await _lines(b, "lines", b.get("style", ""))
+			if b.get("garage", false):
+				await _open_garage("shop")
+				await _lines(b, "after")
 		"goto":
 			await _goto(b)
 		"race":
@@ -140,8 +181,17 @@ func _play(b: Dictionary) -> void:
 			await _lines(b, "before")
 			await _examine(b, b.get("cards", []))
 			await _lines(b, "after")
+		"roam":
+			await _roam(b)
+		"test":
+			await _test(b)
+		"trial":
+			await _trial(b)
+		"final":
+			await _final(b)
 		"end":
 			await dialogue.chapter("PANG DAILY", "THE GHOST LINE", "The road continued ahead, imperfect and unrepeatable.")
+	_write_down(b)
 	if b.has("comic_after"):
 		await dialogue.comic(b["comic_after"], "black" if _cut_next() else "fade")
 	await _exit(b)
@@ -229,7 +279,9 @@ func _reveal_shot(b: Dictionary) -> void:
 	else:
 		# Held still behind the pages: the cold open starts the car itself.
 		_hold(true)
-	if b.has("comic"):
+	# Back in a roam from a mountain event: the roam's pages were seen on the way in.
+	var back: bool = b["type"] == "roam" and StoryMode.roam_from != ""
+	if b.has("comic") and not back:
 		await dialogue.comic(b["comic"], "black" if cold else "fade")
 	elif dialogue.is_black() and not cold:
 		await dialogue.fade(false, 0.5)
@@ -249,13 +301,55 @@ func tokens() -> Dictionary:
 	var t := { "ghost_time": TimeAttackRun.format_time(StoryMode.posted_time(_ghost.time)) if _ghost.valid() else "--:--.---" }
 	t["cut_time"] = TimeAttackRun.format_time(_ghost.time) if _ghost.valid() else "--:--.---"
 	t["crash_cut"] = "%.1f s" % float(StoryMode.record.get("camera_cut", 0.0))
+	var car := StoryMode.car()
+	t["front_wear"] = "%d%%" % roundi(CarParts.wear(car, "front") * 100.0)
+	t["wallet"] = "₱" + StoryGarage._pesos(StoryMode.wallet())
+	t["owed"] = "₱" + StoryGarage._pesos(StoryMode.owed())
+	t["rain_price"] = "₱" + StoryGarage._pesos(StoryShop.price("rain_set"))
 	return t
 
 
-func _lines(b: Dictionary, key: String) -> void:
-	var lines: Array = b.get(key, [])
+func _lines(b: Dictionary, key: String, style := "") -> void:
+	var lines := spoken(b.get(key, []))
 	if not lines.is_empty():
-		await dialogue.play(lines, b.get("place", ""), b.get("when", ""))
+		await dialogue.play(lines, b.get("place", ""), b.get("when", ""), style)
+
+
+## The lines that apply to this player: a line with a third element plays only when that
+## condition holds on their record (see `holds`).
+static func spoken(lines: Array) -> Array:
+	var out := []
+	for line in lines:
+		if line is Array and line.size() == 3:
+			if holds(str(line[2])):
+				out.append([line[0], line[1]])
+		else:
+			out.append(line)
+	return out
+
+
+## A condition on the player's record: "won:NAME", "list" (Dante's list), "bought:part",
+## "cash:N" (the wallet holds N), "patch" (went into the damp in the final), any rep flag;
+## a leading "!" negates.
+static func holds(cond: String) -> bool:
+	if cond.begins_with("!"):
+		return not holds(cond.substr(1))
+	if cond.begins_with("cash:"):
+		return StoryMode.wallet() >= int(cond.substr(5))
+	if cond == "patch":
+		return bool(StoryMode.results.get("s34a", {}).get("entered_patch", false))
+	return StoryMode.flag(cond)
+
+
+## What a beat writes down once it's played: Jolo's commitments (`commit`), Ruel's bill (`bill`),
+## flags (`flag`, e.g. the rain set ordered at s12).
+func _write_down(b: Dictionary) -> void:
+	if b.has("commit"):
+		StoryMode.commitments.append(b["commit"].duplicate())
+	if b.has("bill"):
+		StoryMode.bill(str(b["bill"][0]), int(b["bill"][1]))
+	if b.has("flag"):
+		StoryMode.set_flag(str(b["flag"]))
 
 
 # --- Stage control ----------------------------------------------------------------------------
@@ -309,7 +403,13 @@ func _settle(b: Dictionary) -> void:
 		session.camera.mode = ChaseCamera.Mode.HOOD
 		weather.windscreen.residue = float(b.get("glass", 0.0))
 		return
-	if stage == "hub" and b.has("spot"):
+	if stage == "hub" and b["type"] == "roam":
+		# Back from a race in the roam: on the forecourt. Else where the beat starts, if anywhere.
+		var from: String = StoryMode.roam_from if StoryMode.roam_from != "" else str(b.get("spot", ""))
+		if from != "":
+			var r: Vector3 = HubLayout.PLACES[from]["spawn"]
+			await _place({ "position": HubLayout.pos(r.x, r.y, 0.3), "heading": HubLayout.yaw(r.z) })
+	elif stage == "hub" and b.has("spot"):
 		var s: Vector3 = HubLayout.PLACES[b["spot"]]["spawn"]
 		await _place({ "position": HubLayout.pos(s.x, s.y, 0.3), "heading": HubLayout.yaw(s.z) })
 		if SPOT_VIEWS.has(b["spot"]):
@@ -450,59 +550,199 @@ static func field_spec(entry: Array) -> Dictionary:
 
 
 ## A VS race on Pass 1 or round the barangay loop; `require_win` runs it again until you win.
+## Money: `entry` is paid first (StoryMode.pay_entry: never blocks), `purse` pays by place,
+## `bet` is a side bet won or lost; `heat` races a heat first; `ghost` runs the overlay ahead.
 func _race(b: Dictionary) -> void:
 	await _settle(b)
 	await _lines(b, "before")
-	var vs := vs_battle
-	var made_here := false
-	if b.get("course", "pass") == "loop":
-		vs = VsBattle.new()
-		vs.track = _loop_course()
-		vs.session = session
-		add_child(vs)
-		made_here = true
-		_saved_reset = session.reset_pose
-	var field: Array = []
-	for e in b["field"]:
-		field.append(field_spec(e))
-	vs.field_override = field
-	vs.sp_rival = -1
-	vs.opponents = field.size()
-	var place := 0
-	while true:
-		_hold(false)
-		if time_attack:
-			time_attack.free_drive()
-		vs.start()
-		if b.get("trauma", false):
-			_shaken = 0.0
-			session.input_filter = func(i: VehicleTypes.DriverInput) -> VehicleTypes.DriverInput:
-				return _shake(vs._filter_input(i), vs)
-		place = await vs.finished
-		await _coast(RESULT_HOLD)
-		StoryMode.results[b["id"]] = { "place": place, "time": vs.run.time if vs.run else 0.0 }
-		vs.stop()
-		_hold(true)
-		if place == 1 or not b.get("require_win", false):
-			break
-		await _lines(b, "lose")
-	if made_here:
-		vs.queue_free()
-		session.reset_pose = _saved_reset
-		var s: Vector3 = HubLayout.PLACES["gas"]["spawn"]
-		await _place({ "position": HubLayout.pos(s.x, s.y, 0.3), "heading": HubLayout.yaw(s.z) })
+	_pay_in(b)
+	if b.has("heat"):
+		dialogue.set_caption("HEAT")
+		var heat := await _race_core(b, _field(b["heat"]), false)
+		dialogue.set_caption("")
+		StoryMode.results[b["id"] + "_heat"] = { "place": heat }
+		await _lines(b, "heat_lines")
+		dialogue.set_caption("FINAL")
+	var entries: Array = b["field"].duplicate()
+	for cond in b.get("field_if", {}):
+		if holds(cond):
+			entries.append_array(b["field_if"][cond])
+	var place := await _race_core(b, _field(entries), b.get("require_win", false))
+	dialogue.set_caption("")
+	_pay_out(b, place)
+	if b["field"].size() == 1 and place == 1:
+		StoryMode.set_flag("won:" + str(b["field"][0][0]))
+	if b.has("podium_flag") and place <= 3:
+		StoryMode.set_flag(str(b["podium_flag"]))
+	StoryMode.save()
 	if not b.get("require_win", false):
 		await _lines(b, "win" if place == 1 else "lose")
 	await _lines(b, "after")
 
 
-## One lap of the barangay loop as a race course (two laps of points so look-ahead never runs out).
-func _loop_course() -> TrackData:
-	var t := HubLayout.loop_track(2)
-	var lap := t.length() / 2.0
+static func _field(entries: Array) -> Array:
+	var out := []
+	for e in entries:
+		out.append(field_spec(e))
+	return out
+
+
+## The race itself, run until it is won when `require_win`; returns the finishing place.
+func _race_core(b: Dictionary, field: Array, require_win: bool) -> int:
+	var vs := vs_battle
+	var made_here := false
+	var laps := int(b.get("laps", 1))
+	if b.get("course", "pass") == "loop":
+		vs = VsBattle.new()
+		vs.track = _loop_course(laps)
+		vs.session = session
+		add_child(vs)
+		made_here = true
+		_saved_reset = session.reset_pose
+	drive_track = vs.track
+	vs.field_override = field
+	vs.sp_rival = -1
+	vs.opponents = field.size()
+	var place := 0
+	var tries := 0
+	while true:
+		_hold(false)
+		if time_attack:
+			time_attack.free_drive()
+		if tries > 0:
+			# "They'll let you run it back": each rerun of a race that must be won, the field
+			# eases off a little, so nobody is stuck behind it.
+			for spec in field:
+				spec["skill"] = maxf(0.6, float(spec["skill"]) - 0.02)
+			vs.field_override = field
+		tries += 1
+		vs.start()
+		if b.get("trauma", false):
+			_shaken = 0.0
+			session.input_filter = func(i: VehicleTypes.DriverInput) -> VehicleTypes.DriverInput:
+				return _shake(vs._filter_input(i), vs)
+		if b.get("ghost", false) and _ghost.valid():
+			_overlay(vs)
+		place = await vs.finished
+		await _coast(RESULT_HOLD)
+		StoryMode.results[b["id"]] = { "place": place, "time": vs.run.time if vs.run else 0.0 }
+		vs.stop()
+		_hold(true)
+		if place == 1 or not require_win:
+			break
+		await _lines(b, "lose")
+	# Wear once for the race, however many reruns it took (the story's night happened once).
+	_wear(laps * (StoryMode.LOOP_KM if made_here else StoryMode.PASS_KM))
+	if made_here:
+		vs.queue_free()
+		session.reset_pose = _saved_reset
+		var s: Vector3 = HubLayout.PLACES["gas"]["spawn"]
+		await _place({ "position": HubLayout.pos(s.x, s.y, 0.3), "heading": HubLayout.yaw(s.z) })
+	return place
+
+
+## The Ghost Line running ahead of the field (Night 3): the car in the clip at the cut's pace.
+func _overlay(vs: VsBattle) -> void:
+	_ghost_car = _ghost_car if _ghost_car else _make_ghost_car()
+	_ghost_car.opacity = 0.45
+	while is_inside_tree() and vs.active:
+		await get_tree().physics_frame
+		var running := vs.run and vs.run.phase == TimeAttackRun.Phase.RUNNING
+		_ghost_car.show_pose(_ghost.pose(vs.run.time) if running else {})
+	if _ghost_car:
+		_ghost_car.show_pose({})
+
+
+## One lap (or `laps`) of the barangay loop as a race course, with a lap of points to spare so
+## look-ahead never runs out.
+func _loop_course(laps := 1) -> TrackData:
+	var t := HubLayout.loop_track(laps + 1)
+	var lap := t.length() / float(laps + 1)
 	t.start_distance = 40.0
-	t.finish_distance = 40.0 + lap
+	t.finish_distance = 40.0 + lap * laps
 	return t
+
+
+# --- Money and the car ------------------------------------------------------------------------
+
+
+## The beat's car on the session: the timeline's build (or the line-study snapshot) and its setup.
+func _fit_car() -> void:
+	if session == null or session.car == null:
+		return
+	var car := StoryMode.car()
+	session.car.set_build(car)
+	session.car.set_setup(car.get("setup", {}))
+
+
+## Tire wear for a drive just done, then the car as it now is.
+func _wear(km: float) -> void:
+	StoryMode.drive(km)
+	_fit_car()
+
+
+## A beat's entry: the posted fee, more for a driver off Dante's list where it says so.
+static func entry_for(b: Dictionary) -> int:
+	var fee := int(b.get("entry", 0))
+	if fee > 0 and b.has("off_list") and not StoryMode.flag("list"):
+		fee += int(b["off_list"])
+	return fee
+
+
+func _pay_in(b: Dictionary) -> void:
+	var fee := entry_for(b)
+	if fee <= 0:
+		return
+	var had := StoryMode.wallet()
+	StoryMode.pay_entry(fee, true, str(b.get("title", "ENTRY")))
+	_toast("ENTRY  ₱%s%s" % [StoryGarage._pesos(fee), "" if had >= fee else ("   ·   JOLO COVERED IT" if StoryMode.timeline() == "memory" else "   ·   ON RUEL'S BILL")])
+
+
+## What a race paid: the purse by place, the side bet either way.
+func _pay_out(b: Dictionary, place: int) -> void:
+	var won := 0
+	if b.has("purse"):
+		won = StoryBoard.payout(b["purse"], place, b.get("kind", ""))
+	if b.has("bet"):
+		var stake := mini(int(b["bet"]), StoryMode.wallet()) if place != 1 else int(b["bet"])
+		if place == 1:
+			won += stake
+		else:
+			StoryMode.spend(stake)
+			_toast("SIDE BET  -₱%s" % StoryGarage._pesos(stake))
+	if won > 0:
+		StoryMode.earn(won)
+		_toast("PURSE  ₱%s   ·   WALLET  ₱%s" % [StoryGarage._pesos(won), StoryGarage._pesos(StoryMode.wallet())])
+
+
+## A short line under the top of the screen (money in and out).
+func _toast(text: String) -> void:
+	_objective.text = text
+	_toast_left = 3.5
+	var me := text
+	get_tree().create_timer(3.5).timeout.connect(func():
+		if _objective.text == me:
+			_objective.text = "")
+
+
+func _open_garage(tab: String) -> void:
+	if StoryDialogue.auto_advance > 0.0:
+		_auto_shop()
+		return
+	_hold(true)
+	_money.text = ""
+	await garage.open_garage(tab)
+	_fit_car()
+
+
+## Probes: buy the cheapest part Ruel would choose that the wallet covers.
+func _auto_shop() -> void:
+	for it in StoryShop.ITEMS:
+		if it["kind"] == "ruel" and StoryShop.status(it["id"]) == StoryShop.Status.BUY and StoryShop.price(it["id"]) <= StoryMode.wallet() \
+				and it["id"] != "rain_set":
+			StoryShop.buy(it["id"])
+			_fit_car()
+			return
 
 
 ## The first return: a flash across the barrier mid-lap, and the driver flinches.
@@ -534,6 +774,9 @@ func _shake(i: VehicleTypes.DriverInput, vs: VsBattle) -> VehicleTypes.DriverInp
 func _practice(b: Dictionary) -> void:
 	await _settle(b)
 	await _lines(b, "before")
+	# The car in the clip: what the evidence later runs on (R8, R16).
+	StoryMode.take_snapshot()
+	drive_track = PASS_TRACK
 	StoryMode.record["passes"] = []
 	for p in b["passes"]:
 		MangaArt.apply_night(float(p.get("night", 0.0)))
@@ -544,6 +787,7 @@ func _practice(b: Dictionary) -> void:
 		dialogue.set_caption(p["label"])
 		var run := await _timed_run({}, PackedFloat32Array(), "BEST")
 		StoryMode.add_pass(p["label"], recorder.frames, run["splits"], run["time"])
+		_wear(StoryMode.PASS_KM)
 		dialogue.set_caption("")
 		_hold(true)
 		await dialogue.play([p["note"]])
@@ -586,6 +830,8 @@ func _attack(b: Dictionary) -> void:
 	await _lines(b, "before")
 	if not await _need_ghost():
 		return
+	_pay_in(b)
+	drive_track = PASS_TRACK
 	var label := "COMBINED BEST SECTORS" if b.get("label_clue", false) else "GHOST TIME"
 	var target := _target(b)
 	if b.get("label_clue", false):
@@ -594,16 +840,31 @@ func _attack(b: Dictionary) -> void:
 			if time_attack.hud:
 				time_attack.hud.best_text("GHOST TIME  " + TimeAttackRun.format_time(target["time"])))
 	var run := await _timed_run(target, _ghost.frames, label)
+	_wear(StoryMode.PASS_KM)
 	StoryMode.results[b["id"]] = { "time": run["time"], "splits": Array(run["splits"]) }
 	var key := after_key(b, run["time"], target, _ghost.time)
 	if key == "beaten" and b.get("posted", false):
 		# Beaten in public: by the time the board is read, Dante has posted a time under yours.
 		StoryMode.repost(run["time"])
+		_keep_repost()
+	# The purse goes to a run under the target; anything else gets the ₱1,000 for finishing.
+	if b.has("purse"):
+		_pay_out(b, 1 if run["time"] < float(target["time"]) else 99)
+	if key == "beaten" and b.has("bounty"):
+		StoryMode.earn(int(b["bounty"]))
+		_toast("GHOST BOUNTY  ₱%s" % StoryGarage._pesos(int(b["bounty"])))
 	StoryMode.save()
 	_hold(true)
 	if b.has("after_cards"):
 		await _examine(b, b["after_cards"])
 	await _lines(b, key)
+
+
+## Every number Dante ever posted, oldest first (S29's board, S30's table).
+func _keep_repost() -> void:
+	var list: Array = StoryMode.record.get("reposts", [])
+	list.append(float(StoryMode.record["posted"]))
+	StoryMode.record["reposts"] = list
 
 
 ## What a drive chases: the cut itself, or (`posted`) the number Dante put on it, the splits
@@ -639,12 +900,15 @@ func _sectors(b: Dictionary) -> void:
 	await _lines(b, "before")
 	if not await _need_ghost():
 		return
+	_pay_in(b)
+	drive_track = PASS_TRACK
 	var times := []
 	for trial in b["trials"]:
 		MangaArt.apply_night(float(trial.get("night", 0.0)))
 		weather.wet = float(trial.get("wet", 0.0))
 		dialogue.set_caption(trial["label"])
 		var t := await _flying_sector(int(trial["sector"]))
+		_wear(StoryMode.PASS_KM * 0.35)
 		times.append([int(trial["sector"]), t])
 		dialogue.set_caption("")
 		_hold(true)
@@ -656,8 +920,15 @@ func _sectors(b: Dictionary) -> void:
 		weather.wet = 0.0
 		dialogue.set_caption("ALL OF IT  ·  ONE RUN  ·  TODAY'S ROAD")
 		var run := await _timed_run(_target(b), _ghost.frames, "GHOST TIME")
+		_wear(StoryMode.PASS_KM)
 		dialogue.set_caption("")
 		result["connected"] = run["time"]
+	if b.has("purse"):
+		# Night 1: beat Ghost in any one sector.
+		var any := false
+		for tr in times:
+			any = any or float(tr[1]) < _ghost.sector_time(int(tr[0]))
+		_pay_out(b, 1 if any else 99)
 	StoryMode.results[b["id"]] = result
 	StoryMode.save()
 	_hold(true)
@@ -749,6 +1020,7 @@ func _crash(b: Dictionary) -> void:
 		await _lines(b, "before")
 		if not await _need_ghost():
 			return
+		_pay_in(b)
 		_hold(false)
 		time_attack.records = false
 		time_attack.reference = _target(b)
@@ -894,7 +1166,12 @@ func _daylight(b: Dictionary) -> void:
 	add_child(truck)
 	_hold(false)
 	session.set_clean_feed(true)
-	_ghost_car = _ghost_car if _ghost_car else (_make_ghost_car() if _ghost.valid() else null)
+	drive_track = t
+	# The recce (S34) has no ghost: the road as it is today.
+	if b.get("ghost", true):
+		_ghost_car = _ghost_car if _ghost_car else (_make_ghost_car() if _ghost.valid() else null)
+	# Lines said on the way, at metres from 8A's entry: [offset, who, text].
+	var cues: Array = b.get("cues", []).duplicate()
 	var index := t.nearest_index(session.car.global_position)
 	var ghost_t := -1.0
 	var ghost_life := 0.0
@@ -904,6 +1181,9 @@ func _daylight(b: Dictionary) -> void:
 		truck.step(dt, get_tree().get_nodes_in_group(&"cars"))
 		index = t.nearest_index(session.car.global_position, index)
 		var d := index * t.spacing
+		while not cues.is_empty() and d >= entry + float(cues[0][0]):
+			var c: Array = cues.pop_front()
+			dialogue.subtitle(c[1], c[2], 3.0)
 		if _ghost_car and ghost_t < 0.0 and d >= entry - 240.0:
 			ghost_t = StoryCourse.ghost_time_at(_ghost, d + 20.0)
 		if _ghost_car and ghost_t >= 0.0 and ghost_life < 11.0:
@@ -920,6 +1200,443 @@ func _daylight(b: Dictionary) -> void:
 	_hold(true)
 	truck.queue_free()
 	await _lines(b, "after")
+
+
+# --- Free roam ---------------------------------------------------------------------------------
+
+
+## Where the garage is: the talyer's bays (hub x, z rect), and how close counts as pulled up.
+const BAYS := Rect2(8.5, 151, 31, 16.5)
+const PULL_UP := 7.5
+const BOARD_REACH := 6.0
+
+
+## The barangay between scenes: drive anywhere; pull up at Ruel's for the garage, beside a regular
+## at Bahandi Fuels to race them, at Kapitan's board for everything open; drive into the NEXT place
+## and press E to carry on the story.
+func _roam(b: Dictionary) -> void:
+	await _settle(b)
+	if not StoryMode.once.has("seen:" + b["id"]):
+		await _lines(b, "before")
+		StoryMode.once["seen:" + b["id"]] = true
+	var parked := _park_regulars(b)
+	var board_prop := _board_prop() if not StoryBoard.events(b).is_empty() else null
+	drive_track = null
+	var left := ""
+	# Probes play roams on their own; PANG_ROAM=1 leaves one open (screenshots of the barangay).
+	if StoryDialogue.auto_advance > 0.0 and not OS.has_environment("PANG_ROAM"):
+		await _auto_roam(b)
+	else:
+		left = await _roam_loop(b, parked)
+	if left == "side":
+		# Up the mountain for a board event: this scene is on its way out, the beat stays put.
+		while is_inside_tree():
+			await get_tree().process_frame
+		return
+	for car in parked:
+		car.queue_free()
+	if board_prop:
+		board_prop.queue_free()
+	_prompt.text = ""
+	_money.text = ""
+	_objective.text = ""
+	StoryMode.roam_from = ""
+	var next: String = b["next"]
+	var i := StoryMode.beat + 1
+	var nb: Dictionary = StoryScript.BEATS[i] if i < StoryScript.BEATS.size() else {}
+	if nb.get("spot", "") == next and SPOT_VIEWS.has(next):
+		await _ease_into(next)
+	_hold(true)
+
+
+## Returns "next" when the player carries on, "side" when a board event took them up the mountain.
+func _roam_loop(b: Dictionary, parked: Array) -> String:
+	var next: Dictionary = HubLayout.PLACES[b["next"]]
+	var area: Rect2 = next["area"]
+	_hold(false)
+	while is_inside_tree():
+		await get_tree().process_frame
+		var p := session.car.global_position
+		var at := Vector2(p.x, -p.z)
+		var to := area.get_center() - at
+		if _toast_left <= 0.0:
+			_objective.text = "▶  NEXT:  %s   %d m" % [b.get("prompt", next["name"]), int(to.length())]
+		_toast_left -= get_process_delta_time()
+		_money.text = "₱%s     RUEL  ₱%s" % [StoryGarage._pesos(StoryMode.wallet()), StoryGarage._pesos(StoryMode.owed())]
+		var action := _roam_action(b, parked, at)
+		_prompt.text = action.get("text", "")
+		if action.is_empty() or not Input.is_action_just_pressed("interact"):
+			continue
+		_prompt.text = ""
+		match action["do"]:
+			"next":
+				return "next"
+			"garage":
+				await _open_garage("shop")
+				_hold(false)
+			"board":
+				_hold(true)
+				var picked := await garage.open_board(StoryBoard.events(b))
+				_hold(false)
+				if not picked.is_empty():
+					if await _run_event(b, picked):
+						return "side"
+			"race":
+				if await _run_event(b, action["event"]):
+					return "side"
+		session.camera.current = true
+	return "next"
+
+
+## What E does here, if anything: { text, do, event }.
+func _roam_action(b: Dictionary, parked: Array, at: Vector2) -> Dictionary:
+	if session.car.linear_velocity.length() > 3.0:
+		return {}
+	var area: Rect2 = HubLayout.PLACES[b["next"]]["area"]
+	if area.has_point(at):
+		return { "text": "E   CONTINUE  ·  %s" % b.get("prompt", HubLayout.PLACES[b["next"]]["name"]), "do": "next" }
+	var events := StoryBoard.events(b)
+	for car in parked:
+		if car.global_position.distance_to(session.car.global_position) < PULL_UP:
+			var k: int = car.get_meta("regular")
+			for e in events:
+				if e["kind"] == "sprint" and int(e["regular"]) == k:
+					var r: Dictionary = StoryBoard.REGULARS[k]
+					if e["done"]:
+						return { "text": "%s  ·  \"Already took your money tonight.\"" % r["who"][0], "do": "none" }
+					return { "text": "E   RACE %s   ·   IN ₱%s   ·   WIN ₱%s" % [r["who"][0], StoryGarage._pesos(int(e["entry"])),
+						StoryGarage._pesos(int(e["purse"][0]))], "do": "race", "event": e }
+	if not events.is_empty() and at.distance_to(StoryBoard.BOARD_AT) < BOARD_REACH:
+		return { "text": "E   KAPITAN'S BOARD", "do": "board" }
+	if BAYS.has_point(at):
+		return { "text": "E   RUEL'S GARAGE  ·  PARTS, TUNING, THE BILL", "do": "garage" }
+	return {}
+
+
+## The regulars who race this roam, parked nose-out on the forecourt.
+func _park_regulars(b: Dictionary) -> Array:
+	var out := []
+	if hub == null:
+		return out
+	for e in StoryBoard.events(b):
+		if e["kind"] != "sprint":
+			continue
+		var r: Dictionary = StoryBoard.REGULARS[int(e["regular"])]
+		var car := CarRoster.get_car(r["who"][1])
+		var at: Vector3 = r["park"]
+		var body: CarBody = hub.spawn_parked(car["model"], car["preset"], Color(r["who"][2]), HubLayout.pos(at.x, at.y, 0.3), HubLayout.yaw(at.z))
+		body.set_meta("regular", int(e["regular"]))
+		out.append(body)
+	return out
+
+
+## Kapitan's board by the shop door: a whiteboard on two legs.
+func _board_prop() -> Node3D:
+	var prop := Node3D.new()
+	prop.position = HubLayout.pos(StoryBoard.BOARD_AT.x, StoryBoard.BOARD_AT.y + 1.5)
+	var face := MeshInstance3D.new()
+	var box := BoxMesh.new()
+	box.size = Vector3(2.4, 1.3, 0.06)
+	face.mesh = box
+	face.position.y = 1.5
+	face.material_override = MangaArt.world_preset("board")
+	prop.add_child(face)
+	for x in [-1.0, 1.0]:
+		var leg := MeshInstance3D.new()
+		var cyl := CylinderMesh.new()
+		cyl.top_radius = 0.04
+		cyl.bottom_radius = 0.04
+		cyl.height = 1.0
+		leg.mesh = cyl
+		leg.position = Vector3(x, 0.5, 0)
+		leg.material_override = MangaArt.world_preset("post")
+		prop.add_child(leg)
+	var title := Label3D.new()
+	title.text = "KAPITAN'S BOARD"
+	title.font_size = 64
+	title.pixel_size = 0.004
+	title.modulate = MangaType.INK
+	title.outline_size = 0
+	title.position = Vector3(0, 1.9, 0.05)
+	prop.add_child(title)
+	add_child(prop)
+	return prop
+
+
+## Run an event picked in free roam. Sprints race here, on the loop; mountain events go up to
+## Pass 1 and come back (returns true: the roam restarts from the gas station after).
+func _run_event(b: Dictionary, e: Dictionary) -> bool:
+	if not StoryMode.pay_entry(int(e["entry"]), false):
+		_toast("ENTRY'S ₱%s" % StoryGarage._pesos(int(e["entry"])))
+		return false
+	if StoryMode.timeline() == "memory":
+		StoryMode.once[StoryBoard.once_key(b["id"], e["id"])] = true
+	if e["kind"] != "sprint":
+		StoryMode.side = e.duplicate(true)
+		StoryMode.side["stage"] = "pass"
+		StoryMode.save()
+		await dialogue.fade(true, 0.45)
+		StoryMode.run_side(get_tree())
+		return true
+	var r: Dictionary = StoryBoard.REGULARS[int(e["regular"])]
+	var name: String = r["who"][0]
+	_hold(true)
+	await dialogue.play([[name, r["hello"]]])
+	var race := { "id": "sprint", "course": "loop", "laps": 1 }
+	var place := await _race_core(race, _field(e["field"]), false)
+	var won := StoryBoard.payout(e["purse"], place, "sprint")
+	if won > 0:
+		StoryMode.earn(won)
+		StoryMode.set_flag("won:" + name)
+		_toast("WON  ₱%s   ·   WALLET  ₱%s" % [StoryGarage._pesos(won), StoryGarage._pesos(StoryMode.wallet())])
+	var lines := [[name, r["won"] if place == 1 else r["lost"]]]
+	if place == 1 and r.has("reply_won"):
+		lines.append(["PANG", r["reply_won"]])
+	await dialogue.play(lines)
+	StoryMode.save()
+	_hold(false)
+	return false
+
+
+## Probes: run the first open sprint (if the wallet covers it), buy a part, carry on.
+func _auto_roam(b: Dictionary) -> void:
+	_auto_shop()
+	for e in StoryBoard.events(b):
+		if e["kind"] == "sprint" and not e["done"] and StoryMode.wallet() >= int(e["entry"]) and not StoryMode.once.has("probe:" + b["id"]):
+			StoryMode.once["probe:" + b["id"]] = true
+			await _run_event(b, e)
+			break
+	var c: Vector2 = (HubLayout.PLACES[b["next"]]["area"] as Rect2).get_center()
+	await _place({ "position": HubLayout.pos(c.x, c.y, 0.3), "heading": session.car.rotation.y })
+
+
+## A mountain event from the board, on the pass stage: the clock (one timed run, pay bands) or
+## the downhill (a three-car race).
+func _side_event(e: Dictionary) -> void:
+	MangaArt.apply_night(0.15)
+	weather.rain = 0.0
+	weather.wet = 0.0
+	_fit_car()
+	await _place(PASS_TRACK.pose_at(PASS_TRACK.start_distance - 8.0))
+	dialogue.set_caption(e["title"])
+	await dialogue.fade(false, 0.5)
+	drive_track = PASS_TRACK
+	if e["kind"] == "clock":
+		var bands: Array = e["bands"]
+		var run := await _timed_run({ "time": float(bands[0][0]), "splits": PackedFloat64Array() }, PackedFloat32Array(), "KAPITAN'S GOLD")
+		_wear(StoryMode.PASS_KM)
+		var pay := StoryBoard.clock_pay(float(run["time"]), bands)
+		StoryMode.earn(pay)
+		dialogue.set_caption("")
+		await dialogue.play([["KAPITAN", ("%s. Here. ₱%s." % [TimeAttackRun.format_time(run["time"]), StoryGarage._pesos(pay)]) if pay > 0
+			else "%s. Stopwatch says no." % TimeAttackRun.format_time(run["time"])]])
+	else:
+		var place := await _race_core({ "id": "downhill", "course": "pass" }, _field(e["field"]), false)
+		var pay := StoryBoard.payout(e["purse"], place)
+		StoryMode.earn(pay)
+		dialogue.set_caption("")
+		await dialogue.play([["KAPITAN", "P%d. ₱%s. Same time next week." % [place, StoryGarage._pesos(pay)]]])
+	StoryMode.save()
+
+
+# --- Test drives, the qualifiers and the final -------------------------------------------------
+
+
+## A drive with no clock: the shakedown on the loop, or the lights test on Pass 1 at night.
+func _test(b: Dictionary) -> void:
+	if b.get("kind", "") == "lights":
+		await _lights_test(b)
+		return
+	await _settle(b)
+	await _lines(b, "before")
+	# Two laps from the talyer's stretch of the loop at town speed: the first pulls left.
+	var t := HubLayout.loop_track(4)
+	var lap := t.length() / 4.0
+	var start := lap + t.nearest_index(HubLayout.pos(30, 140)) * t.spacing
+	drive_track = t
+	await _place(t.pose_at(start, 1.6))
+	for k in 2:
+		var pull := -0.14 if k == 0 else 0.0
+		_hold(false)
+		session.set_clean_feed(true)
+		session.input_filter = func(i: VehicleTypes.DriverInput) -> VehicleTypes.DriverInput:
+			i.steer = clampf(i.steer + pull, -1.0, 1.0)
+			if session.car.linear_velocity.length() > HubLayout.CRUISE_SPEED * 1.3:
+				i.throttle = 0.0
+			return i
+		var index := t.nearest_index(session.car.global_position, int(start / t.spacing))
+		while is_inside_tree():
+			await get_tree().physics_frame
+			index = t.nearest_index(session.car.global_position, index)
+			if index * t.spacing >= start + lap * (k + 1) - 6.0:
+				break
+		await _coast(1.6)
+		_hold(true)
+		await _lines(b, "between" if k == 0 else "after_lap")
+	_wear(2.0 * StoryMode.LOOP_KM)
+	await _lines(b, "after")
+
+
+## R16: Nico on the lower road, Pang on the upper, the night run's numbers; recorded, then laid
+## over the crash run's bearing to the lights.
+func _lights_test(b: Dictionary) -> void:
+	var t := PASS_TRACK
+	MangaArt.apply_night(1.0)
+	weather.rain = 0.0
+	weather.wet = 0.0
+	await _settle(b)
+	await _place(t.pose_at(t.start_distance - 8.0))
+	await _lines(b, "before")
+	time_attack.free_drive()
+	if music:
+		music.stop_music()
+	drive_track = t
+	_hold(false)
+	session.set_clean_feed(true)
+	recorder.begin()
+	var entry := StoryCourse.fatal_entry()
+	var cues := [[entry - StoryCourse.LIGHTS_FROM, "NICO", "I'm below you."], [entry - 90.0, "NICO", "Still below you."],
+		[entry - 20.0, "NICO", "Still below you. Sixty metres down."]]
+	var index := t.nearest_index(session.car.global_position)
+	var lights: HeadlightsRig = null
+	while is_inside_tree():
+		await get_tree().physics_frame
+		index = t.nearest_index(session.car.global_position, index)
+		var d := index * t.spacing
+		while not cues.is_empty() and d >= float(cues[0][0]):
+			var c: Array = cues.pop_front()
+			dialogue.subtitle(c[1], c[2], 3.0)
+		if lights == null and d >= entry - StoryCourse.LIGHTS_FROM:
+			lights = HeadlightsRig.new()
+			lights.track = t
+			add_child(lights)
+			dialogue.sfx("pulse")
+		if d >= entry + 40.0 or d >= t.finish_distance - 12.0:
+			break
+	StoryMode.record["lights_test"] = StoryMode.pack(recorder.stop())
+	await _coast(2.5)
+	_hold(true)
+	if lights:
+		lights.queue_free()
+	_wear(StoryMode.PASS_KM * 0.7)
+	StoryMode.save()
+	if b.has("after_cards"):
+		await _examine(b, b["after_cards"])
+	await _lines(b, "after")
+
+
+## A qualifying run: one timed run, the clock only, no ghost. The better of the two sets the grid
+## for the final against Nico's (top) qualifying time; `garage` opens Ruel's toolbox after.
+func _trial(b: Dictionary) -> void:
+	await _settle(b)
+	await _lines(b, "before")
+	_pay_in(b)
+	drive_track = PASS_TRACK
+	var run := await _timed_run({}, PackedFloat32Array(), "BEST")
+	_wear(StoryMode.PASS_KM)
+	StoryMode.results[b["id"]] = { "time": run["time"] }
+	var best := INF
+	for id in ["s33b1", "s33b2"]:
+		best = minf(best, float(StoryMode.results.get(id, {}).get("time", INF)))
+	var nico := nico_qualifying()
+	StoryMode.results["r18"] = { "best": best, "nico": nico, "grid": 1 if best < nico else 2 }
+	StoryMode.save()
+	_hold(true)
+	await dialogue.play([["RUEL", "%s. Official clock says the same. Nico's %s." % [TimeAttackRun.format_time(run["time"]), TimeAttackRun.format_time(nico)]]])
+	if b.get("garage", false):
+		await _open_garage("tune")
+	await _lines(b, "after")
+
+
+## Nico's best qualifying run: the line study's cut, give or take (he has driven it more than anyone).
+func nico_qualifying() -> float:
+	return _ghost.time * 1.01 if _ghost.valid() else 80.0
+
+
+## R19: Pang against Nico on the closed road. From 300 m before 8A the Ghost Line comes up from
+## behind at its dry pace wanting the inside, through the damp patch; hold wide with a lift and
+## it passes through; follow it and the patch takes the grip. No music through 8A. The result is
+## a photograph: the place, no time.
+const PATCH_GRIP := 0.55
+const PATCH_GRIP_RAIN := 0.75
+
+
+func _final(b: Dictionary) -> void:
+	await _settle(b)
+	MangaArt.apply_night(0.1)
+	weather.rain = 0.0
+	weather.wet = 0.0
+	await _lines(b, "before")
+	var br := CarParts.rating(StoryMode.car())
+	var nico := StoryScript.NICO.duplicate()
+	# Build-matched, not rubber-banded: Nico's pace follows the car Pang brought.
+	nico[3] = clampf(0.92 + 0.008 * br, 0.92, 0.99)
+	var grid := int(StoryMode.results.get("r18", {}).get("grid", 2))
+	dialogue.set_caption("THE LAST LINE  ·  GRID P%d" % grid)
+	var st := { "patch": false, "flash": false }
+	_final_watch(st)
+	var place := await _race_core(b, _field([nico]), false)
+	session.car.surface_scale = 1.0
+	dialogue.set_caption("")
+	StoryMode.results["s34a"] = { "place": place, "entered_patch": st["patch"] }
+	StoryMode.save()
+	# The result card: the car at the finish, frozen, and where it came. No time.
+	await dialogue.comic([[{ "art": "snap", "cap": "THE LAST LINE  ·  %s" % ("1ST" if place == 1 else "2ND") }]], "fade")
+	await _lines(b, "chased" if st["patch"] else "lifted")
+	await _lines(b, "after")
+
+
+## During the final: the damp patch under the player's car (inside of 8A), the ghost from 300 m
+## out, the music gone through the bend.
+func _final_watch(st: Dictionary) -> void:
+	var t := PASS_TRACK
+	var entry := StoryCourse.fatal_entry()
+	var exit := StoryCourse.fatal_exit()
+	_ghost_car = _ghost_car if _ghost_car else (_make_ghost_car() if _ghost.valid() else null)
+	var ghost_t := -1.0
+	var life := 0.0
+	var index := t.nearest_index(session.car.global_position)
+	var quiet := false
+	var started := false
+	var rain_set := CarParts.has(StoryMode.car(), "rain_set")
+	while is_inside_tree() and StoryMode.active:
+		await get_tree().physics_frame
+		if vs_battle == null or not vs_battle.active:
+			if started:
+				break
+			continue
+		started = true
+		var dt := get_physics_process_delta_time()
+		var p := session.car.global_position
+		index = t.nearest_index(p, index)
+		var d := index * t.spacing
+		var lateral := t.lateral_offset(p, index)
+		# Inside of the right-hand hairpin: the right half of the road, from the entry to the exit.
+		var in_patch := d >= entry - 4.0 and d <= exit + 4.0 and lateral > 0.6
+		session.car.surface_scale = (PATCH_GRIP_RAIN if rain_set else PATCH_GRIP) if in_patch else 1.0
+		if in_patch:
+			st["patch"] = true
+		if not quiet and d >= entry - 300.0:
+			quiet = true
+			if music:
+				music.stop_music(1.0)
+		if _ghost_car and ghost_t < 0.0 and d >= entry - 300.0:
+			# It starts behind and closes: the cut's dry pace beats anything on today's road.
+			ghost_t = StoryCourse.ghost_time_at(_ghost, d - 25.0)
+		if _ghost_car and ghost_t >= 0.0 and life < 14.0:
+			ghost_t += dt
+			life += dt
+			_ghost_car.opacity = clampf(minf(life * 0.6, (14.0 - life) * 0.3), 0.0, 0.55)
+			var pose := _ghost.pose(ghost_t)
+			_ghost_car.show_pose(pose)
+			if not st["flash"] and not pose.is_empty() and (pose["position"] as Vector3).distance_to(p) < 2.2:
+				st["flash"] = true
+				dialogue.flash_white(0.3)
+		elif _ghost_car:
+			_ghost_car.show_pose({})
+	session.car.surface_scale = 1.0
+	if _ghost_car:
+		_ghost_car.show_pose({})
 
 
 # --- Evidence ---------------------------------------------------------------------------------
@@ -944,6 +1661,8 @@ func _evidence_context() -> Dictionary:
 	if not passes.is_empty():
 		c["dry"] = StoryMode.unpack(passes[0]["frames"])
 	c["crash"] = StoryMode.unpack(StoryMode.record.get("crash", ""))
+	c["lights_crash"] = StoryCourse.lights_bearings(c["crash"], PASS_TRACK)
+	c["lights_test"] = StoryCourse.lights_bearings(StoryMode.unpack(StoryMode.record.get("lights_test", "")), PASS_TRACK)
 	c["camera_cut"] = float(StoryMode.record.get("camera_cut", -1.0))
 	if _ghost.valid():
 		c["board"] = _board_rows()

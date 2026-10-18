@@ -15,9 +15,20 @@ extends RefCounted
 ##   attack    run against the Ghost Line       label_clue, night, rain, wet
 ##   sectors   flying sectors vs the ghost      trials [{ sector, label, wet, night }], notes, connect
 ##   crash     the last night run               cold_open
-##   daylight  the ending drive, no clock
+##   daylight  the recce, no clock              ghost (false: none), cues [[metres from 8A, who, text]]
 ##   evidence  investigation                    cards, question, options, answer, pick, wrong, after
+##   roam      free roam in the barangay        next (place), prompt, events ("sprints", "mountain"), spot
+##   test      a drive with no clock            kind ("shakedown" | "lights"), between, after_lap, after_cards
+##   trial     a qualifying run, clock only     garage (Ruel's toolbox after)
+##   final     Pang vs Nico, the ghost at 8A    lifted, chased (lines by what the player did at 8A)
 ##   end       credits, back to the title
+##
+## Money and the car (docs/story/STORY_MODE.md "Money, parts and free roam"): entry, off_list
+## (more if Pang isn't on Dante's list), purse (by place), bet, bounty, heat (a heat's field
+## first), laps (loop races), ghost (the overlay runs ahead in a race), field_if ({ condition:
+## [entry] }), podium_flag, snapshot ("s06": the line-study car), garage (a talk beat opens Ruel's
+## garage after its lines), commit / bill ([what, pesos] written down), flag (set on the record).
+## A line may carry a third element, a condition on the record (StoryDirector.holds).
 ##
 ## Any beat may carry "comic" (pages before it) and "comic_after" (pages after it): manga pages
 ## between scenes, a panel per press (StoryComic: art, who, say, cap, fx, side, sfx).
@@ -136,8 +147,8 @@ const BEATS := [
 			{ "art": "face", "who": "JOLO", "side": "left", "say": "Bahandi Fuels, then the loop behind the warehouses. My cousin knows a guy." },
 		]] },
 	{ "id": "s03", "scene": "S03", "stage": "hub", "type": "race", "course": "loop", "night": true,
-		"title": "NOTHING TO LOSE", "require_win": true,
-		"field": [["KAPITAN", "silak_box", "1f4dbf", 0.84], ["TISOY", "eg_hatch", "17171a", 0.85], ["RJ", "civic_fd", "8c8f94", 0.83]],
+		"title": "NOTHING TO LOSE", "require_win": true, "purse": [6000, 3000, 1500],
+		"field": [["KAPITAN", "silak_box", "1f4dbf", 0.81], ["TISOY", "eg_hatch", "17171a", 0.82], ["RJ", "civic_fd", "8c8f94", 0.8]],
 		"comic": [[
 			{ "art": "snap", "cap": "Nobody called it a race. They called it a meet, like the word would make the cars behave." },
 			{ "art": "face", "who": "RUEL", "side": "left", "cap": "A text from Ruel.", "say": "Bring it home in one piece.", "sfx": "phone_buzz" },
@@ -164,13 +175,41 @@ const BEATS := [
 		["PANG", "But."],
 		["NICO", "But you found time you won't find twice. Not on those."],
 		["DANTE", "Pang. Nico. Pass 1, Saturday, before the light goes. Settle it there."],
+		["NICO", "Saturday, then. Not on those."],
 	],
+		"exit": { "tail": 1.5 } },
+	{ "id": "s04a", "scene": "S04A", "stage": "hub", "type": "talk", "spot": "talyer", "garage": true,
+		"place": "RUEL'S TALYER", "when": "THE MORNING AFTER KYO",
+		"comic": [[
+			{ "art": "snap", "cap": "MORNING. Six thousand pesos in a brown envelope, counted twice on Ruel's bench." },
+			{ "art": "face", "who": "RUEL", "side": "right", "say": "Bill's on the clipboard. Eight and a half." },
+		]],
+		"lines": [
+		["PANG", "I've got six."],
+		["RUEL", "Then you've got a choice."],
+		["RUEL", "Fronts first."],
+		["JOLO", "Exhaust. It'll sound like it costs more."],
+		["", "Ruel's bench, the clipboard beside it. Whatever I bought, he'd write it down in pencil."],
+	],
+		"after": [
+		["RUEL", "Good. Now the other two.", "bought:front_tires"],
+		["RUEL", "It'll sound like it costs more.", "bought:exhaust"],
+		["", "He wrote the new total under the old one."],
+		["JOLO", "Kapitan's running sprints at the bypass tonight. Five hundred in."],
+	] },
+	{ "id": "s04b", "scene": "S04B", "stage": "hub", "type": "roam", "spot": "gas", "night": true,
+		"next": "home", "prompt": "HOME  ·  CALL IT A NIGHT", "events": ["sprints"],
+		"comic": [[
+			{ "art": "snap", "cap": "BAHANDI FUELS · THAT NIGHT. Kapitan's board by the shop door. The regulars nosed in on the forecourt." },
+			{ "art": "face", "who": "JOLO", "side": "left", "say": "Five hundred a race. Pull up next to whoever you want to lose to." },
+		]],
+		"before": [["KAPITAN", "My station, my rules. One lap. No phones on the line."]],
 		"comic_after": [[
-			{ "art": "face", "who": "NICO", "side": "left", "say": "Saturday, then." },
-			{ "art": "face", "who": "PANG", "side": "right", "say": "Saturday." },
+			{ "art": "black", "fx": "BZZT", "sfx": "phone_buzz", "cap": "The group chat, past midnight." },
+			{ "art": "face", "who": "DANTE", "side": "right", "say": "Pass 1, Saturday. Before the light goes. Nico wants it settled on a real road." },
 			{ "art": "speed", "fx": "VRRMM" },
 		]] },
-	{ "id": "s05", "scene": "S05", "stage": "pass", "type": "race", "course": "pass", "title": "NICO'S LESSON",
+	{ "id": "s05", "scene": "S05", "stage": "pass", "type": "race", "course": "pass", "title": "NICO'S LESSON", "purse": [10000, 5000],
 		"enter": { "sound": "engine", "loop": true, "db": -14.0, "lead": 1.0, "until": "reveal" },
 		"field": [NICO], "night_value": 0.2,
 		"comic": [[
@@ -193,7 +232,33 @@ const BEATS := [
 			["JOLO", "Good race. Really good race. Footage, contacts, all four tires."],
 			["JOLO", "Don't tell Ruel about the tires."],
 		] },
-	{ "id": "s16", "scene": "S16", "stage": "hub", "type": "race", "course": "loop", "title": "THE FIRST RETURN", "trauma": true, "now": "wrench",
+	{ "id": "s15a", "scene": "S15A", "stage": "hub", "type": "test", "kind": "shakedown", "spot": "talyer", "now": "wrench",
+		"place": "RUEL'S TALYER", "when": "MORNING", "night_value": 0.1, "wet": 0.0,
+		"before": [
+		["RUEL", "Pulls left. I know. Drive it so I can see how much."],
+		["PANG", "It's not the same wheel."],
+		["RUEL", "No."],
+		["", "Two laps of the block. Walking speed. Ruel in the roller door."],
+	],
+		"between": [
+		["RUEL", "Again. Slower than that."],
+		["", "He put a wrench to something under the front and didn't explain."],
+	],
+		"after_lap": [["RUEL", "Straight."]] },
+	{ "id": "s15b", "scene": "S15B", "stage": "hub", "type": "roam", "spot": "talyer", "night_value": 0.1,
+		"next": "gas", "prompt": "KAPITAN'S MORNING MEET  ·  BAHANDI FUELS", "events": ["sprints", "mountain"],
+		"before": [
+		["", "In the corner, still in plastic: four tires."],
+		["PANG", "Whose are those?"],
+		["RUEL", "Yours. Rain set. Came two weeks after."],
+		["RUEL", "Repairs are on the clipboard. Thirty-eight. Pay when you can."],
+		["RUEL", "Alignment's free. You drove the second lap straight."],
+	],
+		"comic_after": [[
+			{ "art": "snap", "cap": "KAPITAN'S FLYER: MORNING MEET · SHORT ROUTE · FACES YOU KNOW · ₱500 IN" },
+		]] },
+	{ "id": "s16", "scene": "S16", "stage": "hub", "type": "race", "course": "loop", "title": "THE FIRST RETURN", "trauma": true,
+		"entry": 500, "purse": [4000, 2000, 1000],
 		"night_value": 0.0,
 		"field": [["KAPITAN", "silak_box", "1f4dbf", 0.86], ["BUKO", "dalagan_gsr", "1a6b3d", 0.86], ["RJ", "civic_fd", "8c8f94", 0.84]],
 		"before": [["", "Short route. Faces I know. Dry. I told myself that was controlled."]],
@@ -204,7 +269,8 @@ const BEATS := [
 			["RUEL", "The car did what you asked."],
 			["RJ", "Bro. Somebody said there was another car up there that night. Beside you. Ask at Kyo."],
 		] },
-	{ "id": "s17", "scene": "S17", "stage": "hub", "type": "goto", "place": "kyo", "night": true, "prompt": "KYO COFFEE  ·  ASK AROUND" },
+	{ "id": "s17", "scene": "S17", "stage": "hub", "type": "roam", "next": "kyo", "night": true, "prompt": "KYO COFFEE  ·  ASK AROUND",
+		"events": ["sprints", "mountain"] },
 	{ "id": "s17e", "scene": "S17", "stage": "hub", "type": "evidence", "spot": "kyo", "night": true, "place": "KYO COFFEE", "when": "AFTER THE CRASH",
 		"before": [
 			["KAPITAN", "Ghost? Ex-pro. My cousin says Japan. Came home, left again. That clip's years old."],
@@ -233,11 +299,34 @@ const BEATS := [
 			["NICO", "The line's good. Some sections are excellent. The total doesn't behave like one run."],
 			["NICO", "Drive it with me. Sector by sector. Then tell me it's one run."],
 		] },
-	{ "id": "s06", "scene": "S06", "stage": "pass", "type": "practice", "title": "A LINE STUDY", "memory": "THE LINE STUDY",
+	{ "id": "s05a", "scene": "S05A", "stage": "pass", "type": "race", "course": "pass", "title": "THE MOUNTAIN", "memory": "THE LINE STUDY",
+		"night_value": 0.35, "entry": 1500, "purse": [12000, 6000, 3000], "podium_flag": "list",
 		"enter": { "sound": "rain", "loop": true, "db": -12.0, "lead": 0.6, "until": "reveal", "carry": 0.3 },
 		"comic": [[
 			{ "art": "black", "cap": "Buko's phone, face up at Kyo. The clip again. Rain on the lens." },
-			{ "art": "tone", "cap": "I looked at the rain until something older came up. A dry Tuesday, months before. THE LINE STUDY." },
+			{ "art": "tone", "cap": "I looked at the rain until something older came up. A dry dusk on the mountain, months before. THE LINE STUDY." },
+			{ "art": "face", "who": "DANTE", "side": "right", "say": "Look— a mountain makes everyone honest." },
+		]],
+		"before": [
+		["NICO", "Careful at the chevrons. The trees keep it damp after the rest is dry."],
+		["PANG", "Okay."],
+		["", "He wasn't entered. He said it like he was trying to sound smart. I didn't take it."],
+	],
+		"heat": [["KAPITAN", "silak_box", "1f4dbf", 0.85], ["TISOY", "eg_hatch", "17171a", 0.86]],
+		"field": [["BUKO", "dalagan_gsr", "1a6b3d", 0.87], ["ATE LIZA", "civic_fd", "d9191f", 0.89], ["RJ", "civic_fd", "8c8f94", 0.85]],
+		"win": [["DANTE", "My list, my friend. Saturdays are yours."]],
+		"lose": [
+			["DANTE", "Podium. You're on my list.", "list"],
+			["DANTE", "Off the podium. Jolo talked me round. Saturdays cost you five hundred more.", "!list"],
+		],
+		"after": [
+		["JOLO", "Give me a week on this road."],
+		["PANG", "For what?"],
+		["JOLO", "I'll make you look like the best driver in Panay."],
+	] },
+	{ "id": "s06", "scene": "S06", "stage": "pass", "type": "practice", "title": "A LINE STUDY",
+		"comic": [[
+			{ "art": "road", "cap": "A week on the road. A dry Tuesday first." },
 			{ "art": "face", "who": "JOLO", "side": "left", "say": "Three passes. I'm rolling the whole time." },
 			{ "art": "face", "who": "PANG", "side": "right", "say": "You're always rolling." },
 		]],
@@ -317,6 +406,7 @@ const BEATS := [
 		["~sfx", "phone_buzz"],
 	] },
 	{ "id": "s07", "scene": "S07", "stage": "panel", "type": "talk", "style": "phone", "memory": "GHOST GOES PUBLIC",
+		"commit": ["KUYA BEN'S LENS", 6000],
 		"comic": [[
 			{ "art": "black", "cap": "Jolo's camera bag, under the bench where he left it. The strap still set to his shoulder." },
 			{ "art": "tone", "cap": "THE WEEK GHOST WENT PUBLIC." },
@@ -336,7 +426,7 @@ const BEATS := [
 		["DANTE", "The scene needs a benchmark. Nobody follows a clip called \"study\". They follow a driver nobody can catch."],
 		["", "Jolo read it, turned the phone face down, and asked if I wanted more rice."],
 	] },
-	{ "id": "s08", "scene": "S08", "stage": "pass", "type": "attack", "title": "CHASE THE COMPOSITE", "grip": 0.95,
+	{ "id": "s08", "scene": "S08", "stage": "pass", "type": "attack", "title": "CHASE THE COMPOSITE",
 		"enter": { "sound": "engine", "loop": true, "db": -14.0, "lead": 1.0, "until": "reveal" },
 		"comic": [[
 			{ "art": "road", "cap": "I'd watched it so often the line was on the road before the road was." },
@@ -357,7 +447,7 @@ const BEATS := [
 			["JOLO", "...After."],
 		] },
 	{ "id": "s09", "scene": "S09", "stage": "pass", "type": "attack", "title": "THE COMBINED-SECTOR CHALLENGE",
-		"label_clue": true, "posted": true, "night_value": 0.55, "grip": 0.95,
+		"label_clue": true, "posted": true, "night_value": 0.55, "entry": 1000, "purse": [6000],
 		"comic": [
 			[
 				{ "art": "snap", "cap": "THE NEXT SATURDAY · A CROWD AT THE TOP OF PASS 1" },
@@ -399,6 +489,66 @@ const BEATS := [
 			["PANG", "Then make them add up."],
 			["NICO", "What do you think I've been doing."],
 		] },
+	{ "id": "s09a1", "scene": "S09A", "stage": "pass", "type": "sectors", "title": "GHOST NIGHTS  ·  NIGHT 1",
+		"entry": 1000, "off_list": 500, "purse": [8000],
+		"comic": [[
+			{ "art": "road", "cap": "SATURDAY · GHOST NIGHT 1 · A POSTER BY THE STORE: BEAT GHOST IN ANY SECTOR" },
+			{ "art": "face", "who": "DANTE", "side": "right", "say": "Any sector, my friend. Beat him anywhere and the night is yours." },
+		]],
+		"trials": [
+			{ "sector": 0, "label": "NIGHT 1  ·  SECTOR 1", "wet": 0.0, "night": 0.75 },
+			{ "sector": 2, "label": "NIGHT 1  ·  SECTOR 3", "wet": 0.0, "night": 0.75 },
+		],
+		"after": [
+		["RUEL", "You've done a lot of Saturdays on these.", "!bought:front_tires"],
+		["JOLO", "One more Saturday."],
+	] },
+	{ "id": "s09b1", "scene": "S09B", "stage": "hub", "type": "roam", "spot": "gas", "night": true,
+		"next": "exit", "prompt": "PASS 1  ·  GHOST NIGHT 2", "events": ["sprints"],
+		"comic": [[
+			{ "art": "snap", "cap": "THE WEEK BETWEEN · KAPITAN'S BOARD, RUEL'S SHOP, THE POSTER ON THE STORE WALL" },
+		]],
+		"before": [["JOLO", "A week till the next one. Ruel's open. Kapitan's got the board out."]] },
+	{ "id": "s09a2", "scene": "S09A", "stage": "pass", "type": "attack", "title": "GHOST NIGHTS  ·  NIGHT 2", "posted": true,
+		"night_value": 0.8, "entry": 2000, "off_list": 500, "purse": [12000], "bounty": 5000,
+		"commit": ["ATE LIZA'S LOAN (JOLO, FOR THE LENS)", 5000],
+		"comic": [[
+			{ "art": "road", "cap": "SATURDAY · GHOST NIGHT 2 · ONE RUN AGAINST THE POSTED TIME · NICO IN THE FIELD" },
+			{ "art": "face", "who": "DANTE", "side": "right", "say": "Ghost Time's on the board. Same as last week. Or is it?" },
+		]],
+		"beaten": [
+		["DANTE", "Ghost responded."],
+		["", "The poster had a new number on it before I'd parked. Lower than mine."],
+	],
+		"ahead": [
+		["PANG", "I passed it. The car in the clip. I passed it."],
+		["NICO", "And the clock says you didn't."],
+	],
+		"after": [
+		["NICO", "Close."],
+		["", "By the store, Ate Liza handed Jolo an envelope and didn't look at me."],
+	] },
+	{ "id": "s09b2", "scene": "S09B", "stage": "hub", "type": "roam", "spot": "gas", "night": true,
+		"next": "exit", "prompt": "PASS 1  ·  GHOST NIGHT 3", "events": ["sprints"],
+		"comic": [[
+			{ "art": "snap", "cap": "ANOTHER WEEK · THE POSTER ON THE STORE WALL" },
+		]],
+		"before": [["JOLO", "Last one. Then the big night. Then we stop."]] },
+	{ "id": "s09a3", "scene": "S09A", "stage": "pass", "type": "race", "course": "pass", "title": "GHOST NIGHTS  ·  NIGHT 3",
+		"field": [NICO], "ghost": true, "night_value": 0.85, "entry": 3000, "off_list": 500, "purse": [15000, 6000],
+		"comic": [[
+			{ "art": "road", "cap": "SATURDAY · GHOST NIGHT 3 · HEAD TO HEAD WITH NICO · THE CLIP RUNNING AHEAD OF BOTH OF US" },
+		]],
+		"win": [
+		["NICO", "You beat me tonight."],
+		["PANG", "I didn't beat Ghost."],
+		["NICO", "Ghost wasn't here."],
+	],
+		"lose": [
+		["NICO", "Good run."],
+		["PANG", "I didn't beat Ghost."],
+		["NICO", "Ghost wasn't here."],
+	] },
 	{ "id": "s10", "scene": "S10", "stage": "hub", "type": "talk", "spot": "home", "cabin": true, "glass": 0.35,
 		"enter": { "sound": "rain", "loop": true, "db": -12.0, "lead": 1.2, "carry": 0.2 },
 		"place": "THE CAR, PARKED", "when": "AFTER MIDNIGHT", "night": true,
@@ -420,7 +570,19 @@ const BEATS := [
 		["JOLO", "I know."],
 		["", "He was tired. I remember that."],
 	] },
-	{ "id": "s21", "scene": "S21", "stage": "hub", "type": "evidence", "spot": "talyer", "place": "RUEL'S TALYER", "when": "THE COMPUTER BENCH", "now": "phone_buzz",
+	{ "id": "s20a", "scene": "S20A", "stage": "hub", "type": "race", "course": "loop", "title": "RACE FOR THE CLIP", "now": "phone_buzz",
+		"night": true, "bet": 3000, "field": [["TISOY", "eg_hatch", "17171a", 0.86]],
+		"before": [
+		["TISOY", "I had it before anyone. Before somebody cropped the corners for the poster. You want it, beat me."],
+		["PANG", "You haven't seen me drive since."],
+		["TISOY", "That's why I'm offering."],
+	],
+		"win": [["TISOY", "...Fine. Sending it now."]],
+		"lose": [["TISOY", "Man. Just take it. I'll send it in the morning."]],
+		"after": [["", "Tisoy's copy was older than every repost. Its first half-second: the edge of a title card. White text, mostly cropped. \"...TUDY — BEST\"."]] },
+	{ "id": "s20b", "scene": "S20B", "stage": "hub", "type": "roam", "night": true,
+		"next": "talyer", "prompt": "RUEL'S TALYER  ·  TISOY'S COPY", "events": ["sprints", "mountain"] },
+	{ "id": "s21", "scene": "S21", "stage": "hub", "type": "evidence", "spot": "talyer", "place": "RUEL'S TALYER", "when": "THE COMPUTER BENCH",
 		"before": [["RUEL", "Half these files are damaged. Don't get excited."]],
 		"cards": [
 			{ "kind": "text", "title": "BACKUP DRIVE · FOLDERS", "body": "/lift_day/  (car on the lift)\n/audio_test/\n/rattle_lol/\n/nico_race_unfinished/\n/GHOST_LINE/  v1 · v2 · v3_FINAL\n/raw_tuesday/ /raw_thursday/ /raw_saturday/" },
@@ -477,10 +639,22 @@ const BEATS := [
 		["", "The clip kept playing. Neither of us reached to stop it."],
 		["~wait", 1.6],
 		["PANG", "I drove that once. I can do it again."],
-		["~wait", 1.0],
-		["RUEL", "Clock's wrong."],
-		["PANG", "What?"],
-		["RUEL", "Under the picture. It skips."],
+		["PANG", "Better. I'll call Nico."],
+	] },
+	{ "id": "s23a", "scene": "S23A", "stage": "pass", "type": "race", "course": "pass", "title": "THE REMATCH", "field": [NICO], "night_value": 0.35,
+		"enter": { "sound": "engine", "loop": true, "db": -14.0, "lead": 1.0, "until": "reveal" },
+		"comic": [[
+			{ "art": "face", "who": "PANG", "side": "left", "say": "Race me. The pass. Tomorrow." },
+			{ "art": "face", "who": "NICO", "side": "right", "say": "Why?" },
+			{ "art": "face", "who": "PANG", "side": "left", "say": "Because I'm Ghost." },
+			{ "art": "face", "who": "NICO", "side": "right", "say": "Seven. Bring Ruel." },
+		]],
+		"win": [["NICO", "You're quick. Which run was the clip?"]],
+		"lose": [["NICO", "Your sectors were good. Which run was the clip?"]],
+		"after": [
+		["PANG", "One of them."],
+		["NICO", "Which one?"],
+		["", "I started to answer. I knew every piece of it. I couldn't name the drive it came from."],
 	] },
 	{ "id": "s24", "scene": "S24", "stage": "hub", "type": "talk", "spot": "home", "cabin": true, "glass": 0.35,
 		"exit": { "tail": 2.0, "fade": 0.8 },
@@ -489,6 +663,7 @@ const BEATS := [
 			{ "art": "rain", "cap": "I drove home and didn't go in. Phone on the passenger seat. The other folder open: the same night, from the dash." },
 		]],
 		"lines": [
+		["RUEL", "(on the phone) The clock under the picture. It's wrong. It skips."],
 		["", "On Jolo's phone, readable now: COMPOSITE LINE STUDY — BEST SECTORS / NOT ONE RUN."],
 		["JOLO", "There is something about the clip I should've—"],
 		["PANG", "I know. I know it's hard. If I get the middle clean, the rest follows."],
@@ -540,12 +715,15 @@ const BEATS := [
 			["PANG", "The one we'll pretend you meant to do."],
 			["", "Nico peeled the tape off the shutter."],
 		] },
-	{ "id": "s26", "scene": "S26", "stage": "pass", "type": "sectors", "title": "THE SECTOR TRIALS", "connect": true,
+	{ "id": "s26", "scene": "S26", "stage": "pass", "type": "sectors", "title": "THE SECTOR TRIALS", "connect": true, "snapshot": "s06",
 		"enter": { "sound": "engine", "loop": true, "db": -14.0, "lead": 1.0, "until": "reveal" },
 		"comic": [[
 			{ "art": "road", "cap": "Pass 1, dry, new fronts. Nico's sheet clipped to the dash." },
 		]],
-		"before": [["NICO", "Each piece under its own conditions, like the source passes. Then the whole road. One go. Today."]],
+		"before": [
+			["RUEL", "Back to the line-study build. Same car as the clip, or it proves nothing."],
+			["NICO", "Each piece under its own conditions, like the source passes. Then the whole road. One go. Today."],
+		],
 		"trials": [
 			{ "sector": 0, "label": "SECTOR 1  ·  DRY (PASS A)", "wet": 0.0, "night": 0.0 },
 			{ "sector": 1, "label": "SECTOR 2  ·  DAMP (PASS B)", "wet": 0.45, "night": 0.1 },
@@ -585,7 +763,22 @@ const BEATS := [
 			["", "Ruel didn't say the rest. Neither did he."],
 			["RUEL", "Bring the car in before you say yes to anything. I want those tires."],
 		] },
-	{ "id": "s12", "scene": "S12", "stage": "hub", "type": "talk", "spot": "talyer", "night_value": 0.6, "rain": 0.6, "wet": 0.9,
+	{ "id": "s11a", "scene": "S11A", "stage": "hub", "type": "race", "course": "loop", "title": "ONE MORE PAYDAY", "night": true,
+		"laps": 3, "entry": 1000, "purse": [8000],
+		"field": [["KAPITAN", "silak_box", "1f4dbf", 0.86], ["BUKO", "dalagan_gsr", "1a6b3d", 0.86]],
+		"comic": [[
+			{ "art": "snap", "cap": "WEDNESDAY · KAPITAN'S POT RACE · THREE CARS, THREE LAPS, WINNER TAKES IT" },
+		]],
+		"before": [
+		["KAPITAN", "Pot race. Nothing else on the board this week."],
+		["", "Jolo on the phone to the parts shop in Mandurriao before the flag dropped."],
+	],
+		"after": [
+		["JOLO", "One set. Manila. Two weeks."],
+		["PANG", "Event's Friday."],
+		["JOLO", "I know when the event is."],
+	] },
+	{ "id": "s12", "scene": "S12", "stage": "hub", "type": "talk", "spot": "talyer", "night_value": 0.6, "rain": 0.6, "wet": 0.9, "flag": "rain_ordered",
 		"enter": { "sound": "rain", "loop": true, "db": -10.0, "lead": 1.0, "until": "reveal" },
 		"exit": { "sound": "rain", "loop": true, "db": -8.0, "carry": 3.0 },
 		"place": "RUEL'S TALYER", "when": "THE NIGHT RUN · DUSK",
@@ -605,6 +798,12 @@ const BEATS := [
 		["JOLO", "Boss, the clip isn't—"],
 		["~sfx", "phone_buzz"],
 		["", "Dante's name on the screen. Jolo watched it until it stopped. Then he didn't finish."],
+		["RUEL", "Fronts are at {front_wear}. I said."],
+		["RUEL", "I ordered a rain set. Comes when it comes."],
+		["PANG", "When?"],
+		["RUEL", "After Friday."],
+		["RUEL", "{rain_price}. Your pot money would have covered it. If it was here.", "!cash:16000"],
+		["RUEL", "Money's not the problem. It's in Manila.", "cash:16000"],
 		["PANG", "We take the first section easy. Feel the road."],
 		["RUEL", "You don't get to feel a wet road after you've committed to the corner."],
 		["JOLO", "Eat. Pan de sal. You brake angry when you're hungry."],
@@ -616,7 +815,7 @@ const BEATS := [
 			{ "art": "face", "who": "PANG", "side": "left", "say": "Do you want to go?" },
 			{ "art": "face", "who": "JOLO", "side": "right", "say": "We're here." },
 		]] },
-	{ "id": "s13", "scene": "S13", "stage": "pass", "type": "crash", "title": "THE LAST NIGHT RUN", "posted": true, "grip": 0.95 },
+	{ "id": "s13", "scene": "S13", "stage": "pass", "type": "crash", "title": "THE LAST NIGHT RUN", "posted": true, "entry": 5000 },
 	{ "id": "s27", "scene": "S27", "stage": "pass", "type": "evidence", "at": "overlook", "place": "PASS 1 · ABOVE 8A", "when": "DAYLIGHT", "now": "wiper", "night_value": 0.0, "wet": 0.0,
 		"enter": { "head": 2.0 },
 		"before": [
@@ -641,6 +840,21 @@ const BEATS := [
 		"after": [
 			["", "Here's what I know. There were two cars at that corner. One of them was on a different road."],
 			["NICO", "8A. Here."],
+			["NICO", "Tonight. I'll take the lower road."],
+		] },
+	{ "id": "s27a", "scene": "S27A", "stage": "pass", "type": "test", "kind": "lights", "title": "THE LIGHTS TEST", "snapshot": "s06",
+		"night": true, "wet": 0.0, "enter": { "head": 2.0 },
+		"comic": [[
+			{ "art": "lights", "cap": "NIGHT · PASS 1 · NICO ON THE LOWER SWITCHBACK · RUEL COUNTING US BOTH IN OVER THE PHONE" },
+		]],
+		"before": [
+			["RUEL", "Line-study build again. On three. One. Two."],
+			["NICO", "Rolling."],
+		],
+		"after_cards": [{ "kind": "lights", "title": "TONIGHT OVER THE NIGHT RUN · BEARING TO THE LIGHTS" }],
+		"after": [
+			["NICO", "Sixty metres down and a ridge between us."],
+			["PANG", "You looked like you were beside me."],
 			["RUEL", "Then we read the logger."],
 		] },
 	{ "id": "s28", "scene": "S28", "stage": "hub", "type": "evidence", "spot": "talyer", "place": "RUEL'S TALYER", "when": "THE LOGGER",
@@ -734,6 +948,7 @@ const BEATS := [
 	{ "id": "a5_card", "scene": "S32", "stage": "panel", "type": "chapter",
 		"act": "ACT V", "title": "THE ROAD IS NOT A RECORDING", "subtitle": "Two barangays over." },
 	{ "id": "s32", "scene": "S32", "stage": "room", "type": "talk", "set": "jolo_home", "place": "JOLO'S FAMILY HOME", "when": "AFTERNOON",
+		"bill": ["KUYA BEN'S LENS", 6000],
 		"enter": { "sound": "dog", "db": -10.0, "lead": 0.8 },
 		"exit": { "tail": 2.5, "fade": 1.2 },
 		"comic": [[
@@ -765,25 +980,84 @@ const BEATS := [
 		["PANG", "I won't ask you to forgive me."],
 		["JOLO'S FATHER", "Good."],
 	] },
-	{ "id": "s33", "scene": "S33", "stage": "hub", "type": "goto", "place": "kyo", "prompt": "THE BARANGAY  ·  WEEKS LATER" },
-	{ "id": "s33t", "scene": "S33", "stage": "hub", "type": "talk", "spot": "kyo", "place": "KYO COFFEE", "when": "WEEKS LATER", "lines": [
+	{ "id": "s33", "scene": "S33", "stage": "hub", "type": "roam", "next": "gas", "prompt": "KAPITAN'S MEET  ·  BAHANDI FUELS",
+		"events": ["sprints", "mountain"],
+		"comic": [[
+			{ "art": "snap", "cap": "THE BARANGAY · WEEKS LATER" },
+		]],
+		"before": [["", "Weeks later. Fewer people said hello. More of them meant it."]] },
+	{ "id": "s33a", "scene": "S33A", "stage": "hub", "type": "race", "course": "loop", "title": "KAPITAN'S MEET", "laps": 3,
+		"night_value": 0.1, "entry": 500, "purse": [5000, 3000, 1500],
+		"field": [["KAPITAN", "silak_box", "1f4dbf", 0.87], ["ATE LIZA", "civic_fd", "d9191f", 0.9]],
+		"field_if": { "won:TISOY": [["TISOY", "eg_hatch", "17171a", 0.87]] },
+		"comic": [[
+			{ "art": "snap", "cap": "A SUNDAY MORNING · THE WAREHOUSE LOOP, CLOSED OFF · KAPITAN'S NEPHEWS IN VESTS" },
+		]],
+		"before": [
+		["KAPITAN", "My meet, my rules. You race clean or you go home."],
+		["PANG", "Clean."],
+		["", "RJ took his car home rather than line up with me."],
+		["", "So did Tisoy.", "!won:TISOY"],
+	],
+		"after": [
+		["ATE LIZA", "You finished slowing."],
+		["KAPITAN", "Sign here. Nico's club. A hillclimb. The pass closed for a Sunday, permit and all."],
+	] },
+	{ "id": "s33b1", "scene": "S33B", "stage": "pass", "type": "trial", "title": "QUALIFYING  ·  RUN 1", "night_value": 0.05,
+		"entry": 2000, "garage": true,
+		"comic": [[
+			{ "art": "road", "cap": "THE PASS, CLOSED FOR THE DAY · MARSHALS AT THE CORNERS · TWO RUNS, THE CLOCK ONLY" },
+			{ "art": "face", "who": "RUEL", "side": "right", "say": "Clock's honest today. Use it." },
+		]],
+		"after": [["RUEL", "Pressures. Then go again."]] },
+	{ "id": "s33b2", "scene": "S33B", "stage": "pass", "type": "trial", "title": "QUALIFYING  ·  RUN 2", "night_value": 0.05,
+		"after": [
+		["NICO", "Drive it with me the day before. At forty."],
+		["PANG", "At forty."],
+	] },
+	{ "id": "s33t", "scene": "S33", "stage": "hub", "type": "talk", "spot": "kyo", "place": "KYO COFFEE", "when": "THE WEEK BEFORE",
+		"comic": [[
+			{ "art": "snap", "cap": "KYO COFFEE · THE WEEK BEFORE THE HILLCLIMB" },
+		]],
+		"lines": [
 		["KAPITAN", "Still a legend, Pang. I don't care about your notes."],
 		["ATE LIZA", "Good that you said it. Sit. Eat first."],
 		["BUKO", "So who's Ghost."],
 		["TISOY", "Bro. Dante's still running Saturdays. Fewer people."],
-		["NICO", "Drive the mountain with me. Daylight. No event, no timer, no crowd."],
-		["PANG", "Why?"],
-		["NICO", "I want to see what it looks like at forty."],
+		["TISOY", "You still owe me a rematch.", "won:TISOY"],
+		["NICO", "Saturday. At forty."],
 	] },
-	{ "id": "s34", "scene": "S34", "stage": "pass", "type": "daylight", "title": "THE DAYLIGHT ROAD",
+	{ "id": "s33r", "scene": "S33R", "stage": "hub", "type": "roam", "spot": "kyo",
+		"next": "exit", "prompt": "THE ROAD UP  ·  THE RECCE WITH NICO", "events": ["sprints", "mountain"],
+		"before": [["RUEL", "A week. Tires, brakes, the rain set's in the corner. Your call."]] },
+	{ "id": "s34", "scene": "S34", "stage": "pass", "type": "daylight", "title": "THE DAYLIGHT ROAD", "ghost": false,
+		"exit": { "tail": 2.5 },
 		"comic": [[
+			{ "art": "road", "cap": "SATURDAY · NO TIMER" },
 			{ "art": "face", "who": "NICO", "side": "left", "say": "No timer." },
 			{ "art": "face", "who": "PANG", "side": "right", "say": "No timer." },
 		]],
-		"before": [["", "A weekday morning. A delivery truck uphill. A family of four on one motorcycle. Patches in the asphalt I'd never seen at speed."]],
+		"before": [["", "The day before. A delivery truck uphill. A family of four on one motorcycle. Patches in the asphalt I'd never seen at speed."]],
+		"cues": [[-45.0, "NICO", "That stays wet till noon."], [-30.0, "PANG", "I know."]],
 		"after": [
-			["NICO", "That's it?"],
-			["PANG", "That's it."],
+			["NICO", "Nine tomorrow. It'll still be there."],
+			["PANG", "I know."],
+		] },
+	{ "id": "s34a", "scene": "S34A", "stage": "pass", "type": "final", "course": "pass", "title": "THE LAST LINE",
+		"comic": [[
+			{ "art": "road", "cap": "SUNDAY · 9 A.M. · THE PASS CLOSED BY PERMIT · MARSHALS AT EVERY CORNER" },
+			{ "art": "face", "who": "RUEL", "side": "right", "say": "Pressures are right." },
+		]],
+		"lifted": [
+			["NICO", "You lifted at 8A."],
+			["PANG", "It was wet."],
+		],
+		"chased": [
+			["NICO", "You went inside at 8A."],
+			["PANG", "It was wet."],
+		],
+		"after": [
+			["", "Kapitan wrote the times in his notebook. Nobody asked about Ghost all morning, except Buko, once."],
 			["", "Here's what I know. I was driving."],
 		] },
 	{ "id": "s35", "scene": "S35", "stage": "hub", "type": "talk", "spot": "talyer", "night": true, "rain": 0.4, "wet": 0.6,

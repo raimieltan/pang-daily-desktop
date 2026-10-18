@@ -238,6 +238,7 @@ class Plot extends Control:
 			"board": _draw_board()
 			"notes": _draw_notes()
 			"trials": _draw_trials()
+			"lights": _draw_lights()
 
 	func _text(at: Vector2, text: String, size_px := 17, color := MangaType.INK) -> void:
 		draw_string(_font, at, text, HORIZONTAL_ALIGNMENT_LEFT, -1, size_px, color)
@@ -440,6 +441,38 @@ class Plot extends Control:
 			var row: Array = rows[r]
 			for c in mini(row.size(), cols.size()):
 				_text(Vector2(14 + cols[c] * cw, 64 + r * 32), str(row[c]), 18)
+
+	## The lights test over the night run: the lights' bearing off the nose against distance to 8A.
+	## The same curve twice means the same lights in the same place, whoever drove.
+	func _draw_lights() -> void:
+		var crash: PackedVector2Array = context.get("lights_crash", PackedVector2Array())
+		var test: PackedVector2Array = context.get("lights_test", PackedVector2Array())
+		if crash.size() < 2 and test.size() < 2:
+			_text(Vector2(14, 30), "(no runs to compare on this save)")
+			return
+		var r := Rect2(70, 10, size.x - 84, size.y - 50)
+		draw_rect(r, MangaType.INK, false, 2.0)
+		var entry := StoryCourse.fatal_entry()
+		var d0 := entry - StoryCourse.LIGHTS_FROM
+		var d1 := entry + 20.0
+		var lo := -60.0
+		var hi := 60.0
+		var y0 := r.end.y - (0.0 - lo) / (hi - lo) * r.size.y
+		draw_dashed_line(Vector2(r.position.x, y0), Vector2(r.end.x, y0), MangaType.INK, 1.0, 4.0)
+		_text(Vector2(4, y0 + 5), "NOSE", 14)
+		_text(Vector2(4, r.position.y + 14), "RIGHT", 14)
+		_text(Vector2(4, r.end.y), "LEFT", 14)
+		var x8 := r.position.x + (entry - d0) / (d1 - d0) * r.size.x
+		draw_line(Vector2(x8, r.position.y), Vector2(x8, r.end.y), MangaType.RED, 2.0)
+		_text(Vector2(x8 - 26, r.position.y + 20), "8A", 18, MangaType.RED)
+		for pair in [[crash, MangaType.INK, 3.0], [test, MangaType.RED, 2.0]]:
+			var pts := PackedVector2Array()
+			for p in (pair[0] as PackedVector2Array):
+				pts.append(Vector2(r.position.x + clampf((p.x - d0) / (d1 - d0), 0.0, 1.0) * r.size.x,
+					r.end.y - clampf((p.y - lo) / (hi - lo), 0.0, 1.0) * r.size.y))
+			if pts.size() >= 2:
+				draw_polyline(pts, pair[1], pair[2])
+		_text(Vector2(r.position.x, size.y - 8), "INK: THE NIGHT RUN     RED: TONIGHT, NICO ON THE LOWER ROAD     170 M OUT TO 8A", 15)
 
 	func _axes(r: Rect2, label: String, span: float) -> void:
 		draw_rect(r, MangaType.INK, false, 2.0)

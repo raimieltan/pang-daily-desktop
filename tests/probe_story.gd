@@ -33,6 +33,9 @@ func _physics_process(delta: float) -> bool:
 		_scene = current_scene
 		_driver = null
 	if StoryMode.completed and not StoryMode.active:
+		print("PROGRESS wallets=%s owed=%s/%s commitments=%d rep=%s memory=%s present=%s" % [JSON.stringify(StoryMode.wallets),
+			StoryMode.owed("memory"), StoryMode.owed("present"), StoryMode.commitments_total(), JSON.stringify(StoryMode.rep),
+			JSON.stringify(StoryMode.cars["memory"]), JSON.stringify(StoryMode.cars["present"])])
 		print("STORY COMPLETE at %.0f s  passes=%d ghost=%s crash_frames=%d results=%s" % [_t,
 			StoryMode.record.get("passes", []).size(), TimeAttackRun.format_time(StoryMode.ghost_line().time),
 			StoryMode.unpack(StoryMode.record.get("crash", "")).size() / GhostLine.STRIDE, JSON.stringify(StoryMode.results)])
@@ -41,10 +44,15 @@ func _physics_process(delta: float) -> bool:
 	if StoryMode.beat != _beat:
 		_beat = StoryMode.beat
 		var b := StoryMode.current()
-		print("t=%6.1f  beat %2d  %-6s %-9s %-6s %s" % [_t, _beat, b["id"], b["type"], b["stage"], b.get("title", b.get("place", ""))])
+		print("t=%6.1f  beat %2d  %-6s %-9s %-6s %-40s wallet %d" % [_t, _beat, b["id"], b["type"], b["stage"], b.get("title", b.get("place", b.get("prompt", ""))), StoryMode.wallet()])
 		_driver = null
 	_drive()
-	if _t > 3600.0:
+	# Every minute: where the player's car is, so a stuck drive shows itself.
+	if fmod(_t, 60.0) < delta and _scene and "session" in _scene and _scene.session and _scene.session.car:
+		var car: CarBody = _scene.session.car
+		var res = StoryMode.results.get(StoryMode.current()["id"], {})
+		print("  ... t=%6.1f %5.1f km/h at %s result %s" % [_t, car.speed_kmh(), car.global_position.snapped(Vector3.ONE), JSON.stringify(res)])
+	if _t > 7200.0:
 		print("TIMEOUT at beat ", StoryMode.current()["id"])
 		quit(1)
 	return false
@@ -66,10 +74,15 @@ func _drive() -> void:
 			var c := area.get_center()
 			if not area.has_point(Vector2(car.global_position.x, -car.global_position.z)):
 				car.place(HubLayout.pos(c.x, c.y, 0.3), car.rotation.y)
-		"race", "practice", "attack", "sectors", "daylight", "crash":
-			var track: TrackData = director._loop_course() if b.get("course", "") == "loop" else StoryDirector.PASS_TRACK
+		"race", "practice", "attack", "sectors", "daylight", "crash", "test", "trial", "final", "roam":
+			# The director names the road a drive is on; a roam drives only for its sprints.
+			var track: TrackData = director.drive_track
+			if track == null:
+				if b["type"] == "roam":
+					return
+				track = director._loop_course(int(b.get("laps", 1))) if b.get("course", "") == "loop" else StoryDirector.PASS_TRACK
 			var jumped := car.global_position.distance_to(_last_pos) > 25.0
-			if _driver == null or jumped:
+			if _driver == null or jumped or _driver.track != track:
 				_driver = AiDriver.new(car, track, 1.0, 0.0)
 				_driver.racing = true
 			var me := _driver

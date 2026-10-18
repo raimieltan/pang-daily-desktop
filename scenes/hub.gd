@@ -84,6 +84,7 @@ func _ready() -> void:
 		director.stage = "hub"
 		director.session = session
 		director.loop = loop
+		director.hub = self
 		add_child(director)
 
 
@@ -127,6 +128,32 @@ func _spawn_car(rival: int, at: Vector3, heading: float) -> CarBody:
 	visual.car = car
 	car.add_child(visual)
 	car.place(at, heading)
+	return car
+
+
+## A car parked in the story's free roam (a regular waiting at the gas station): body, tune and
+## paint, held on the brakes with its lamps dark.
+func spawn_parked(model: String, preset: String, paint: Color, at: Vector3, heading: float) -> CarBody:
+	var car := CarBody.new()
+	car.preset = preset
+	car.tire_product = "street"
+	add_child(car)
+	car.global_position = at
+	car.rotation.y = heading
+	var visual := CarVisual.new()
+	visual.model_scene = load(model)
+	visual.paint_color = paint
+	visual.car = car
+	car.add_child(visual)
+	car.place(at, heading)
+	car.input_source = func() -> VehicleTypes.DriverInput:
+		return VehicleTypes.DriverInput.make(0.0, 1.0, 0.0, 1.0, "ai")
+	# CarVisual builds its spots a frame or two late (see _park_lights_off).
+	var dark := func():
+		if is_instance_valid(car):
+			for spot in car.find_children("*", "SpotLight3D", true, false):
+				(spot as SpotLight3D).light_cull_mask = 0
+	get_tree().create_timer(0.2).timeout.connect(dark)
 	return car
 
 
