@@ -56,6 +56,10 @@ var garage: StoryGarage
 var _prompt: Label
 var _money: Label
 var _toast_left := 0.0
+## The objective's compass (points at the place relative to the car) and the beam standing on it.
+var _compass: Compass
+var _beam: Node3D
+var _goal := Vector3.INF
 
 
 func _ready() -> void:
@@ -80,6 +84,11 @@ func _ready() -> void:
 	layer.layer = 13
 	layer.add_child(_objective)
 	add_child(layer)
+	_compass = Compass.new()
+	_compass.set_anchors_preset(Control.PRESET_CENTER_TOP)
+	_compass.position = Vector2(-32, 40)
+	_compass.visible = false
+	layer.add_child(_compass)
 	_prompt = MangaType.label("", 28)
 	_prompt.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
 	_prompt.grow_horizontal = Control.GROW_DIRECTION_BOTH
@@ -90,7 +99,7 @@ func _ready() -> void:
 	_money = MangaType.label("", 24, MangaType.caption())
 	_money.set_anchors_preset(Control.PRESET_TOP_RIGHT)
 	_money.grow_horizontal = Control.GROW_DIRECTION_BEGIN
-	_money.position = Vector2(-24, 124)
+	_money.position = Vector2(-24, 170)
 	_money.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	layer.add_child(_money)
 	garage = StoryGarage.new()
@@ -530,15 +539,18 @@ func _goto(b: Dictionary) -> void:
 	var place: Dictionary = HubLayout.PLACES[b["place"]]
 	_hold(false)
 	var area: Rect2 = place["area"]
+	_show_target(b["place"])
 	while is_inside_tree():
 		var p := session.car.global_position
 		var at := Vector2(p.x, -p.z)
 		var to := area.get_center() - at
-		_objective.text = "▶  %s   %d m" % [b.get("prompt", place["name"]), int(to.length())]
+		_objective.text = "%s   %d m" % [b.get("prompt", place["name"]), int(to.length())]
+		_point_compass()
 		if area.has_point(at):
 			break
 		await get_tree().process_frame
 	_objective.text = ""
+	_show_target("")
 	var i := StoryMode.beat + 1
 	var next: Dictionary = StoryScript.BEATS[i] if i < StoryScript.BEATS.size() else {}
 	if next.get("spot", "") == b["place"] and SPOT_VIEWS.has(b["place"]):
@@ -1246,6 +1258,7 @@ func _roam(b: Dictionary) -> void:
 	_prompt.text = ""
 	_money.text = ""
 	_objective.text = ""
+	_show_target("")
 	StoryMode.roam_from = ""
 	var next: String = b["next"]
 	var i := StoryMode.beat + 1
@@ -1260,13 +1273,15 @@ func _roam_loop(b: Dictionary, parked: Array) -> String:
 	var next: Dictionary = HubLayout.PLACES[b["next"]]
 	var area: Rect2 = next["area"]
 	_hold(false)
+	_show_target(b["next"])
 	while is_inside_tree():
 		await get_tree().process_frame
 		var p := session.car.global_position
 		var at := Vector2(p.x, -p.z)
 		var to := area.get_center() - at
 		if _toast_left <= 0.0:
-			_objective.text = "▶  NEXT:  %s   %d m" % [b.get("prompt", next["name"]), int(to.length())]
+			_objective.text = "NEXT:  %s   %d m" % [b.get("prompt", next["name"]), int(to.length())]
+		_point_compass()
 		_toast_left -= get_process_delta_time()
 		_money.text = "₱%s     RUEL  ₱%s" % [StoryGarage._pesos(StoryMode.wallet()), StoryGarage._pesos(StoryMode.owed())]
 		var action := _roam_action(b, parked, at)
@@ -1334,6 +1349,85 @@ func _park_regulars(b: Dictionary) -> Array:
 		body.set_meta("regular", int(e["regular"]))
 		out.append(body)
 	return out
+
+
+## The objective's place: the compass, the minimap's diamond and a red beam with the place's name,
+## tall enough to see over the roofs. "" clears them.
+func _show_target(place: String) -> void:
+	if _beam:
+		_beam.queue_free()
+		_beam = null
+	if place == "" or not HubLayout.PLACES.has(place):
+		_goal = Vector3.INF
+		_compass.visible = false
+		if session:
+			session.minimap.target = Vector3.INF
+		return
+	var c: Vector2 = (HubLayout.PLACES[place]["area"] as Rect2).get_center()
+	_goal = HubLayout.pos(c.x, c.y)
+	session.minimap.target = _goal
+	_compass.visible = true
+	_beam = Node3D.new()
+	_beam.position = _goal
+	var shaft := MeshInstance3D.new()
+	var cyl := CylinderMesh.new()
+	cyl.top_radius = 0.9
+	cyl.bottom_radius = 0.9
+	cyl.height = 40.0
+	shaft.mesh = cyl
+	shaft.position.y = 20.0
+	var m := StandardMaterial3D.new()
+	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	m.albedo_color = Color(MangaType.RED, 0.45)
+	m.cull_mode = BaseMaterial3D.CULL_DISABLED
+	shaft.material_override = m
+	shaft.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	_beam.add_child(shaft)
+	var name := Label3D.new()
+	name.text = HubLayout.PLACES[place]["name"]
+	name.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	name.no_depth_test = true
+	name.fixed_size = true
+	name.pixel_size = 0.0012
+	name.font_size = 40
+	name.outline_size = 10
+	name.modulate = MangaType.PAPER
+	name.outline_modulate = MangaType.INK
+	name.position.y = 9.0
+	_beam.add_child(name)
+	add_child(_beam)
+
+
+## Turn the compass toward the target as the car sees it (up = straight ahead).
+func _point_compass() -> void:
+	if _goal == Vector3.INF or session == null or session.car == null:
+		return
+	var local := session.car.global_transform.basis.inverse() * (_goal - session.car.global_position)
+	_compass.rotation = atan2(local.x, -local.z)
+
+
+## The objective's arrow: red, ink-outlined, pointing where to drive.
+class Compass extends Control:
+	const SIZE := 64.0
+
+	func _ready() -> void:
+		size = Vector2(SIZE, SIZE)
+		pivot_offset = size * 0.5
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+	func _draw() -> void:
+		var c := size * 0.5
+		# A head and a shaft, so the point can't be mistaken for the tail at a glance.
+		var tri := PackedVector2Array([c + Vector2(0, -28), c + Vector2(20, -4), c + Vector2(7, -4), c + Vector2(7, 26),
+			c + Vector2(-7, 26), c + Vector2(-7, -4), c + Vector2(-20, -4)])
+		var shadow := tri.duplicate()
+		for i in shadow.size():
+			shadow[i] += Vector2(4, 4)
+		draw_colored_polygon(shadow, MangaType.INK)
+		draw_colored_polygon(tri, MangaType.RED)
+		tri.append(tri[0])
+		draw_polyline(tri, MangaType.INK, 3.0, true)
 
 
 ## Kapitan's board by the shop door: a whiteboard on two legs.

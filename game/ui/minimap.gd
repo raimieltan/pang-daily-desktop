@@ -25,6 +25,9 @@ var track: TrackData:
 		_build()
 var player: Node3D
 var rivals: Array[Node3D] = []
+## Where the player is headed (story objectives), or INF for nowhere: a ringed red diamond,
+## pinned to the panel's edge when it lies off the map.
+var target := Vector3.INF
 
 var _line := PackedVector2Array()
 var _angle := 0.0
@@ -138,6 +141,7 @@ func _draw() -> void:
 	if not _line.is_empty():
 		_draw_road()
 		_draw_marks()
+		_draw_target()
 		_draw_cars()
 	draw_rect(panel.grow(-BORDER * 0.5), INK, false, BORDER)
 	_draw_caption(panel)
@@ -198,6 +202,22 @@ func _draw_cars() -> void:
 			draw_circle(at, 4.5, INK)
 	if is_instance_valid(player):
 		_draw_arrow(_world_to_map(player.global_position), _heading(player))
+
+
+func _draw_target() -> void:
+	if target == Vector3.INF:
+		return
+	var room := _room()
+	var at := _world_to_map(target)
+	var inside := room.has_point(at)
+	at = at.clamp(room.position, room.end)
+	var r := 9.0 if inside else 7.0
+	var diamond := PackedVector2Array([at + Vector2(0, -r), at + Vector2(r, 0), at + Vector2(0, r), at + Vector2(-r, 0)])
+	draw_colored_polygon(diamond, RED)
+	diamond.append(diamond[0])
+	draw_polyline(diamond, INK, 2.5, true)
+	if inside:
+		draw_arc(at, r + 5.0, 0.0, TAU, 24, RED, 2.0, true)
 
 
 func _heading(node: Node3D) -> Vector2:
