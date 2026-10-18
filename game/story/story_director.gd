@@ -59,6 +59,9 @@ var _toast_left := 0.0
 
 
 func _ready() -> void:
+	# The car is heard from the first frame: the title screen mutes the car buses while it is up and
+	# the story's scene change skips the menu's unmute (a long free roam stayed silent).
+	_mute_car(false)
 	dialogue = StoryDialogue.new()
 	add_child(dialogue)
 	# Every scene opens out of black; the first beat lifts it (_reveal).
