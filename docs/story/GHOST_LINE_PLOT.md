@@ -2,6 +2,8 @@
 
 **Full narrative plot · Psychological thriller / underground racing drama · Iloilo, Philippines**
 
+*Includes the races-and-progression additions of Oct 18, 2026.*
+
 **Logline:** After surviving a mountain-road crash that kills his closest friend, an underfunded street racer returns to Iloilo's underground scene to discover whether another driver caused the accident. His search leads him to the Ghost Line, an anonymous racing benchmark that has become the scene's obsession. First he discovers that the legendary driver is himself. Then he discovers something worse: the perfect run he has spent months trying to beat never happened. It was assembled from fragments of his own best drives—and the night he tried to reproduce it, he ignored the one person who knew the road could not be made to behave like a recording.
 
 ---
@@ -20,9 +22,15 @@ One night, Jolo gets them into an informal race. The prize is modest but meaning
 
 Among the spectators is Dante, a well-connected organizer who arranges private races and facilitates bets. Dante knows mechanics, racers, sellers, and people with money. He can get an unknown driver into rooms they would never otherwise enter. He is personable and pragmatic, with a talent for understanding what people want to believe about themselves. He is not the fastest driver in the scene. He is the person who knows how to turn a fast driver into an event.
 
+The prize from the warehouse run does not last a morning. Ruel keeps the car's bill on a clipboard by the calendar, and every win arrives already spent: front tires, pads, the part that has been waiting longest. There is never enough to cover the list, only enough to choose which item waits. The choosing is the protagonist's life with the car, and it is the player's too: every purse lands in a wallet beside Ruel's bill, and every part on Ruel's bench is either the kind Ruel would choose or the kind that looks good on Jolo's camera.
+
+Most of that money comes from the gas station on the bypass, where an older regular everyone calls Kapitan runs one-lap sprints for five hundred pesos a car. The regulars there become the protagonist's first real rivals: Kapitan, who never brakes first; Tisoy, whose car is better than his driving; Buko, who films everything; and Ate Liza, who brakes later than anyone and says less. Ate Liza beats him the first time they race, and tells him why in one sentence: he turns in before he has finished slowing, and it works until it doesn't. He decides she is wrong. Between the bigger nights, his evenings are a slow loop of the barangay: the gas station, a sprint, the talyer, the next sprint.
+
 Dante sees a story in the protagonist: a talented underdog with an ordinary car, a loyal friend, and something to prove. He begins inviting them to better races. Jolo handles the connections while the protagonist concentrates on driving. Their situation improves, but never as quickly as they need it to. They earn prize money and make friends, yet parts break, entry fees rise, and every new opportunity seems to require another expense. The more they gain access to the scene, the more money they have to spend to remain in it.
 
 They meet Nico, an established racer with a beautifully prepared car and enough financial security to absorb a loss. Nico dismisses the protagonist as another newcomer who believes courage can replace preparation. The protagonist hears only the contempt. He resents Nico's equipment and access; Nico resents being forced to take an underfunded stranger seriously. Their rivalry becomes personal, but not simple. Nico has earned his skill. He also has advantages that the protagonist cannot buy his way into.
+
+Dante's first event on the mountain is where the protagonist meets the road that will matter. He finishes on the podium and onto Dante's list. Nico, who isn't racing, watches from the pull-off and tells him something useful: the trees at one bend keep the road damp long after the rest of it has dried. The protagonist hears it as Nico trying to sound smart. Jolo falls in love with the road and asks for a week on it.
 
 For the first time, the protagonist feels that he belongs somewhere. Drivers lend each other tools and trade advice. People who spent a week arguing online will still help a rival change a wheel at midnight. The scene has its own rough loyalty. But favors become debts, debts become leverage, and a friendly wager can turn into a financial trap when the wrong person needs money by morning.
 
@@ -48,11 +56,15 @@ Jolo encourages him at first. Beating Ghost could give them the recognition they
 
 Dante realizes that the protagonist's fixation can be monetized. He organizes events around attempts to match the Ghost Line, encourages side bets, and promotes a larger mountain-road challenge. The line has become an attraction, and the protagonist has become one of its most compelling challengers. Dante's business grows as the mystery becomes harder to question.
 
+The challenge becomes a series. Every Saturday the entry costs more and the purse grows. Every time a driver beats the posted Ghost time, Dante pays a small bounty and quietly posts a lower one, and the scene reads it as Ghost answering. The protagonist spends his winnings on parts that the shop now prices against Ghost's time, and gets faster, and the number keeps moving. One Saturday he passes the car in the clip and still loses to the clock. Another, he beats Nico for the first time, and nobody talks about anything but Ghost. Nico points out that Ghost wasn't there. The protagonist doesn't hear it. Jolo, meanwhile, borrows from Ate Liza to cover a lens.
+
 The stakes rise. The protagonist wants to prove himself against Nico, but now he also wants to beat Ghost. Jolo begins taking financial risks to keep the car competitive and to cover the commitments he has made. Their friendship strains under the pressure neither knows how to articulate. The protagonist sees Jolo's caution as fear of losing their chance. Jolo sees the protagonist turning every warning into a test of courage.
 
 Then Dante offers them the opportunity they have been waiting for: a heavily promoted night run on the mountain route. The payout is substantial, the audience is larger than any event they have entered, and the winner will be the driver who can finally beat the Ghost Line's reference pace. The money could cover their debts, rebuild the car properly, and give them a chance to stop scraping together entry fees just to remain in the scene.
 
 Ruel tells them the car is not ready for the conditions. The weather is deteriorating, the road is wet, and the tires they can afford are not the tires he would choose for a run like this. Jolo also tries to back out. He knows the clip is not a single drive, though he has not yet found the courage to explain the full story. He tells the protagonist that a reference line cannot tell them what the road will be like that night.
+
+The protagonist has already tried to solve it with money. Midweek he wins Kapitan's pot race, and Jolo spends the laps on the phone to a parts shop: there is one set of rain tires for the car, in Manila, two weeks away. The event is Friday. Ruel orders the set anyway. It is the one thing in the story that money could have fixed, and money arrives too late to fix it.
 
 The protagonist hears this as another attempt to talk him out of his one chance. He has spent months trying to reach a performance that seems to exist just beyond him. Now the event, the money, and the audience have given the obsession a deadline. He insists that they can do it.
 
@@ -78,6 +90,8 @@ Dante does not claim to know that another driver caused the crash, but he does n
 
 The protagonist returns to Ruel's garage. Ruel has repaired what he could of the car, though some parts had to be replaced and the bodywork still bears the marks of the crash. Ruel kept the damaged camera card and the small data logger from the car, assuming they might matter if the family ever needed answers. He has not examined them in detail because the protagonist was barely ready to look at the car, let alone the evidence from the night.
 
+Ruel's first request is simple: drive it around the block, slowly, so he can see how much it pulls. The protagonist does, at walking speed, with a steering wheel that isn't the one he remembers. Ruel adjusts it, and the second lap runs straight. In the corner of the garage, still wrapped in plastic, are four tires. The rain set came two weeks after. Ruel writes the repair bill on the clipboard and tells him to pay when he can. He starts over: a new wallet, an old car, a bill he can't cover, and races that pay less because fewer people want to race him. The nights in between are the old loop again, the gas station to the talyer and back, a small purse at a time.
+
 The protagonist starts racing again. At first, he tells himself it is to prove the crash has not taken his ability away. Soon, he is asking the same questions at every coffee shop and garage: Who else was on the mountain? Who was the driver in the headlights? Why did nobody come forward? He says he wants the truth, but what he really wants is a person whose identity will make the death feel explainable.
 
 The Ghost Line becomes the center of the investigation. The protagonist searches old footage, compares accounts from racers who attended the event, and questions people who claim to know Ghost. Their stories disagree in ways that make the mystery seem larger. Some swear the clip came from a car no one in Iloilo owned. Others remember seeing a driver wearing a helmet that hid their face. One person claims the run was years old. Another says it was filmed only months before the crash. Each retelling contains details that cannot all be true.
@@ -96,6 +110,8 @@ The protagonist confronts Dante. He wants to know whether the organizer had a dr
 
 The answer is infuriating because it is not enough to prove Dante innocent in every respect, nor enough to prove him guilty of the crash. The protagonist leaves convinced that Dante is hiding something. Dante, in turn, watches the investigation threaten a story that has made him powerful. Their conflict becomes less about a secret killer and more about who benefited from keeping the truth vague.
 
+The first useful copy of the clip doesn't come from Dante. It comes from Tisoy, who downloaded the Ghost Line the night it went up and will send it only if the protagonist beats him on the loop. It is his first night race since the crash, and Tisoy's headlights fill his mirror the whole way. Tisoy's copy is older than every repost. Its first half-second shows the cropped edge of a title card that Dante's version doesn't have. The clip, it turns out, once had a name.
+
 ### **The first revelation: Ghost is not a stranger**
 
 Ruel finds an old copy of Jolo's source folder on a backup drive. Most of it contains ordinary practice footage, but one directory is labeled with the Ghost Line project name. The files predate the crash. There are several versions of the clip, editing notes, and raw recordings from different practice sessions.
@@ -113,6 +129,8 @@ The realization knocks away the story he had built around the crash. He had imag
 But the discovery brings an even more painful question. If the Ghost Line was his own run, why can't he reproduce it? Why did the footage seem to contain a level of consistency that no driver, including him, could match?
 
 The first answer seems obvious: months of obsession have made him desperate, and he is not driving the same car or the same road under the same conditions. He believes he has found the driver. He has not yet understood the run.
+
+For a night, the discovery makes him reckless in a new way. If he is Ghost, then the run is his to take back. He calls Nico and challenges him on the mountain: no crowd, no bets, no overlay. He drives well enough to win. Nico doesn't argue the result. He asks a different question: which run was the clip? The protagonist starts to answer and can't. He knows every piece of it. He cannot name the drive it came from.
 
 ---
 
@@ -148,6 +166,8 @@ The camera file is partially corrupted, and the last seconds before impact are m
 
 At first, the lights appear to confirm the protagonist's memory of another car. Nico helps them compare the route with the footage. The mountain road bends back on itself, and another section of road lies below the corner. Headlights on that lower switchback can slide through gaps in the trees and appear, for a moment, to be moving alongside a car on the upper road. In the surviving footage, the lights are distant and separated by the hillside. They do not cross into the protagonist's lane.
 
+They test it the only way the game allows: by driving it. That night Nico takes the lower switchback while the protagonist drives the upper road toward the bend at an ordinary pace, Ruel counting both of them in over the phone. The lights appear through the trees at the same angle as in the surviving footage, slide alongside, and vanish behind the ridge. Nico is sixty metres below the whole time, saying so. The protagonist brakes anyway; his foot does it before he decides. His own recorded run, laid over the crash run, puts the lights in the same place at the same distance down the road.
+
 A witness who was leaving a roadside stop confirms that another car used the lower section that night, but cannot place it close enough to the crash to have caused it. There is no evidence of contact, no second set of marks that indicates another vehicle forced the car off course, and no change in the steering data that can be explained by a collision or evasive maneuver against a nearby car.
 
 The logger shows the protagonist approaching the fatal corner too quickly for the wet surface. He brakes later than he had during the dry practice sessions. He tries to carry the reference line into a corner whose grip has changed. As the car begins to lose stability, he makes a sharp correction and the car leaves the road. The surviving audio captures Jolo saying "Pang, it's wet. It's wet." The protagonist has spent months remembering it as "drive the road", a dry-day joke of Jolo's from the line study, spliced into the crash night. It does not reveal a secret final warning or a hidden confession. It confirms what the protagonist already remembers but has spent months trying to interpret differently.
@@ -180,15 +200,19 @@ There is no immediate forgiveness. Jolo's family is allowed anger, disbelief, an
 
 The aftermath is neither a clean redemption nor a punishment designed to erase him. Some people in the scene condemn him. Others respect that he stopped blaming an invisible rival. Some relationships end; a few survive with less certainty and more honesty. He loses opportunities that had depended on the legend, and he can no longer hide behind the identity of the gifted underdog who nearly beat an impossible record. His reputation becomes less impressive and more real.
 
+Some drivers won't line up with him anymore. Kapitan and Ate Liza run a different kind of meet now, a closed loop with marshals and no bets, and the protagonist races there on the same warehouse road where he won his first purse. He finishes, and Kapitan signs his entry for something the scene has never had: a hillclimb on the mountain road, closed by permit for a Sunday, organized by Nico's club, with marshals at every corner and a clock nobody can repost. He qualifies on a car rebuilt the way Ruel would have built it from the start: tires, brakes, suspension, the rain set from the corner, the paint still faded and one door still in primer.
+
 The Ghost Line's hold on the scene weakens, though it does not disappear overnight. A few drivers continue trying to beat it. Others save the source files as a warning about how easily a reference can be mistaken for a record. The myth remains part of the scene's history, but its meaning changes: what was once presented as proof of a perfect driver becomes evidence of how a community can manufacture perfection out of ordinary human effort.
 
-Months later, the protagonist returns to the mountain road with Nico. It is not an underground event. There are no bookmakers, no crowd, and no money riding on the result. They drive the route in daylight under ordinary road conditions, taking care around other vehicles and respecting the fact that a public road is not a circuit. The purpose is not to recreate the fatal run or prove that the protagonist has recovered his old skill. He wants to face the place without turning it into a test he has to win.
+The day before the hillclimb, Nico asks him to drive the open road at forty. There are no bookmakers, no crowd and no clock, only a delivery truck, a family on one motorcycle and a car beyond the bend. At the corner where the crash happened, the outside edge is dark under the trees. Nico says it stays wet until noon. The protagonist says he knows. The ghost does not appear.
 
-As they approach the corner where the crash happened, the Ghost Line briefly appears as a visual overlay: the idealized reference car following its impossibly smooth trajectory. The effect recalls the player's earlier attempts to chase it. For a moment, the old instinct returns. He knows the entry, the angle, and the sequence the footage tells him to follow.
+On Sunday morning the road is closed and the two of them race it for real. Three hundred metres before the bend, the Ghost Line appears in his mirror: the idealized car, at its impossible dry pace, closing on him and wanting the inside line through the damp. For a moment the old instinct returns. He knows the entry, the angle and the sequence the footage tells him to follow.
 
-Then the road in front of him takes precedence. The surface is different. The light is different. There is traffic beyond the bend. He slows down and takes a line that suits the conditions, not the recording. The ghost continues through the corner and disappears ahead. The gap between them grows.
+He lifts. He holds the line that suits the road. The ghost passes through him, takes the inside without a slide, because it is a recording and the road does not touch it, and disappears ahead. The gap between them grows. For the first time, he allows it to.
 
-For the first time, he allows it to.
+He finishes second to Nico, three tenths behind. Nico tells him he lifted at the bend. The protagonist says what Jolo said on the night he didn't answer: it was wet. There is no trophy. Kapitan writes the times in his notebook. Nobody asks about Ghost all morning, except Buko, once.
+
+*(In the game the player can win R19; the manuscript's canon is second place.)*
 
 He reaches the other side of the mountain without a time, a record, or an audience. Nothing has been reversed. He has not undone the crash, recovered Jolo, or earned automatic forgiveness. He has simply made a different decision when the road asked him to.
 
@@ -217,6 +241,8 @@ The first is that **Ghost is the protagonist**. The unknown driver he has spent 
 The second truth changes the meaning of the first: **the perfect run never happened**. Jolo assembled the Ghost Line from the best sections of several separate drives. Every segment was real; the seamless performance was not. The protagonist has been chasing a version of himself created by selecting away every mistake.
 
 The third truth is the hardest: **exposing the lie does not erase responsibility**. Jolo's edit and Dante's exploitation helped create the pressure around the benchmark, but the protagonist chose to push beyond what the road could support. The accident was not a conspiracy waiting to be solved. It was a preventable tragedy surrounded by people who each had reasons to avoid facing an uncomfortable truth.
+
+Progression carries the same idea in the player's hands. Before the crash, the car is built with Dante's money in pursuit of a number that moves every time it is reached. After the crash, it is rebuilt Ruel's way, from the parts that let a car respond to the road it is on. The last race is not won by the faster build. It is decided at one corner, by whether the player follows a recording or the road.
 
 The nonlinear structure should mirror the Ghost Line itself. Scenes from different periods flow together as if they form one continuous memory. A conversation seems to resume where it left off; an object or a line of dialogue links one night to another. Later, details reveal the joins. The player realizes that the apparent continuity was created by the way the memories were presented, just as Jolo created the benchmark by joining separate moments of good driving. The structure should reward attention rather than simply hide information: clues appear early, and the audience can recognize them in retrospect.
 

@@ -40,7 +40,7 @@ Reference points: Initial D Arcade Stage (handling feel), Tokyo Xtreme Racer / W
 
 ## Build status (Oct 17, 2026)
 
-The build covers the driving, the first road, time attack, SP battles, a drivable barangay hub, presentation, and the full story mode; the economy layer (tuning, parts, wear, money, rival ladder) is not started.
+The build covers the driving, the first road, time attack, SP battles, a drivable barangay hub, presentation, and the full story mode; the grind economy (parts, wear, money, rival ladder) is not started; story mode has its own (Oct 18, 2026).
 
 **Built**
 
@@ -63,7 +63,8 @@ The build covers the driving, the first road, time attack, SP battles, a drivabl
 | Trailer | Movie Maker capture tooling and a Remotion edit for a 30 s vertical trailer | `trailer/` |
 | Barangay hub | Drivable neighbourhood: Kyo Coffee (parked rivals to challenge), Ruel's talyer (swap cars), cruising rivals to flash, the road up to Pass 1 | `scenes/hub.gd`, `game/world/` |
 | Weather | Rain (ink streaks, mist, rain loop), wet road look (`manga_wet`) and wet grip (× 0.62) on every car; rain on the windscreen with wipers in hood view; used by story mode, no toggle in free modes yet | `game/world/weather.gd`, `game/world/windscreen.gd` |
-| Story mode | "The Ghost Line": told from after the crash with four marked memories (warm tint, period stamp, cut back to NOW), 45 beats over S00–S35, dialogue, phone feed, act cards, recorded practice passes cut into the Ghost Line, flying sector trials, the authored night run, evidence board, daylight ending; speaker portraits; 3D rooms (clinic, rented room, Jolo's home); manga comic pages between scenes; headless end-to-end probe | `game/story/`, `scenes/story_room.gd`, `docs/story/STORY_MODE.md` |
+| Story progression | Story-only money, parts, tire wear and tuning on two cars (before and after the crash); free-roam sections in the barangay with races against the regulars, Kapitan's board (mountain clock, downhill) and Ruel's garage (shop, tuning, ledger) | `game/story/story_board.gd`, `story_shop.gd`, `story_garage.gd`, `game/vehicle/car_parts.gd` |
+| Story mode | "The Ghost Line": told from after the crash with four marked memories (warm tint, period stamp, cut back to NOW), 65 beats over S00–S35 and the progression cards (races, free roam, the final), dialogue, phone feed, act cards, recorded practice passes cut into the Ghost Line, flying sector trials, the authored night run, evidence board, the recce and the final against Nico; speaker portraits; 3D rooms (clinic, rented room, Jolo's home); manga comic pages between scenes; headless end-to-end probe | `game/story/`, `scenes/story_room.gd`, `docs/story/STORY_MODE.md` |
 
 **Partial**
 

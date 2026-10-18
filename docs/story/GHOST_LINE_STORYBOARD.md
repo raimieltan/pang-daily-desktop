@@ -10,7 +10,7 @@ A playable sequence of races, cinematics, investigations, memory transitions, an
 | STORY ENGINE  A driver searches for the rival who may have caused his friend’s death, only to discover that the impossible benchmark he chased was assembled from his own best moments—and that the truth cannot undo his choices. |
 | :---- |
 
-**WORKING STORYBOARD  /  VERSION 1.0  /  17 OCTOBER 2026**
+**WORKING STORYBOARD  /  VERSION 1.1  /  18 OCTOBER 2026  /  INCLUDES THE RACES-AND-PROGRESSION ADDITIONS AND FREE ROAM**
 
 *This is a player-experience document, not a prose plot summary. It describes what the player sees, does, learns, and feels in sequence.*
 
@@ -35,7 +35,14 @@ The scene order below is the intended order of player experience. The chronology
 * Dante is an exploiter, not a mastermind. He deliberately misrepresents the benchmark and protects his event, but there is no evidence he arranged the crash.  
 * Racing stays central in the middle. At least two playable drives after the crash must advance the investigation or dramatize the protagonist’s altered relationship with driving.  
 * Confession is not absolution. The protagonist tells Jolo’s family what happened without asking them to forgive him. The ending changes his conduct, not the past.  
-* Avoid repeating the theme after the image has landed. The final daylight drive should carry the meaning; explanatory dialogue should be minimal.
+* Avoid repeating the theme after the image has landed. The final daylight drive should carry the meaning; explanatory dialogue should be minimal.  
+* Races matter. Every new drive has stakes: money, reputation, information, a grid slot, or the car. A loss costs something; it never fails the story.  
+* The past has a fixed number of nights. Memory events can each be run once. The player cannot grind the months before the crash.  
+* The build is the arc. The memory car is built with Dante's money while chasing Ghost. The present car is rebuilt Ruel's way, from the wreck.  
+* The crash stays fixed without feeling rigged. Money cannot buy the night out of the rain: the only set of rain tires is two weeks away.  
+* The final race is decided by a line, not horsepower. Letting the ghost go is the faster choice on that road.  
+* Still no trophy, no medal, no "Ghost beaten" achievement, and no time on the final result card.  
+* Free-roam sections never block the story. A required entry the wallet cannot cover is covered and written down (memory: on Jolo's commitments, “Jolo covered it”; present: on Ruel's bill). Optional events need the cash.
 
 ## **The Ghost Line: the rules the player must eventually understand**
 
@@ -63,17 +70,62 @@ The scene order below is the intended order of player experience. The chronology
 
 Every featured drive needs a distinct dramatic function. Reuse roads and locations where useful, but change the player’s relationship to them.
 
-| ID | SEQUENCE | TIMELINE | PLAYER LEARNS |
-| :---- | :---- | :---- | :---- |
-| **R1** | **Nothing to Lose** | Before crash | The protagonist wins time through instinct. Establish talent and a habit of late correction. |
-| **R2** | **Nico’s Lesson** | Before crash | Nico wins through consistency and preparation. Show the protagonist’s peak speed is not the same as repeatable performance. |
-| **R3** | **Chase the Composite** | Before crash | The synthetic sector target is introduced. The player can match a segment but cannot reproduce the combined pace. |
-| **R4** | **Combined-Sector Challenge** | Before crash | The false benchmark becomes social pressure. Drivers compare individual sectors against a synthetic combined pace. |
-| **R5** | **The Last Night Run** | Crash night | A high-pressure mountain run in deteriorating conditions. The known crash is an authored story outcome, not a surprise punishment for a hidden input. |
-| **R6** | **First Return** | After crash | The protagonist re-enters a controlled meet and loses rhythm when headlights flash across a course. Trauma changes driving, not just dialogue. |
-| **R7** | **Nico’s Reproduction Test** | Investigation | Nico tries to repeat the Ghost sequence. The route does not behave like a consistent recording; he shares notes that challenge the myth. |
-| **R8** | **Sector Trials** | Investigation | The player drives separated test segments under controlled conditions and compares them with archived runs. The combined target breaks down into incompatible conditions. |
-| **D1** | **The Daylight Road** | Ending | Not a race. The protagonist slows for the actual conditions and lets the ghost image pull away. |
+| ID | SEQUENCE | TIMELINE | PLAYER LEARNS | STAKES |
+| :---- | :---- | :---- | :---- | :---- |
+| **R1** | **Nothing to Lose** | Before crash | The protagonist wins time through instinct. Establish talent and a habit of late correction. | ₱6,000 / 3,000 / 1,500 |
+| **R2** | **Nico’s Lesson** | Before crash | Nico wins through consistency and preparation. Show the protagonist’s peak speed is not the same as repeatable performance. | ₱10,000 / 5,000 |
+| **R3** | **Chase the Composite** | Before crash | The synthetic sector target is introduced. The player can match a segment but cannot reproduce the combined pace. | None |
+| **R4** | **Combined-Sector Challenge** | Before crash | The false benchmark becomes social pressure. Drivers compare individual sectors against a synthetic combined pace. | ₱1,000 in; ₱6,000 to the winner |
+| **R5** | **The Last Night Run** | Crash night | A high-pressure mountain run in deteriorating conditions. The known crash is an authored story outcome, not a surprise punishment for a hidden input. | ₱5,000 in |
+| **R6** | **First Return** | After crash | The protagonist re-enters a controlled meet and loses rhythm when headlights flash across a course. Trauma changes driving, not just dialogue. | ₱500 in; ₱4,000 / 2,000 / 1,000 |
+| **R7** | **Nico’s Reproduction Test** | Investigation | Nico tries to repeat the Ghost sequence. The route does not behave like a consistent recording; he shares notes that challenge the myth. | None |
+| **R8** | **Sector Trials** | Investigation | The player drives separated test segments under controlled conditions and compares them with archived runs. The combined target breaks down into incompatible conditions. | Evidence (on the S06 snapshot) |
+| **R9** | **Gas-Station Sprints** | Before crash | The regulars by how they drive. Ate Liza names Pang's flaw. | ₱500 in; ₱2,000–3,000 a win; once per regular |
+| **R10** | **The Mountain** | Before crash | The pass, the chevrons at 8A, and Nico's warning that the trees keep it damp. | ₱1,500 in; podium = Dante's invitations |
+| **R11** | **Ghost Nights** | Before crash | The goalpost moves every time you reach it. A real win over Nico counts for nothing against a number. | Rising entries; purses; a bounty each time the posted time falls |
+| **R12** | **One More Payday** | Crash week | Money is not what's missing. | ₱1,000 in; ₱8,000 to the winner |
+| **R13** | **The Shakedown** | After crash | The car changed. So did he. The rain set came two weeks after. | The car; the present shop opens |
+| **R14** | **Race for the Clip** | Investigation | The earliest copy of Ghost Line had a title card. | Information; ₱3,000 side bet |
+| **R15** | **The Rematch** | Investigation | Being Ghost doesn't answer "which run was it?" | Pride; Nico's question |
+| **R16** | **The Lights Test** | Investigation | The player's own driving reproduces the headlights from the lower road. | Evidence |
+| **R17** | **Kapitan's Meet** | Aftermath | Who will still race him. A finish with no myth attached. | ₱5,000 / 3,000 / 1,500; entry form for the hillclimb |
+| **R18** | **The Qualifiers** | Aftermath | The present build, measured honestly. | Grid for R19 |
+| **R19** | **The Last Line** | Ending | Ghost's line is wrong for this road. Pang lets it pass. | The race itself; nothing else |
+| **D1** | **The Daylight Road** *(changed)* | Ending | Now the recce for R19. No ghost. The damp under the trees at 8A. | None. No timer |
+| **P1** | **Present Sprints** *(optional)* | After crash | One lap of the loop against one regular, from the forecourt in any present free roam. Repeatable. | ₱500 in; ₱1,500–2,500 a win |
+| **P2** | **Mountain Clock** *(optional)* | After crash | A time trial on Pass 1 from Kapitan's board. | Entry; pays in three bands by time |
+| **P3** | **Downhill** *(optional)* | After crash | A three-car race down Pass 1 from Kapitan's board. | Entry; purse by place |
+
+*R1–R8 and D1 are the Oct 17 drives; R9–R19 are the Oct 18 additions. P1–P3 are optional present-day events offered in free roam; they never gate the story.*
+
+## **Progression at a glance**
+
+| | MEMORY CAR (BEFORE THE CRASH) | PRESENT CAR (AFTER) |
+| :---- | :---- | :---- |
+| **Starts as** | The faded EG, three tires Nico can see through | The repaired wreck: primer door, new steering wheel, the taped console survived |
+| **Paid for by** | Purses, Dante's events, Ghost bounties | Purses at honest meets |
+| **Ledger** | Ruel's shop bill; Jolo's commitments (lens, loans) shown beside it | Ruel's repair bill ("pay when you can"); Kuya Ben's lens from S32 |
+| **Shop pull** | "vs GHOST TIME" deltas next to power parts | No ghost deltas. Ruel's notes only |
+| **Ends at** | The night run, worn fronts, no rain set | The final, rain set fitted, the paint still faded |
+
+## **Free roam**
+
+Between story scenes the player gets the barangay. A free-roam section has Ruel's talyer (the garage: SHOP · TUNING · LEDGER), the regulars parked at Bahandi Fuels (pull up, press E to race one for money), Kapitan's board at the pumps (every event open this section, mountain runs included) and a NEXT marker. Driving into the NEXT place and pressing E continues the story. In memory each event runs once per section; in the present, events repeat. The roams are S04B, S09B1, S09B2, S15B, S17, S20B, S33 and S33R.
+
+## **Play order**
+
+65 beats. The cards below are in story order; this is the order they are played in. New beats (Oct 18) in **bold**; free-roam sections marked (roam).
+
+| ACT | BEATS |
+| :---- | :---- |
+| **Prologue** | p_card, s00 |
+| **I** | a1_card, s14, s15 · MONTHS BEFORE: s01, s02, s03, s04t, **s04a** (talk + garage), **s04b** (roam, night: sprints once per regular), s05 · NOW: **s15a** (shakedown), **s15b** (roam: the present shop opens), s16, s17 (roam), s17e · THE LINE STUDY: **s05a** (R10), s06 · s20 |
+| **II** | a2_card, s18, s19 · GHOST GOES PUBLIC: s07, s08, s09, **s09a1** (Night 1, sectors), **s09b1** (roam), **s09a2** (Night 2, posted time), **s09b2** (roam), **s09a3** (Night 3, Nico + the overlay), s10 · NOW: **s20a** (R14), **s20b** (roam), s21, s22 |
+| **III** | a3_card, s23, **s23a** (R15), s24, s25, s26 (on the s06 snapshot) |
+| **IV** | a4_card · THE WEEK OF THE NIGHT RUN: s11, **s11a** (R12), s12, s13 · s27, **s27a** (R16, on the snapshot), s28, s29, s30, s31 |
+| **V** | a5_card, s32, s33 (roam), **s33a** (R17), **s33b1**, **s33b2** (R18), s33t, **s33r** (roam: the week before), s34 (recce, no ghost), **s34a** (R19), s35, end |
+
+The second memory opens on S05A (the same Buko's-phone page that used to open S06). The returns to the present cut at s15a (the wrench) and s20a (Tisoy's buzz).
 
 **ACT 0**
 
@@ -164,7 +216,45 @@ Every featured drive needs a distinct dramatic function. Reuse roads and locatio
 
 **CLUES / CONTINUITY**  Dante notices the crowd’s reaction to the underdog story. His gift is reading the room; seed that he values a compelling narrative as much as lap times.
 
-**EXIT / TRANSITION**  A clean, expensive car arrives. Nico steps out and looks over the protagonist’s build.
+**EXIT / TRANSITION**  Nico looks over the build: “Not on those.” The night ends there; the next morning is S04A.
+
+## **S04A  /  The Bill**
+
+| PLAYABLE HUB / SHOP | BEFORE CRASH | Ruel’s talyer, the morning after Kyo |
+| :---- | :---- | :---- |
+
+**PURPOSE**  Make scarcity the player's problem. Introduce the shop, the ledger, and the two kinds of parts.
+
+**PLAYER EXPERIENCE**  The garage opens at Ruel's bench: SHOP · TUNING · LEDGER. The R1 purse lands in a wallet beside Ruel's clipboard (₱8,500 owed). The shop is Ruel's bench: front tires, pads, a secondhand exhaust Jolo's cousin is selling. Six thousand pesos covers none of the list. Ruel comments on each pick; Jolo comments on how it will look on camera. Nothing is the wrong thing to buy.
+
+**STAKES**  Money. The first purchase sets the tone of the memory build.
+
+**DRAMATIC BEATS**  Nico's "Not on those." from the night before sits under every choice. Ruel says fronts first. Jolo wants the exhaust. Whatever the player buys, Ruel writes it on the bill in pencil and writes the new total under the old one.
+
+**KEY LINES**  Ruel: “Fronts first.” Jolo: “Exhaust. It’ll sound like it costs more.” Ruel (if the exhaust): “It’ll sound like it costs more.” Ruel (if the fronts): “Good. Now the other two.”
+
+**CLUES / CONTINUITY**  The purchase is kept. S12 reads the car the player actually built.
+
+**EXIT / TRANSITION**  Jolo: “Kapitan’s running sprints at the bypass tonight. Five hundred in.”
+
+## **S04B  /  Race 9: Gas-Station Sprints**
+
+| PLAYABLE FREE ROAM / RACES | BEFORE CRASH | Gas station on the bypass, barangay loop, night |
+| :---- | :---- | :---- |
+
+**PURPOSE**  Turn the regulars into rivals the player knows by how they drive, so their rumours in S17 carry weight. Give the economy a heartbeat.
+
+**PLAYER EXPERIENCE**  A free-roam night in the barangay. The regulars are parked on the forecourt at Bahandi Fuels; pull up beside one and press E to race them: one-lap sprints of the loop, one regular at a time. Kapitan holds the inside and never brakes first. Tisoy wins every straight in his money car and brakes early. Buko drafts and films from his dash. Ate Liza brakes latest and says least. Each regular can be raced once here (the past has a fixed number of nights). The talyer is open on the way. Driving into the NEXT marker ends the night.
+
+**STAKES**  ₱500 entry. A win pays ₱2,000 (Kapitan, Buko) or ₱3,000 (Tisoy, Ate Liza). A first win over a regular changes their lines in S17 and S33.
+
+**DRAMATIC BEATS**  Ate Liza is the hardest of them and is not rigged to win. Win or lose, she finds Pang afterward and tells him what she saw.
+
+**KEY LINES**  Kapitan: “My station, my rules. One lap. No phones on the line.” Tisoy (losing): “My tires are new.” Pang: “Mine aren’t.” Ate Liza: “You turn in before you’ve finished slowing. Works till it doesn’t.”
+
+**CLUES / CONTINUITY**  Ate Liza names the late correction from R1 in plain words. She is the regular who later says Ghost "wasn't, exactly" fake.
+
+**EXIT / TRANSITION**  The group chat buzzes: Dante's invitation to the organized meet (S05).
 
 ## **S05  /  Race 2: Nico’s Lesson**
 
@@ -177,9 +267,28 @@ Every featured drive needs a distinct dramatic function. Reuse roads and locatio
 
 **DRAMATIC BEATS**  Nico wins without cheating and offers an unromantic explanation: the protagonist has pace, but he keeps spending grip he cannot afford. The protagonist hears condescension; the player should recognize some truth in it.
 
-**CLUES / CONTINUITY**  Nico’s car is better prepared, but his discipline is also real. Do not reduce his advantage to money alone. Record his habit of comparing repeated runs rather than celebrating a single best pass.
+**CLUES / CONTINUITY**  Nico’s car is better prepared, but his discipline is also real. Do not reduce his advantage to money alone. Record his habit of comparing repeated runs rather than celebrating a single best pass. S05 is the first event on Dante's guest list. Its purse (₱10,000 / ₱5,000) goes to the shop.
 
-**EXIT / TRANSITION**  Jolo tells the protagonist he will make a clip that proves what the car can do.
+**EXIT / TRANSITION**  In story order, Dante's first mountain event (S05A).
+
+## **S05A  /  Race 10: The Mountain**
+
+| PLAYABLE RACE / EVENT | BEFORE CRASH | Mountain route, dusk, dry |
+| :---- | :---- | :---- |
+
+**PURPOSE**  Put the player on the mountain for the first time with something at stake, and show 8A before it means anything.
+
+**PLAYER EXPERIENCE**  Dante's first event on the pass: a heat against Kapitan and Tisoy, then a final against the two fastest. Nico isn't entered; he watches from the pull-off with his phone timing every car. Jolo films. The chevron board at 8A stands straight.
+
+**STAKES**  ₱1,500 entry. ₱12,000 / ₱6,000 / ₱3,000. A podium puts Pang on Dante's list. Off the podium, Jolo talks them in anyway, but every Ghost Night entry then costs ₱500 more.
+
+**DRAMATIC BEATS**  Dante works the crowd at the sari-sari store. Nico gives Pang a piece of free information he doesn't take. Jolo falls in love with the road.
+
+**KEY LINES**  Dante: “Look— a mountain makes everyone honest.” Nico (at the store, about 8A): “Careful at the chevrons. The trees keep it damp after the rest is dry.” Jolo: “Give me a week on this road.” Pang: “For what?” Jolo: “I’ll make you look like the best driver in Panay.”
+
+**CLUES / CONTINUITY**  Nico's damp line is the first plant for S13 ("it's wet past the sign"), S34 and R19. The board is straight here (Pass A condition).
+
+**EXIT / TRANSITION**  “A week on this road.” The memory carries straight into the line study (S06).
 
 ## **S06  /  A Line Study**
 
@@ -218,7 +327,7 @@ Every featured drive needs a distinct dramatic function. Reuse roads and locatio
 
 **PURPOSE**  Make the benchmark seductive and show the protagonist beginning to mistake it for a promise.
 
-**PLAYER EXPERIENCE**  The player drives the route attempting to follow the overlay. The ghost path looks unnaturally clean, but the player can match one sector. A later sector demands a different entry rhythm and conditions than the previous one.
+**PLAYER EXPERIENCE**  The player drives the route attempting to follow the overlay. The ghost path looks unnaturally clean, but the player can match one sector. A later sector demands a different entry rhythm and conditions than the previous one. The shop's “vs GHOST TIME” delta appears from here. Front grip is the car's real wear, floored at ×0.95, so the car is never the one in the clip.
 
 **DRAMATIC BEATS**  The protagonist improves his own time, yet the combined target remains out of reach. He feels that he is nearly there rather than questioning whether the target represents one real drive.
 
@@ -239,16 +348,75 @@ Every featured drive needs a distinct dramatic function. Reuse roads and locatio
 
 **CLUES / CONTINUITY**  One leaderboard labels the target “combined best sectors” briefly before the promotional overlay replaces the wording with “GHOST TIME.” This is a fair, missable clue. A second one: Nico's sector sums never quite reach the posted total, because the posted total is under the sum the sectors were cut from.
 
-**EXIT / TRANSITION**  After the event, Jolo sees the protagonist staring at the benchmark and begins to tell him something.
+**EXIT / TRANSITION**  Dante announces Saturdays (S09A). Jolo's attempt to tell Pang moves to after Night 3.
+
+## **S09A  /  Race 11: Ghost Nights**
+
+*Three Saturdays, one run each.*
+
+| PLAYABLE EVENT SERIES | BEFORE CRASH | Mountain route, three Saturday nights, dry |
+| :---- | :---- | :---- |
+
+**PURPOSE**  Make the repost loop a treadmill the player feels. Debts grow. Upgrades get spent chasing a number that moves.
+
+**PLAYER EXPERIENCE**  Night 1: sector attack, beat GHOST in any sector. Night 2: one full run against the posted GHOST TIME, Nico in the field. Night 3: head-to-head with Nico, the Ghost overlay running ahead of both. Between nights, free roam (S09B1, S09B2): Kapitan's board and Ruel's shop. The shop now prints “vs GHOST TIME” beside every power part.
+
+**STAKES**  Entry ₱1,000 / ₱2,000 / ₱3,000. First place ₱8,000 / ₱12,000 / ₱15,000. Beat the posted time and Dante pays a ₱5,000 bounty, then reposts a time under yours ("Ghost responded"). Regulars bet on or against Pang in the chat. After Night 2, Jolo borrows ₱5,000 from Ate Liza (on Jolo's commitments, not the player's ledger).
+
+**DRAMATIC BEATS**  The better the player drives, the faster the goalpost moves. On Night 2 the player can pass the car in the clip and still lose to the clock. On Night 3 Pang can beat Nico for the first time, and the crowd only talks about Ghost.
+
+**KEY LINES**  Dante (on the mic): “Ghost responded.” Ruel (looking at the fronts): “You’ve done a lot of Saturdays on these.” Jolo: “One more Saturday.” Nico (after Night 3): “You beat me tonight.” Pang: “I didn’t beat Ghost.” Nico: “Ghost wasn’t here.”
+
+**CLUES / CONTINUITY**  Every repost is kept (`StoryMode.repost`) and returns on the S29 board and in S30: the poster changed, and only ever downward. Passing the clip's car but losing to the clock is a fair, missable clue that the time is not the clip.
+
+**EXIT / TRANSITION**  After Night 3, the parked car (S10).
+
+## **S09B1  /  Between Saturdays (1)**
+
+*Free roam between Ghost Night 1 and Night 2.*
+
+| PLAYABLE FREE ROAM | BEFORE CRASH | The barangay: Ruel's talyer, Bahandi Fuels, the bypass, the week after Night 1 |
+| :---- | :---- | :---- |
+
+**PURPOSE**  Let the player spend the Night 1 money and feel the week between Saturdays. Show the poster without pointing at it.
+
+**PLAYER EXPERIENCE**  The barangay is open. Kapitan's board at the pumps lists what is open this week; regulars not yet raced are parked on the forecourt. At Ruel's bench the shop prints “vs GHOST TIME” beside every power part. The Ghost Night poster at the pumps shows the posted time. The NEXT marker is the road up to the pass on Saturday.
+
+**STAKES**  Money and the build. Each memory event runs once. A required Saturday entry the wallet cannot cover is covered and written down: “Jolo covered it,” on Jolo's commitments.
+
+**DRAMATIC BEATS**  None scripted. Ruel's lines at the bench react to what the player buys.
+
+**CLUES / CONTINUITY**  The poster's number is the clue. If the player beat the posted time on Night 1, the number is lower now. Nobody comments on it.
+
+**EXIT / TRANSITION**  The player drives into NEXT: Saturday, Night 2 (S09A).
+
+## **S09B2  /  Between Saturdays (2)**
+
+*Free roam between Ghost Night 2 and Night 3.*
+
+| PLAYABLE FREE ROAM | BEFORE CRASH | The barangay: Ruel's talyer, Bahandi Fuels, the bypass, the week after Night 2 |
+| :---- | :---- | :---- |
+
+**PURPOSE**  The treadmill again, a week deeper. Jolo's loan from Ate Liza now sits on Jolo's commitments.
+
+**PLAYER EXPERIENCE**  As S09B1: the board at the pumps, the parked regulars, the shop with its “vs GHOST TIME” deltas. The NEXT marker is the pass on Saturday.
+
+**STAKES**  Money and the build. Same rule: a required entry the wallet cannot cover is covered and written down on Jolo's commitments.
+
+**DRAMATIC BEATS**  None scripted.
+
+**CLUES / CONTINUITY**  The poster's number is the clue: if Night 2's time was beaten, it has dropped again, and only ever downward (`StoryMode.repost`).
+
+**EXIT / TRANSITION**  The player drives into NEXT: Saturday, Night 3 (S09A).
 
 ## **S10  /  Jolo’s Almost-Confession**
 
-| CINEMATIC / INTIMATE DIALOGUE | BEFORE CRASH | Car interior, parked after the event |
+| CINEMATIC / INTIMATE DIALOGUE | BEFORE CRASH | Car interior, parked after Ghost Night 3 |
 | :---- | :---- | :---- |
 
 **PURPOSE**  Give Jolo a decisive moment of silence that the audience can reinterpret later.
 
-**PLAYER EXPERIENCE**  The player remains in the parked car. Jolo opens the project notes on his phone and starts: “There’s something about the clip I should’ve—”. He sees how excited the protagonist is about the next event and stops.
+**PLAYER EXPERIENCE**  The player remains in the parked car. Jolo opens the project notes on his phone and starts: “There’s something about the clip I should’ve—”. He sees how excited the protagonist is about the next event and stops. The car is parked after Ghost Night 3, not after S09.
 
 **DRAMATIC BEATS**  Jolo says they should focus on the car and the weather instead. The protagonist interprets this as nerves. Jolo pockets the phone, knowing the opportunity may disappear if he corrects the story.
 
@@ -263,13 +431,32 @@ Every featured drive needs a distinct dramatic function. Reuse roads and locatio
 
 **PURPOSE**  Make the final event materially tempting rather than an arbitrary dare.
 
-**PLAYER EXPERIENCE**  The player checks repair estimates, event details, and Jolo’s outstanding commitments. The prize could clear immediate debts and pay for tires and proper repairs, but only if they perform well. Side obligations have accumulated because each prior opportunity seemed to justify one more expense.
+**PLAYER EXPERIENCE**  The player checks repair estimates, event details, and Jolo’s outstanding commitments. The prize could clear immediate debts and pay for tires and proper repairs, but only if they perform well. Side obligations have accumulated because each prior opportunity seemed to justify one more expense. The ledger is real: the player reads their own wallet, Ruel's bill and Jolo's commitments.
 
 **DRAMATIC BEATS**  Dante needs a headline event; Jolo needs money and momentum; the protagonist needs to prove the benchmark is within reach. Each character has a different reason to continue.
 
 **CLUES / CONTINUITY**  Dante’s wrongdoing is pressure through selective framing, not an explicit threat. Do not imply he arranged for another driver to interfere.
 
-**EXIT / TRANSITION**  Ruel asks to inspect the tires before they commit.
+**EXIT / TRANSITION**  Kapitan's pot race (S11A).
+
+## **S11A  /  Race 12: One More Payday**
+
+| PLAYABLE RACE | CRASH WEEK, WEDNESDAY | Gas station on the bypass, night, dry |
+| :---- | :---- | :---- |
+
+**PURPOSE**  Give the player one more chance to fix it with money, and let them find out that money isn't what's missing.
+
+**PLAYER EXPERIENCE**  Kapitan's pot race: three cars, three laps, winner takes it. Nothing else is on the board this week. The ledger shows what is due Friday: Dante's night-run entry, Ruel's bill. Between laps Jolo is on the phone to the parts shop in Mandurriao.
+
+**STAKES**  ₱1,000 entry; ₱8,000 to the winner. Whatever the wallet ends at, the rain set can't be bought this week.
+
+**DRAMATIC BEATS**  The race can be won cleanly. The phone call takes the win away from the problem.
+
+**KEY LINES**  Jolo (on the phone): “One set. Manila. Two weeks.” Pang: “Event’s Friday.” Jolo: “I know when the event is.”
+
+**CLUES / CONTINUITY**  The player who saved hard hears "Money's not the problem." The player who spent hears the price too. Both arrive at S12 with the same tires.
+
+**EXIT / TRANSITION**  FRIDAY · DUSK, and the rain (S12).
 
 ## **S12  /  The Weather Check**
 
@@ -280,7 +467,7 @@ Every featured drive needs a distinct dramatic function. Reuse roads and locatio
 
 **PLAYER EXPERIENCE**  The player inspects tires, brakes, and the forecast with Ruel. The available tires are worn and not suited to the deteriorating wet conditions. Jolo says a reference line cannot tell them how the road will grip tonight.
 
-**DRAMATIC BEATS**  Ruel recommends withdrawing. The protagonist refuses, convinced he can adapt on the fly and that the event is their only chance. Jolo can still tell the full truth about the composite, but the moment passes.
+**DRAMATIC BEATS**  Ruel recommends withdrawing. The protagonist refuses, convinced he can adapt on the fly and that the event is their only chance. Jolo can still tell the full truth about the composite, but the moment passes. Ruel inspects the tires the player actually bought and reads their wear aloud. Ruel: “I ordered a rain set. Comes when it comes.” Pang: “When?” Ruel: “After Friday.”
 
 **CLUES / CONTINUITY**  The scene must be emotionally credible, not a lecture. The protagonist is not ignorant of risk; he believes his talent will let him manage it.
 
@@ -337,7 +524,47 @@ Every featured drive needs a distinct dramatic function. Reuse roads and locatio
 
 **CLUES / CONTINUITY**  Let the damage and missing camera seconds be visible. The evidence is incomplete from the start.
 
-**EXIT / TRANSITION**  A small local meet is announced. The protagonist decides to race again.
+**EXIT / TRANSITION**  Ruel: “Drive it.” Into the shakedown (S15A).
+
+## **S15A  /  Race 13: The Shakedown**
+
+*In play, it follows the first memory and opens on the wrench cut.*
+
+| PLAYABLE TEST DRIVE | AFTER CRASH | Ruel’s talyer and the barangay loop, morning |
+| :---- | :---- | :---- |
+
+**PURPOSE**  The first time in the car since the crash, at walking speed. Introduce the present car, its ledger and its shop.
+
+**PLAYER EXPERIENCE**  Two laps of the loop. On the first, the car pulls left: no HUD, the player feels it through the wheel. Back at the roller door, Ruel adjusts it. The second lap runs straight. The present shop opens after it, in free roam (S15B). In the corner, four tires wait in plastic.
+
+**STAKES**  The car. The present ledger opens with Ruel's repair bill, ₱38,000. The wallet is empty.
+
+**DRAMATIC BEATS**  Ruel watches from the door and says almost nothing. The rain set he ordered in S12 is the last thing the player sees before the shop.
+
+**KEY LINES**  Ruel: “Pulls left. I know. Drive it so I can see how much.” Pang: “It’s not the same wheel.” Ruel: “No.” Pang (at the plastic): “Whose are those?” Ruel: “Yours. Rain set. Came two weeks after.” Ruel (the bill): “Pay when you can.”
+
+**CLUES / CONTINUITY**  The rain set can be fitted from here at cost (₱16,000, on the ledger). The primer door and the new wheel stay on the car to the end.
+
+**EXIT / TRANSITION**  Kapitan's flyer for the morning meet; free roam (S15B), then the meet (S16). S15's old exit moves here.
+
+## **S15B  /  The Present Shop**
+
+*Free roam after the shakedown.*
+
+| PLAYABLE FREE ROAM | AFTER CRASH | The barangay: Ruel's talyer, Bahandi Fuels, morning |
+| :---- | :---- | :---- |
+
+**PURPOSE**  Open the present garage and the barangay after the crash. The economy starts again from nothing.
+
+**PLAYER EXPERIENCE**  The garage at Ruel's bench (SHOP · TUNING · LEDGER) opens on the present car. The rain set sits in plastic in the corner and can be fitted at cost, on the ledger. No ghost deltas in this shop. The NEXT marker is Kapitan's morning meet at Bahandi Fuels.
+
+**STAKES**  The present ledger: Ruel's repair bill, ₱38,000, “pay when you can.” The wallet starts at zero.
+
+**DRAMATIC BEATS**  None scripted. Ruel's notes on each part.
+
+**CLUES / CONTINUITY**  The rain set stays in the corner until the player fits it. It matters most in R19's damp.
+
+**EXIT / TRANSITION**  The player drives into NEXT: the morning meet (S16).
 
 ## **S16  /  Race 6: First Return**
 
@@ -347,6 +574,8 @@ Every featured drive needs a distinct dramatic function. Reuse roads and locatio
 **PURPOSE**  Show that the protagonist’s relationship with driving has changed before he can explain it.
 
 **PLAYER EXPERIENCE**  The player enters a short, controlled course to prove that the crash has not taken his ability. A headlight reflection flashes across a barrier; for a moment the sound and camera movement recall the mountain bend. The protagonist overbrakes, loses rhythm, and finishes poorly.
+
+**STAKES**  ₱500 entry; ₱4,000 / ₱2,000 / ₱1,000. The flinch costs real money.
 
 **DRAMATIC BEATS**  He tries to disguise the result as rust or an uncompetitive setup. Ruel sees that the issue is not simply pace. The protagonist is both more cautious and more desperate to force a clean run.
 
@@ -362,6 +591,8 @@ Every featured drive needs a distinct dramatic function. Reuse roads and locatio
 **PURPOSE**  Introduce competing rumors without letting rumor function as evidence.
 
 **PLAYER EXPERIENCE**  The player questions racers, watches old clips, and compares accounts. One says Ghost was a professional; another claims the driver was at the crash; a third says the footage is years old.
+
+**FREE ROAM**  Played as a free-roam section: the destination is Kyo (NEXT), as before; the garage, Kapitan's board and the parked regulars are open on the way. Arriving at Kyo starts the scene.
 
 **DRAMATIC BEATS**  Each account contains a detail that cannot fit with the others. People have reasons to believe the version that flatters their own status, protects the event, or gives the tragedy a clear culprit.
 
@@ -412,7 +643,47 @@ Every featured drive needs a distinct dramatic function. Reuse roads and locatio
 
 **CLUES / CONTINUITY**  Do not confirm Dante’s innocence in every conceivable respect; establish only that there is no evidence he caused the crash. His complicity is the deliberate marketing of a dangerous false premise.
 
-**EXIT / TRANSITION**  Dante refuses to provide the original files. Ruel remembers an old backup drive.
+**EXIT / TRANSITION**  Dante refuses to provide the original files. Ruel remembers an old backup drive. Tisoy's message about the earliest copy arrives after the next memory (S20A).
+
+## **S20A  /  Race 14: Race for the Clip**
+
+*In play: after the GHOST GOES PUBLIC memory, before free roam (S20B) and S21.*
+
+| PLAYABLE RACE | AFTER CRASH | Gas station on the bypass, night, dry |
+| :---- | :---- | :---- |
+
+**PURPOSE**  Make a race advance the investigation.
+
+**PLAYER EXPERIENCE**  Tisoy downloaded Ghost Line the night it went up, before the reposts cropped it. He'll send his copy if Pang beats him. One lap of the loop at night: Pang's first night race since the crash, Tisoy's headlights filling the mirror.
+
+**STAKES**  Information, plus a ₱3,000 side bet. Win: Tisoy sends it now, and he races Pang again in S33. Lose: he sends it in the morning anyway. The file is the same either way.
+
+**DRAMATIC BEATS**  The headlights in the mirror recall R6, and the flinch is smaller. Tisoy offers the race as a kindness he'd never call one.
+
+**KEY LINES**  Tisoy: “I had it before anyone. Before somebody cropped the corners for the poster. You want it, beat me.” Pang: “You haven’t seen me drive since.” Tisoy: “That’s why I’m offering.” Tisoy (if he wins): “Man. Just take it.”
+
+**CLUES / CONTINUITY**  The earliest copy opens on half a second of a title card Dante's version doesn't have: white text, mostly cropped, “…TUDY — BEST”. S21's backup completes it.
+
+**EXIT / TRANSITION**  Free roam (S20B), NEXT the talyer with Tisoy's copy (S21).
+
+## **S20B  /  Night Roads**
+
+*Free roam after Tisoy's race.*
+
+| PLAYABLE FREE ROAM | AFTER CRASH | The barangay at night: Bahandi Fuels, the bypass, Ruel's talyer |
+| :---- | :---- | :---- |
+
+**PURPOSE**  Give the player the barangay at night, after the first night race since the crash, with the clip in his pocket.
+
+**PLAYER EXPERIENCE**  Free roam: present sprints from the regulars on the forecourt, Kapitan's board at the pumps, the garage at the talyer. The NEXT marker is the talyer, where Pang takes Tisoy's copy to Ruel.
+
+**STAKES**  Money and the build. Present events repeat.
+
+**DRAMATIC BEATS**  None scripted.
+
+**CLUES / CONTINUITY**  Tisoy's copy is the same file whether the player won or lost S20A.
+
+**EXIT / TRANSITION**  The player drives into NEXT: Ruel's bench (S21).
 
 **ACT III**
 
@@ -465,7 +736,26 @@ Every featured drive needs a distinct dramatic function. Reuse roads and locatio
 
 **CLUES / CONTINUITY**  The voice is recognizable and specific. Resist explanatory dialogue; allow silence and room tone.
 
-**EXIT / TRANSITION**  Ruel notices that the timestamp and telemetry do not fit a continuous run.
+**EXIT / TRANSITION**  Pang calls Nico (S23A). Ruel's timestamp note moves to S24.
+
+## **S23A  /  Race 15: The Rematch**
+
+| PLAYABLE RACE | AFTER CRASH | Mountain route, dusk, dry |
+| :---- | :---- | :---- |
+
+**PURPOSE**  Reveal 1 briefly inflates Pang. Let the player drive that confidence, and let a real race hand him the question that opens Reveal 2.
+
+**PLAYER EXPERIENCE**  Head-to-head with Nico on the pass. No bets, no crowd, no overlay. The present build counts. Winnable.
+
+**STAKES**  Pride, and the question. A win raises Pang's standing with the regulars who are still talking to him.
+
+**DRAMATIC BEATS**  Pang calls the race as if he's reclaiming a title. Nico accepts because he wants to watch the hands.
+
+**KEY LINES**  Pang (on the phone): “Race me. The pass. Tomorrow.” Nico: “Why?” Pang: “Because I’m Ghost.” Nico: “Seven. Bring Ruel.” After (win): “You’re quick. Which run was the clip?” After (loss): “Your sectors were good. Which run was the clip?” Pang: “One of them.” Nico: “Which one?”
+
+**CLUES / CONTINUITY**  Pang can't name the run. The question carries into S24 and S25.
+
+**EXIT / TRANSITION**  The drive home with the question unanswered (S24).
 
 ## **S24  /  Jolo Almost Told Him**
 
@@ -504,7 +794,7 @@ Every featured drive needs a distinct dramatic function. Reuse roads and locatio
 
 **PURPOSE**  Return to driving at the heart of the investigation. The player must feel why a combined target is not a repeatable performance.
 
-**PLAYER EXPERIENCE**  The player runs three short test segments under clearly labeled conditions, then attempts to connect them. To match the first segment, the car needs one setup/entry; the next segment rewards a different condition and approach. The player can improve each piece but cannot recreate the composite total in one continuous run.
+**PLAYER EXPERIENCE**  The player runs three short test segments under clearly labeled conditions, then attempts to connect them. To match the first segment, the car needs one setup/entry; the next segment rewards a different condition and approach. The player can improve each piece but cannot recreate the composite total in one continuous run. The trials run on the car as it was in the clip. Ruel sets the present car back to the line-study build: “Same car as the clip, or it proves nothing.”
 
 **DRAMATIC BEATS**  The result is not “the protagonist was never good.” Each sector is a genuine strong performance. What is false is the implication that they happened together. Nico compares the runs and acknowledges the distinction.
 
@@ -533,7 +823,26 @@ Every featured drive needs a distinct dramatic function. Reuse roads and locatio
 
 **CLUES / CONTINUITY**  The headlights were real; the assumed threat was not supported. The witness is limited and imperfect. Avoid a convenient all-seeing bystander.
 
-**EXIT / TRANSITION**  Nico marks the fatal bend on the map. Ruel brings out the recovered logger.
+**EXIT / TRANSITION**  Nico: “Tonight. I'll take the lower road.” (S27A)
+
+## **S27A  /  Race 16: The Lights Test**
+
+| PLAYABLE RECONSTRUCTION | CRASH NIGHT RECONSTRUCTED | Mountain route at night: the upper road and the lower switchback |
+| :---- | :---- | :---- |
+
+**PURPOSE**  Keep the mode's rule: the evidence is the player's own driving. The player reproduces the headlights.
+
+**PLAYER EXPERIENCE**  Night, dry, no timer. Pang drives toward 8A at a sane pace while Nico drives the lower switchback, timed to Ruel's count over the phone. From 170 m out, lights appear 12–24° off the nose through the trees, slide alongside, then vanish behind the ridge. The player may brake, flinch, or carry on. Whatever they do is recorded.
+
+**STAKES**  The evidence. No money.
+
+**DRAMATIC BEATS**  The pulse comes back at the first flash. Nico talks the whole way, from below. Afterward the evidence screen lays this run's frames over the crash run's: the same metres, the same bearing.
+
+**KEY LINES**  Nico (on the phone): “I’m below you.” Then: “Still below you.” Nico (after): “Sixty metres down and a ridge between us.” Pang: “You looked like you were beside me.”
+
+**CLUES / CONTINUITY**  Answers S27's question ("Where were the lights?") with a test the player drove. The witness stays as limited as before.
+
+**EXIT / TRANSITION**  Ruel brings out the logger (S28). S27's old exit moves here.
 
 ## **S28  /  The Logger’s Version**
 
@@ -572,7 +881,7 @@ Every featured drive needs a distinct dramatic function. Reuse roads and locatio
 
 **PURPOSE**  Make Dante face the practical cost of maintaining the lie.
 
-**PLAYER EXPERIENCE**  The protagonist lays out the source files and notes. Dante first argues that the audience knew Ghost was a legend. When shown Jolo’s original label and the synthetic sector target, he admits that ambiguity kept the challenge profitable: a verified record could be broken, but a legend could sell the next event indefinitely.
+**PLAYER EXPERIENCE**  The protagonist lays out the source files and notes. Dante first argues that the audience knew Ghost was a legend. When shown Jolo’s original label and the synthetic sector target, he admits that ambiguity kept the challenge profitable: a verified record could be broken, but a legend could sell the next event indefinitely. The reposts from S09A are on the table, oldest first. Pang reads the first and the latest against Jolo's 1:29.4 (manuscript canon: 1:26.7, then 1:26.2).
 
 **DRAMATIC BEATS**  Dante denies arranging the crash, and the available evidence does not establish that he did. He does accept that he knowingly promoted a composite as an unbeatable benchmark and protected the story afterward.
 
@@ -627,26 +936,110 @@ Every featured drive needs a distinct dramatic function. Reuse roads and locatio
 
 **PLAYER EXPERIENCE**  The player returns to familiar spaces. Some people avoid the protagonist; some respect the truth; some still defend Ghost as a legend. Opportunities built on the myth disappear. Ruel continues working. The garage remains imperfect and alive.
 
+**FREE ROAM**  Played as a free-roam section: the destination is the warehouse loop for Kapitan's meet (NEXT), as before; the garage, the board (mountain events included) and the present sprints are open on the way.
+
 **DRAMATIC BEATS**  Nico and the protagonist are no longer rivals in the old sense, but friendship is not declared in a single conversation. Dante’s status is damaged, not erased. The scene continues without requiring the protagonist to be its center.
 
 **CLUES / CONTINUITY**  Keep the environment specific to Iloilo’s everyday car culture: parts searches, coffee, informal favors, workshop sounds, and group chat rumors. Avoid turning the city into a generic neon racing world.
 
-**EXIT / TRANSITION**  Nico invites the protagonist to take the mountain road in daylight, with no event, no timer, and no crowd.
+**EXIT / TRANSITION**  Kapitan's meet (S33A). Nico's invitation moves to S33B.
 
-## **S34  /  The Daylight Road**
+## **S33A  /  Race 17: Kapitan’s Meet**
 
-| PLAYABLE DRIVE / FINAL IMAGE | MONTHS LATER | Mountain road, daylight |
+| PLAYABLE RACE / AFTERMATH | WEEKS LATER | Industrial-edge loop, morning, closed, marshals |
 | :---- | :---- | :---- |
 
-**PURPOSE**  Resolve the central mechanic through a changed player decision, not a speech.
+**PURPOSE**  Show the scene's split in who will still race him. Give the present build a race with no myth attached.
 
-**PLAYER EXPERIENCE**  The player drives the road under ordinary daylight conditions. There is traffic beyond the bend and the surface differs from the archived passes. The Ghost overlay briefly appears, tracing the idealized line the player has spent the game chasing.
+**PLAYER EXPERIENCE**  Kapitan and Ate Liza run a legit morning meet on the warehouse loop where R1 was run: closed off, Kapitan's nephews in vests as marshals, no bets. Some regulars take their cars home rather than line up with Pang (RJ always; Tisoy unless Pang won S20A). Three laps.
 
-**DRAMATIC BEATS**  The old instinct returns: match the angle, hit the point, close the gap. The protagonist slows and takes the line that suits the road now. The ghost continues through the corner and disappears ahead. The player does not chase it.
+**STAKES**  ₱500 entry; ₱5,000 / ₱3,000 / ₱1,500. Any finish gets Kapitan's signature on the hillclimb entry form.
 
-**CLUES / CONTINUITY**  This is not a race and the game should not score it. No time, medal, or unlock should contradict the emotional point. The road is a public place with changing conditions, not a replayable recording.
+**DRAMATIC BEATS**  The same loop as R1, with nothing to prove and nobody watching for Ghost.
 
-**EXIT / TRANSITION**  Engine and tire sounds settle into ordinary road noise. The car reaches the other side of the mountain without an audience.
+**KEY LINES**  Kapitan: “My meet, my rules. You race clean or you go home.” Pang: “Clean.” Ate Liza (after): “You finished slowing.”
+
+**CLUES / CONTINUITY**  Ate Liza's line answers S04B without either of them saying so.
+
+**EXIT / TRANSITION**  Nico's club posts the hillclimb: the pass closed for a Sunday under permit, marshals at every corner. Qualifying the weekend before.
+
+## **S33B  /  Race 18: The Qualifiers**
+
+*Two timed runs.*
+
+| PLAYABLE TIME TRIAL | WEEKS LATER | Mountain route, closed for the day, dry |
+| :---- | :---- | :---- |
+
+**PURPOSE**  The present build's exam. Put the car's history in front of the player as numbers they earned.
+
+**PLAYER EXPERIENCE**  Two timed runs: clock only, marshals at the corners, no ghost. The better run sets the grid for R19. Between runs, the paddock shop is Ruel's toolbox: pressures and adjustments, no new parts.
+
+**STAKES**  ₱2,000 entry. Grid position for R19. No purse.
+
+**DRAMATIC BEATS**  The clock is back for the first time since the sector trials, and it is honest. Ruel times every run on a stopwatch beside the official clock, out of habit.
+
+**KEY LINES**  Ruel: “Clock’s honest today. Use it.” Nico (top qualifier): “Drive it with me the day before. At forty.”
+
+**CLUES / CONTINUITY**  No ghost appears in either run.
+
+**EXIT / TRANSITION**  Nico's invitation (S33's old exit moves here); the week before in free roam (S33R), then the recce (S34).
+
+## **S33R  /  The Week Before**
+
+*Free roam between S33B and the recce.*
+
+| PLAYABLE FREE ROAM | WEEKS LATER | The barangay and Pass 1, the week before the hillclimb |
+| :---- | :---- | :---- |
+
+**PURPOSE**  A last week to build the present car Ruel's way before the final.
+
+**PLAYER EXPERIENCE**  The garage at the talyer, present sprints on the forecourt, and Kapitan's board with the mountain events (MOUNTAIN CLOCK, DOWNHILL). The NEXT marker is the road up to Pass 1 for the recce.
+
+**STAKES**  Money and the build. Ruel's bill and Kuya Ben's lens are on the present ledger.
+
+**DRAMATIC BEATS**  None scripted.
+
+**CLUES / CONTINUITY**  Whatever is on the car here is the car in R19.
+
+**EXIT / TRANSITION**  The player drives into NEXT: the road up to Pass 1, Saturday, no timer (S34).
+
+## **S34  /  The Daylight Road (revised: the recce)**
+
+| PLAYABLE DRIVE | MONTHS LATER | Mountain route, the day before the hillclimb, open road |
+| :---- | :---- | :---- |
+
+**PURPOSE**  Learn the road as it is today, at forty, the day before racing it.
+
+**PLAYER EXPERIENCE**  The player drives the open road with Nico, no HUD, no timer, ordinary traffic: a delivery truck uphill, a family of four on one motorcycle, a car beyond the bend. At 8A the outside edge is dark where the trees hold the moisture. The ghost does not appear.
+
+**DRAMATIC BEATS**  The old instinct returns at the chevrons. Pang slows anyway. Nico points at the dark edge.
+
+**KEY LINES**  Nico: “I want to see what it looks like at forty.” Nico (at 8A): “That stays wet till noon.” Pang: “I know.”
+
+**CLUES / CONTINUITY**  The final runs at nine in the morning. The damp is the information that decides R19.
+
+**EXIT / TRANSITION**  The lay-by, coffee at the bottom of the mountain, then Sunday (S34A).
+
+## **S34A  /  Race 19: The Last Line**
+
+*Replaces S34 as the story's last drive.*
+
+| PLAYABLE RACE / FINAL IMAGE | MONTHS LATER | Mountain route, closed for the hillclimb, morning; damp under the trees at 8A |
+| :---- | :---- | :---- |
+
+**PURPOSE**  Resolve the central mechanic through a race: letting the ghost go is the right line for the road.
+
+**PLAYER EXPERIENCE**  A two-car final, Pang against Nico, grid from R18. A real race. About 300 m before 8A, the Ghost Line appears in the mirror: the cut, at its dry pace, closing, wanting the inside through the damp patch the recce showed. Hold the line that suits the road, wide of the damp with a lift, and the ghost passes through the car (it is a recording), takes the inside without a slide, pulls away and fades past the exit. Defend it or chase it and the player is on the damp: grip falls to ×0.55 for the patch, the car slides and loses time, and the padded barrier catches any mistake. The race with Nico goes on either way.
+
+**STAKES**  The race, and nothing else. A win or a loss stands. The result card is a photograph of the car and the place: no time, no medal, no purse.
+
+**DRAMATIC BEATS**  No music through 8A, only tires and engine. Nico walks over after the finish. Pang finally says the words he didn't say on the night run.
+
+**KEY LINES**  Ruel (at the start): “Pressures are right.” Nico (if Pang let it pass): “You lifted at 8A.” Pang: “It was wet.” Nico (if Pang chased it): “You went inside at 8A.” Pang: “It was wet.”
+
+**CLUES / CONTINUITY**  The damp was shown in S05A and S34. The player who looked has everything they need. Pang never answered Jolo; here he says it himself.
+
+**EXIT / TRANSITION**  The cars go back down the mountain to the garage (S35).
 
 ## **S35  /  The Kid at the Garage**
 
@@ -700,10 +1093,11 @@ Every featured drive needs a distinct dramatic function. Reuse roads and locatio
 
 ## **Pacing and quality gates**
 
-* Do not let the post-crash investigation go too long without a playable drive. S16, S18, and S26 are required story-driving sequences, not optional side content.  
+* Do not let the post-crash investigation go too long without a playable drive. S15A, S16, S18, S20A, S23A, S26 and S27A are required story drives after the crash, not optional side content. The longest non-driving run is now S28–S31 (four beats, down from five); S30 opens on a drive-to.  
 * Separate the two Ghost revelations with an emotional beat and a new question: first “the driver is me,” then “that complete run never happened.”  
 * The crash reconstruction must use at least three evidence sources and state the limits of each. Do not offer a meaningless last-second QTE during S13.  
-* No ending branch should award forgiveness, a championship trophy, or a “Ghost beaten” achievement. Before scripting dialogue, playtest whether people can suspect the composite before S25 without being handed the answer.
+* No ending branch should award forgiveness, a championship trophy, or a “Ghost beaten” achievement. Before scripting dialogue, playtest whether people can suspect the composite before S25 without being handed the answer.  
+* Playtest that a player who chased the ghost in R19 understands why it cost them, without being told.
 
 ## **Vertical-slice build order**
 
@@ -713,6 +1107,7 @@ For an efficient first playable, prove the story’s distinctive mechanics in th
 | :---- | :---- |
 | **1\. Driving identity** | Build the garage hub and R1. Prove the car feels underfunded but responsive; the late correction must read clearly. |
 | **2\. Synthetic benchmark** | Build the Ghost overlay, sector targets, and R3/R4 event flow. The target must be legible as a combined-sector pace without giving away the edit. |
+| **2b. Scarcity** | Shop, ledger, wear and the S12 rain-set catch. A tester can say what they bought, why, and why it didn't matter on Friday. |
 | **3\. Crash-to-return contrast** | Prototype the fragmentary cold open, authored crash sequence, and S16 return race. Reuse sound and light motifs consistently. |
 | **4\. Evidence loop** | Build the source-footage alignment, composite timeline, sector trials, route map, and logger sync. Every conclusion must be supported by visible evidence. |
 | **5\. Ending mechanic** | Prototype S34 with no timer or medal. The Ghost overlay recedes when the player chooses the line appropriate to present conditions. |

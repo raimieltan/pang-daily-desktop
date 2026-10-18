@@ -6,6 +6,8 @@
 
 **NARRATIVE MANUSCRIPT  ·  FIRST DRAFT**
 
+*Includes the races-and-progression additions of Oct 18, 2026. Chapters marked · are new and unnumbered, so the numbered chapters keep their numbers.*
+
 *“The road will not be the same twice.”*
 
 # **Contents**
@@ -20,7 +22,11 @@
 
 **CHAPTER THREE**  A Man Who Arranged Things
 
+**·**  Five Hundred In
+
 **CHAPTER FOUR**  Nico’s Lesson
+
+**·**  The Mountain
 
 **CHAPTER FIVE**  The Line Study
 
@@ -38,7 +44,11 @@
 
 **CHAPTER TWELVE**  The Wrong Tuesday
 
+**·**  Tisoy’s Copy
+
 **CHAPTER THIRTEEN**  The Backup Folder
+
+**·**  Seven O’Clock
 
 **CHAPTER FOURTEEN**  The Seams
 
@@ -50,7 +60,11 @@
 
 **CHAPTER EIGHTEEN**  Jolo’s Family
 
+**·**  Kapitan’s Rules
+
 **CHAPTER NINETEEN**  The Road Is Not a Recording
+
+**·**  The Last Line
 
 **EPILOGUE**  The Kid at the Garage
 
@@ -244,6 +258,76 @@ It sounded possible because Jolo said it as if possibility were a thing he could
 
 In the days that followed, Dante's invitations became more frequent. The events were better organized, the drivers faster, the stakes larger. They made some money and spent almost all of it on the car. Pang learned that a better room rarely made a person less broke. It simply gave him more expensive ways to discover it.
 
+# **Five Hundred In**
+
+The money from the warehouse run came in a brown envelope folded twice and shut with masking tape. Six thousand pesos. Pang counted it on Ruel's workbench the next morning, then counted it again, because the first count had felt too much like a wish.
+
+Ruel didn't look at the envelope. He looked at the clipboard that hung from a nail beside the calendar, where the car's bill was written in pencil. Eight thousand five hundred. The number had been there so long it had stopped looking like money and started looking like part of the wall.
+
+“Fronts first,” Ruel said.
+
+“Nico said—”
+
+“I know what Nico said. Jolo told me. Twice.” Ruel tapped the front left tire with the toe of his slipper. “He was right. I don't care who says it.”
+
+Jolo came in with three coffees in a plastic bag and a printout from his cousin, who was selling a secondhand exhaust: stainless, a little bent at one hanger, fifty-five hundred. He laid it on the bench beside the envelope like a card he expected to win with.
+
+“Exhaust,” he said. “It'll sound like it costs more.”
+
+“It'll sound like it costs more,” Ruel repeated, without any expression at all.
+
+“On camera, boss. People listen before they watch.”
+
+Pang looked at the three things on the bench: the envelope, the bill, the printout. Two front tires were four thousand eight hundred. A set of pads was three and a half. The exhaust was fifty-five. No arrangement of six thousand pesos covered the list. None ever had. That was the shape of his life with the car: the list was always longer than the envelope, and the only question was which item he let wait.
+
+He bought the fronts. Ruel wrote them on the bill under the eight thousand five hundred, then crossed out the old total and wrote a new one beneath it. Pang put twelve hundred against it and kept the rest.
+
+“Good,” Ruel said. “Now the other two.”
+
+Jolo folded the printout into his pocket. “Kapitan's running sprints at the bypass tonight. Five hundred in.”
+
+“For what?”
+
+“For the other two.”
+
+The gas station on the bypass shut its pumps at ten and left its lights on until morning, because the owner had decided long ago that he would rather have the cars than the argument. By eleven the forecourt was full. Kapitan ran it the way he had for years: a folding chair beside the air pump, a notebook, a whistle he never blew. He was older than everyone there by a decade and had been called Kapitan for so long that nobody remembered whether he had ever been one.
+
+“My station, my rules,” he told Pang, writing his name in the notebook. “One lap. No phones on the line.”
+
+Buko, whose phone was already propped on his dash, waved from his car.
+
+The sprints ran one pair at a time: around the barangay and back, the forecourt for a finish. Pang raced Kapitan first. The old man held the inside of every corner like a door he was keeping shut, and he never braked first, not once, so that passing him meant going around the outside and trusting the car to come back. It did. Pang won by a length. Kapitan wrote it down without complaint.
+
+Tisoy was next. His car was the kind that came in a magazine, and he drove it as if he had paid for the straights. He walked away on every one of them, then braked so early that Pang could see his brake lights for what felt like the length of a street. Pang caught him at the last corner.
+
+“My tires are new,” Tisoy said afterward.
+
+“Mine aren't.”
+
+Two of them were. Pang didn't say so.
+
+Buko drafted him the whole lap, talking the entire time to the phone on his dash, and lost by a bumper. He posted the clip before he had finished parking.
+
+Ate Liza went last. She drove a quiet hatch on mismatched wheels, and she sat in it with the window down and her arm on the sill until Kapitan called her name. She didn't talk before the race or during it. She braked later than anyone Pang had driven against, so late he thought she had missed the corner, and then her car simply turned, settled and left. He finished a length and a half behind and could not have said where he lost it.
+
+She found him by the air pump afterward, where Jolo was counting what they had left.
+
+“You turn in before you've finished slowing,” she said. “Works till it doesn't.”
+
+Then she went back to her car.
+
+Jolo looked up from the money. “She likes you.”
+
+“She beat me.”
+
+“That's how she shows it.”
+
+Pang watched her pull out onto the bypass. Her brake lights came on at the first junction, late, and then she was gone. He thought about what she had said all the way home, and before he reached the house he decided she was wrong.
+
+After that, the bypass was where the money came from. On the nights between the bigger events he and Jolo drove the barangay, the talyer to the forecourt and back, and Pang raced whoever Kapitan's notebook had open for five hundred in and a couple of thousand out. Most of it was spent before they got home.
+
+*(In the game the player may beat Ate Liza. The manuscript keeps the loss.)*
+
 # **Chapter Four**
 
 ## ***Nico’s Lesson***
@@ -291,6 +375,38 @@ Over the next several weeks, Pang drove the route in practice sessions, learning
 Pang still disliked him. But he began to watch how Nico drove.
 
 The lesson was not that talent did not matter. It was that talent could be spent badly, and Pang had a habit of spending it all at once.
+
+# **The Mountain**
+
+Dante's first event on the mountain wasn't called a race. It was called an evening.
+
+He had chosen the stretch of the pass above the last barangay, where the road stopped pretending to be a street and began to climb. There was a pull-off with a sari-sari store that sold cold drinks out of a chest freezer and let cars park in its gravel as long as people bought something. By six the gravel was full. People stood along the low wall with their phones out, and the light came sideways through the trees in long orange bars that made every car look more expensive than it was.
+
+“Look—” Dante said, walking Pang from the store to the start. “A mountain makes everyone honest. Flat roads, money wins. Up here, you see who can drive.”
+
+Pang thought it was the kind of thing Dante said to everyone. He also thought it was true.
+
+He raced Kapitan and Tisoy in the heat and finished first, mostly because Tisoy braked for the second hairpin as if it owed him an apology. The final was three cars: Pang, Ate Liza, and a driver from Jaro whose car Pang had only ever seen in photographs. The road rose and folded back on itself. Halfway up, a bend went left beneath a stand of old trees, with a white chevron board on the outside and a concrete post someone had long ago painted with a number, 8A. Pang took it fast, the car leaning, the board flashing past his shoulder, and felt the rear go light for an instant and come back.
+
+He finished second to Ate Liza, ahead of the car from Jaro. It was the first time he had stood on anything called a podium, even if the podium was the store's step. Dante handed him an envelope and put his name on a list.
+
+Nico had not raced. He had spent the evening by the freezer with his phone, timing every car on every run. When Pang went in for a drink, Nico was paying for water.
+
+“Careful at the chevrons,” Nico said, without being asked. “The trees keep it damp after the rest is dry.”
+
+“It was dry.”
+
+“Today.” Nico took his change and left.
+
+Pang stood in the store and drank his soda and decided that Nico said things like that so people would remember he had said them. Outside, Jolo was walking the edge of the pull-off, looking down the mountain at the road folding below them in the last of the light, the way other people looked at a house they wanted to buy.
+
+“Give me a week on this road,” Jolo said.
+
+“For what?”
+
+“I'll make you look like the best driver in Panay.”
+
+Pang laughed. Jolo didn't.
 
 # **Chapter Five**
 
@@ -438,6 +554,46 @@ Nico studied him for a moment. “What do you think I've been doing.”
 
 Dante turned every failed attempt into an advertisement for Ghost. If a driver came close, he called it progress. If a driver missed the target, he called it proof of the benchmark's difficulty. The more the totals failed to match, the more valuable the legend became.
 
+Then Dante made it every Saturday.
+
+The first Saturday he only asked them to beat Ghost in a single sector. Pang did it in the first, by a tenth, and the crowd at the pull-off made a sound he had never heard a crowd make for him. Dante paid him a bounty from his own pocket and told the microphone that Ghost would not like it. By Sunday morning the poster had a new number, a little lower than the last, with a caption underneath: *Ghost responded.*
+
+The entry for the second Saturday was twice the first. Pang paid it with what was left of the bounty, and bought an intake Ruel had told him not to buy. The parts sellers in the group chat had started pricing parts against the Ghost time, as if horsepower could be bought in tenths. Ruel fitted the intake without comment and then stood looking at the front tires for a long time.
+
+“You've done a lot of Saturdays on these,” he said.
+
+“Two.”
+
+“And the Wednesdays. And the bypass.” Ruel wiped his hands. “Tires don't know what day it is.”
+
+Between the Saturdays there were the weeknights: the bypass, Kapitan's notebook, a sprint for a few thousand, the drive back to the talyer with the money already spent.
+
+On the second Saturday Pang ran the whole route against the posted time. Somewhere past the middle he caught the pale car in the overlay, the one from the clip, and passed it. He felt it happen: the reference line slipping behind him in his head, the gap opening the other way for the first time. He crossed the line sure he had done it. The board said he was two seconds slow.
+
+He stared at the number until Jolo came and stood beside him.
+
+“I passed it,” Pang said.
+
+Jolo looked at the board and then away. “Yeah.”
+
+“I passed it and I'm two seconds behind.”
+
+“It's a number, boss.” Jolo's voice did something strange on *number*. “One more Saturday.”
+
+That week Jolo borrowed five thousand from Ate Liza for the lens he still owed Kuya Ben. Pang found out by accident, from a message on Jolo's screen, and said nothing, because he knew what the money had been for and that Jolo would never have borrowed it if Pang had not needed the clips.
+
+The third Saturday Dante put Pang and Nico on the mountain together, side by side, with Ghost running ahead of them both on the big screen at the pull-off. Pang beat Nico. It was close, a few car lengths at the line, and it was the first time. He climbed out with his hands shaking and found the crowd already looking past him at the screen, where the pale car was finishing well ahead of both of them.
+
+Nico walked over through the gravel.
+
+“You beat me tonight,” he said.
+
+“I didn't beat Ghost.”
+
+Nico looked at the screen and then back at him. “Ghost wasn't here.”
+
+Pang heard it as the kind of thing Nico said.
+
 After midnight, Pang found Jolo sitting in the car with his phone open. The project notes were on the screen. Jolo had typed a message to Pang and not sent it. Beneath it was the original label: \*\*NOT ONE RUN.\*\*
 
 “There is something about the clip I should've—” Jolo began.
@@ -474,11 +630,31 @@ Dante wanted a night run on the mountain route. The format would be simple: driv
 
 For Pang, the money represented an end to several immediate problems. The car could get proper tires. Ruel could replace the parts he had been telling them not to postpone. They could pay the remaining shop bill, cover what Jolo owed on a camera lens, and still have something left over. It was the sort of chance they had imagined when the car first began winning races.
 
+On Wednesday Pang tried to fix it with money.
+
+Kapitan was running a pot race at the bypass, three cars, three laps, eight thousand to the winner, and there was nothing else on the board that week. Pang raced Tisoy and the driver from Jaro under the forecourt lights and won by most of a straight, carefully, braking earlier than he wanted to. He was learning to win carefully. It felt like holding his breath.
+
+Between laps Jolo stood by the air pump with his phone pressed to one ear and a finger in the other, talking to the parts shop in Mandurriao. When Pang came back in with the money, Jolo was still on the phone. He ended the call and looked at the screen for a moment before he spoke.
+
+“One set,” he said. “Manila. Two weeks.”
+
+“Event's Friday.”
+
+“I know when the event is.”
+
+Pang held the envelope from Kapitan. It was thick enough to matter and thin enough to make no difference at all. For the first time since the warehouse run, he had money and there was nothing on the list it could buy.
+
 Ruel looked at the weather report and said no.
 
 “You can say no to Dante,” he told Pang. “You can't say no to standing water.”
 
 The sky over Iloilo had been heavy all afternoon. By dusk, the mountains had disappeared behind a low sheet of rain. Ruel examined the tires, checked the brakes, and explained what he already knew: the car was not prepared for a high-speed run in those conditions. The tires they could afford were acceptable for ordinary driving and dry practice. He would not choose them for a wet mountain route at night.
+
+“I ordered a rain set,” Ruel said. “Comes when it comes.”
+
+“When?”
+
+“After Friday.”
 
 “We've driven there before,” Pang said.
 
@@ -596,6 +772,40 @@ Ruel's expression tightened. “Report says no second car.”
 
 Pang walked around the car. The driver's door had been replaced. The steering wheel was not the one he remembered. He ran his thumb along the repaired seam in the dash. There was a small mark near the center console where Jolo had once struck it with his knuckles to demonstrate a beat for a video edit.
 
+“Drive it,” Ruel said.
+
+Pang looked at him.
+
+“Around the block. Slow.” Ruel folded his arms. “Pulls left. I know. Drive it so I can see how much.”
+
+The key was the same. The seat was the same, with the same split seam, and that undid him more than anything else had. He sat for a while with his hands in his lap. Then he put them on the wheel.
+
+“It's not the same wheel,” he said.
+
+“No.”
+
+He drove out under the roller door at walking pace. The barangay was its ordinary late-morning self: a tricycle waiting for a fare, a woman hanging laundry from a second-floor window, a dog asleep in the exact middle of the side street, so that he had to stop and wait for it to decide to move. The car pulled left the whole way. Not much. Enough that he had to hold the wheel against it, a small constant pressure in his right wrist, like a voice in the next room he could not stop hearing.
+
+When he came back, Ruel was waiting in the doorway. He didn't ask how it felt. He crouched at the front wheel with a wrench for ten minutes, then stood and nodded at the street.
+
+The second lap ran straight. Pang came back in and switched off the engine and sat with his hands on a wheel that wasn't the one he remembered, in a car that drove straight, and found that he was breathing hard.
+
+In the corner of the garage, behind the compressor, four tires stood stacked in their factory plastic.
+
+“Whose are those?”
+
+Ruel didn't look. “Yours. Rain set. Came two weeks after.”
+
+He took the clipboard down from its nail and wrote something on it in pencil. Thirty-eight thousand. He hung it back on the nail without showing it to Pang.
+
+“I can't pay that,” Pang said.
+
+“Pay when you can.”
+
+“I can't.”
+
+“Then when you can,” Ruel said, and went back to the engine he had been working on when Pang came in.
+
 He had returned to the scene to prove he was not afraid. Within a week, he was asking the same questions wherever people gathered after dark. Who else had been on the mountain? Which driver had been invited late? Did anyone see a car beside them? Why had Dante not spoken about the lights? Why had so many people been ready to blame the weather before checking the footage?
 
 Rumors came easily. A driver had been seen leaving the mountain in a dark car. Someone said Dante had arranged a private rivalry. Another insisted Ghost itself had appeared on the route that night, the anonymous driver trying to protect the benchmark. No one could show him proof. Everyone had a version that made the death feel like an event with a cause he could find and confront.
@@ -704,13 +914,43 @@ He left before Dante answered. Outside, a group of younger drivers were watching
 
 Then the clip looped, and the ghost car made the corner without a single hesitation.
 
+# **Tisoy's Copy**
+
+Tisoy messaged at nine. *I had it before anyone,* the message said. *Before Dante's logo. Come to the bypass.*
+
+The forecourt was quieter than Pang remembered. People still came, but some of them now stood a little apart when he pulled in, the way people stand apart from someone at a funeral without meaning to. Kapitan nodded at him from his chair. Buko filmed him getting out of the car and then seemed to remember something and lowered his phone.
+
+Tisoy was leaning on his car with his arms crossed. “The night Dante posted it, I downloaded it. Before the reposts. Before somebody cropped the corners for the poster.” He held up his phone. “You want it, beat me.”
+
+“You haven't seen me drive since.”
+
+“That's why I'm offering.”
+
+It was, Pang understood later, the kindest thing Tisoy had ever said to him. Tisoy would have denied it.
+
+They ran the loop at night. It was the first time Pang had raced after dark since the mountain, and he knew from the first corner that his body had been waiting for it. Tisoy's headlights filled his mirror on every straight, white and close, and twice he felt his foot lift before he had told it to. But the corners came the way they used to, and Tisoy still braked as if the turns had insulted him, and at the last bend before the forecourt Pang was ahead and stayed there.
+
+He climbed out with his shirt stuck to his back. Tisoy looked at him for a long moment, then held out his phone and sent the file.
+
+“My tires are new,” Tisoy said.
+
+“Mine are too,” Pang said. Ruel had made sure of it.
+
+He watched it in the car before he drove away. It was the clip everyone had seen, the pale line, the smooth corners, the music someone had added later. But this copy began a moment earlier than the others. For less than half a second, before the road came up, the frame was white, and at its cropped bottom edge, cut off by whoever had resized it, there were letters:
+
+*…TUDY — BEST*
+
+He played it nine times. The letters didn't change.
+
+*(In the game the player can lose this race; Tisoy then sends the same file the next morning: “Man. Just take it.”)*
+
 # **Chapter Thirteen**
 
 ## ***The Backup Folder***
 
 Ruel kept backups because he distrusted any technology that assumed a single copy was enough.
 
-The old drive sat in a drawer beneath receipts and spare fuses. He had used it to preserve Jolo's camera files after a laptop began failing, then forgotten about it as the months accumulated. When Nico mentioned that the circulating Ghost Line clips had lost their original metadata, Ruel remembered the drive and brought it to the workbench.
+The old drive sat in a drawer beneath receipts and spare fuses. He had used it to preserve Jolo's camera files after a laptop began failing, then forgotten about it as the months accumulated. When Pang showed him Tisoy's copy, and the half-second of a title that Dante's version didn't have, Ruel remembered the drive and brought it to the workbench.
 
 “Half these files are damaged,” he said. “Don't get excited.”
 
@@ -747,6 +987,40 @@ Pang watched the clip again, searching for a clue that would make the discovery 
 He had found Ghost.
 
 He still had no idea how Ghost had driven that way.
+
+# **Seven O'Clock**
+
+He called Nico before he had closed the laptop.
+
+“Race me,” he said. “The pass. Tomorrow.”
+
+There was a pause on the line. “Why?”
+
+“Because I'm Ghost.”
+
+The pause was longer. Pang could hear traffic on Nico's end, a horn, someone selling something.
+
+“Seven,” Nico said. “Bring Ruel.”
+
+They met at the pull-off the next evening. There was no crowd, no Dante, no screen. The sari-sari store was open and the woman behind the counter looked at the two cars and went back to her television. Ruel stood by the wall with a stopwatch he had owned for thirty years.
+
+Pang drove the way the clip drove. He knew now where every piece of it had come from, or thought he did, and he drove each corner as if it belonged to him, which he believed it did. The car was not the car in the clip. The fronts were new; the rain set was still in its plastic in Ruel's corner; the steering was a different weight. None of it seemed to matter. He felt light. He felt, for the first time since the crash, like the person he had been.
+
+He beat Nico by three car lengths. At the top, both cars ticking as they cooled, Nico got out and walked over.
+
+“You're quick,” he said. “Which run was the clip?”
+
+“One of them.”
+
+“Which one?”
+
+Pang opened his mouth. He knew the entry. He knew the middle, the exit, the place where the camera trembled over the seam. He could feel each of them in his hands. He could not name the drive they had come from. He tried to picture the whole run from start to finish, one afternoon, one pass, and found that the pictures would not join.
+
+Nico waited. Then he nodded, as if Pang had answered.
+
+Ruel clicked the stopwatch off and put it in his pocket. “Home,” he said.
+
+*(In the game the player may lose. Nico's question is the same: “Your sectors were good. Which run was the clip?”)*
 
 # **Chapter Fourteen**
 
@@ -814,7 +1088,35 @@ A witness who had been leaving a small roadside stop on the night of the crash m
 
 Pang did not ask him to turn uncertainty into a statement. The man had seen what he had seen. That was all.
 
-They returned to the garage with the route map and the recovered logger. Ruel had managed to extract part of the data: speed, braking, steering input, and several seconds of information beyond the point where the camera failed. The numbers were not a full reconstruction. They could not tell them every movement or prove what Pang had been thinking. But they recorded the car approaching the fatal corner faster than it had during the dry practice runs, braking later, then making a sharp steering correction as stability disappeared.
+“Tonight,” Nico said, when the witness had gone. “I'll take the lower road.”
+
+They came back after dark. The mountain was dry and still, and the road looked narrower than it had in the afternoon, the way it always did. Ruel stayed at the pull-off with a phone in each hand, one to Pang and one to Nico, counting them both down to their starts so that the lower car would reach the gap below the bend as the upper car approached it.
+
+Pang drove at an ordinary pace. Not slow. Ordinary. The headlights found short pieces of the world: the white line, the guardrail, the wet-looking leaves that were not wet tonight.
+
+“I'm below you,” Nico said in his ear.
+
+The bend came. The chevrons. The post with its painted number. And then, to his left, through the trees, lights.
+
+They moved with him. They slid across the glass at the exact angle he had carried for months, close enough to make the road feel narrower than it was, and his foot was on the brake before he had decided anything. His heart did a thing he felt in his teeth.
+
+“Still below you,” Nico said. “Still below you.”
+
+The lights went behind the ridge and were gone.
+
+Pang stopped in the lay-by past the bend and sat with the engine running. A minute later Nico's car came up the lower road, around the switchback, and pulled in behind him. Nico walked up to the window.
+
+“Sixty metres down,” he said. “And a ridge between us.”
+
+Pang looked at the trees, at the dark gap where the lights had been.
+
+“You looked like you were beside me.”
+
+“I know,” Nico said. “I saw your face.”
+
+Back at the garage, Ruel laid the night's recording over the surviving frames from the crash run, distance against distance. The lights came through the trees at the same metres down the road and at the same angle off the nose, near enough that the two lines on the screen became one line.
+
+Later, they sat to the garage with the route map and the recovered logger. Ruel had managed to extract part of the data: speed, braking, steering input, and several seconds of information beyond the point where the camera failed. The numbers were not a full reconstruction. They could not tell them every movement or prove what Pang had been thinking. But they recorded the car approaching the fatal corner faster than it had during the dry practice runs, braking later, then making a sharp steering correction as stability disappeared.
 
 There was no sudden input consistent with avoiding a car entering his lane. No trace that required a collision to explain it. The car left the road after the correction, not before it.
 
@@ -887,7 +1189,7 @@ The first time, he was looking for a way to argue with them. The second time, he
 
 The folder lay open between them: v1, title card and all. He did not pretend not to know it.
 
-“The notes say 1:29.4. Your poster says 1:26.7.”
+“The notes say 1:29.4. Your first poster said 1:26.7. This one says 1:26.2.”
 
 “Posters round.”
 
@@ -969,27 +1271,65 @@ Pang left the house without an answer. Outside, the afternoon carried on around 
 
 The engine started on the second try. He let it idle until the temperature settled, then drove away without checking the time.
 
+# **Kapitan's Rules**
+
+Some of them would not race him anymore.
+
+Nobody said so. RJ simply took his car home on the mornings Pang turned up. Two drivers he had known for years started arriving after he had left. Tisoy raced him; Tisoy, it turned out, would race anyone who had beaten him, out of what he called principle. Buko still filmed everything and posted almost none of it.
+
+Kapitan changed the bypass. He moved his meets to the warehouse loop, the patched road behind the warehouses where Pang had won his first envelope, and he closed it off with cones and his nephews in orange vests, and he stopped taking bets. He said he was too old to be on anyone's poster.
+
+“My meet, my rules,” he told Pang at the first one. “You race clean or you go home.”
+
+“Clean.”
+
+Kapitan wrote his name in the notebook.
+
+Pang raced three laps against Ate Liza, Tisoy and a boy from Molo in a car with no rear seats. He did not win. He finished second, behind Ate Liza, and when she passed him into the last corner he saw her brake lights come on late, the way they always had, and he braked earlier, and did not mind.
+
+She found him by the cones afterward.
+
+“You finished slowing,” she said.
+
+Then she went back to her car. Pang stood there longer than he needed to.
+
+The car he drove that morning was not the car from the mountain. Over the months, envelope by envelope, it had become something Ruel would have built from the start: the rain set out of its plastic and on the wheels, new pads and rotors, a set of secondhand coilovers from a man in Jaro who had sold his own car to pay for a wedding. The engine was what it had been. The paint was what it had been, the faded colour that could not decide between blue and grey, with one door in primer where the old one had folded. He had paid Kuya Ben for the lens before he paid anything else. Ruel's clipboard still had a number on it, smaller.
+
+That week Nico's club posted something the scene had never had. A hillclimb on the mountain road: the pass closed for a Sunday by permit from the municipality, marshals at every corner, an ambulance at the bottom, a clock that belonged to nobody. Qualifying the Saturday before. Kapitan signed Pang's entry form on the hood of his own car.
+
+Qualifying was two runs, alone, against the clock. Marshals in orange stood at the corners with flags. The road was closed, and it was strange to see it empty, the yellow line running uphill with nothing on it. Ruel stood at the start with his old stopwatch beside the club's timing screen.
+
+“Clock's honest today,” Ruel said. “Use it.”
+
+Pang drove the first run cleanly and the second faster. He qualified second to Nico. Nobody posted a lower number afterward. The number stayed where he had put it.
+
+At the top, Nico found him by the cars.
+
+“Drive it with me the day before,” he said. “At forty.”
+
 # **Chapter Nineteen**
 
 ## ***The Road Is Not a Recording***
 
-Nico asked him to drive the mountain road in daylight.
+Nico asked him to drive the mountain road the day before the hillclimb, on the open road, with the traffic.
 
-Not as a test. Not to recreate the crash. Not for an event or a video. “I want to see what it looks like at forty,” he said.
+Not as a test. Not to recreate the crash. Not for a video. “I want to see what it looks like at forty,” he said.
 
-They went on a weekday morning when the road was quiet but not empty. A delivery truck moved slowly uphill. A family of four on one motorcycle passed them before a bend. The trees shone with the clean green brightness that rain left behind, and the asphalt changed texture where repairs had been made.
+They went early on the Saturday, when the road was quiet but not empty. A delivery truck moved slowly uphill. A family of four on one motorcycle passed them before a bend. The trees shone with the clean green brightness that rain left behind, and the asphalt changed texture where repairs had been made.
 
 Pang drove without a timer. At first, he could not stop thinking in sectors. He saw the start of the Ghost Line in the approach to the first bend, then its idealized middle section, then the fast exit. The ghost car appeared in his mind with its pale, smooth trajectory. He knew exactly where it wanted him to place the car. The knowledge arrived as a reflex, not a choice.
 
-When they approached the fatal corner, the road narrowed under the trees. A vehicle was coming in the opposite direction farther ahead, its windshield catching the morning light. The outside edge was darker where moisture remained in the shade. Pang felt the old hunger rise—the need to prove that the corner could be taken cleanly, that he could pass through it without flinching, that the crash had not taken the driver he had been.
+When they approached the fatal corner, the road narrowed under the trees. A vehicle was coming in the opposite direction farther ahead, its windshield catching the morning light. The outside edge of the bend was darker than the rest of the road, a long stripe of shade where the trees kept the moisture.
 
-The ghost line brightened for a moment, so vivid that it seemed to lie over the road itself. The perfect entry. The precise angle. The imaginary car already leaving the corner before the real car had arrived.
+Pang felt the old hunger rise, the need to prove that the corner could be taken cleanly, that he could pass through it without flinching, that the crash had not taken the driver he had been. He knew exactly where the clip would have put the car.
 
-Pang slowed.
+He slowed. He gave the oncoming vehicle its space and kept his tires on the surface he could see.
 
-He chose a line that gave the oncoming vehicle space and kept his tires on the surface he could actually see. The car moved through the bend without drama. Nothing spectacular happened. No one cheered. The ghost continued ahead and vanished beyond the trees, still carrying the impossible speed of a recording built from separate moments.
+“That stays wet till noon,” Nico said, pointing at the dark edge.
 
-Pang did not follow it.
+“I know.”
+
+Nothing spectacular happened. No ghost appeared. The car moved through the bend at forty, and the road went on.
 
 On the other side of the corner, he pulled into a safe lay-by and switched off the engine. For a while, neither man spoke. Nico looked toward the trees, then back at him.
 
@@ -1000,6 +1340,56 @@ Pang rested his hands on the wheel. “That's it.”
 They drove the rest of the route at an ordinary pace. The car rattled over a rough patch, and Pang heard the familiar trim tapping against the dash. Instead of imagining the sound as a defect that might ruin a run, he felt a strange affection for it. The car was imperfect. It had always been imperfect. Its flaws were part of the information it gave him, not a challenge to his pride.
 
 At the bottom of the mountain, Nico stopped for coffee. They talked about tires, a friend who needed help finding a part, and a new shop that had opened near the highway. They did not talk about forgiveness or closure. There was no need to turn the drive into a ceremony.
+
+# **The Last Line**
+
+On Sunday the road was closed by nine.
+
+Marshals stood at every corner in orange vests. An ambulance waited at the bottom of the mountain with its back doors open and the crew eating breakfast inside. Kapitan sat in his folding chair at the start with his notebook. Ate Liza was there, and Tisoy, and Buko with his phone, and a hundred people Pang didn't know, standing along the low wall at the pull-off where Dante had once worked the crowd. Dante was not there. Nobody mentioned it.
+
+The final was two cars. Pang and Nico, side by side at the start line, the pearl white Dalagan and the faded EG with its primer door.
+
+Ruel walked once around Pang's car, crouching at each wheel with a gauge. When he had finished, he stood at the window.
+
+“Pressures are right,” he said.
+
+That was all. It was, from Ruel, a speech.
+
+The marshal dropped the flag.
+
+Nico led from the start, as Pang had known he would. The road climbed and folded, and the two cars climbed with it, close enough that Pang could see the stitching in the rear seats of the Dalagan through its back glass. He did not drive like the clip. He drove the road: the patched section at the second hairpin, the seam near the store, the shade that lay across the asphalt in bands where the trees leaned in. The car told him what it was doing and he listened. It was not the fastest he had ever driven. It was the most he had ever heard.
+
+Three hundred metres before the chevrons, something appeared in his mirror.
+
+It was pale and silent and closing fast. He knew it before he could see it clearly: the line from the clip, the car made of light, at its dry impossible pace, the pace of an afternoon that had never happened. It came up behind him as if he were standing still, and it moved toward the inside, toward the place under the trees where the asphalt was dark. It wanted the line it had always wanted. The perfect entry. The precise angle.
+
+His hands knew that line. For an instant they began to go to it.
+
+He lifted.
+
+He held the car wide, out of the dark stripe, on the surface he could see. The ghost came level with him, and then it was in the car with him, a wash of pale light through the cabin, there and gone, and then it was ahead, sweeping inside through the damp without the smallest slide, because it was a recording and the road had never touched it. It went through the bend. It went past the exit. It went up the mountain and faded into the morning between the trees.
+
+The gap grew. He let it.
+
+Nico was still ahead. Pang chased him the rest of the way up, a real car with real brake lights, and caught him on the last straight, and did not quite pass him.
+
+He crossed the line three tenths behind.
+
+There was no music. A marshal waved a flag. Kapitan, at the top, wrote two numbers in his notebook. The cars ticked as they cooled.
+
+Nico got out and walked across.
+
+“You lifted at 8A,” he said.
+
+Pang looked down the mountain toward the trees. For months he had heard the same words in another voice, small, under an engine, in the rain, and he had not answered them. He had carried them as something else, a joke from a dry day.
+
+“It was wet,” he said.
+
+Nico nodded. “It was.”
+
+They stood there for a while. Behind them, people were already talking about the next one, about tires, about who had a spare set of pads, about a shop that had opened near the highway. Nobody asked about Ghost all morning, except Buko, once.
+
+*(In the game the player can win R19, or chase the ghost and pay for it at 8A. The manuscript's canon is second place and the lift. Nico's line if the player chased the ghost: “You went inside at 8A.” Pang's answer is the same.)*
 
 # **Epilogue**
 
