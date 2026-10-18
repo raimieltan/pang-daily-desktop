@@ -295,7 +295,7 @@ Every featured drive needs a distinct dramatic function. Reuse roads and locatio
 
 **PLAYER EXPERIENCE**  The player drives the opening sectors while crowds and camera lights fall behind. The Ghost overlay becomes more insistent as the protagonist chases its timing. The surface changes; grip falls away; Jolo’s warnings are audible but compete with engine and road noise.
 
-**DRAMATIC BEATS**  At the key bend, the protagonist imitates the reference entry instead of responding to the wet surface. A sharp correction destabilizes the car. Headlights flash through the trees from the lower switchback. Impact. The player is not offered a fake last-second button prompt that pretends the fixed outcome is avoidable.
+**DRAMATIC BEATS**  At the key bend, the protagonist imitates the reference entry instead of responding to the wet surface. Jolo, in fragments: it feels different, it's wet past the sign, “Pang, it's wet. It's wet.”, then “Okay. Okay.” Pang says nothing. A sharp correction destabilizes the car. Headlights flash through the trees from the lower switchback. Impact. The player is not offered a fake last-second button prompt that pretends the fixed outcome is avoidable.
 
 **CLUES / CONTINUITY**  This scene establishes the actual decisions: event pressure, unsuitable conditions, late braking, and overcorrection. The headlights are real but not in the protagonist’s lane. Preserve the last seconds for later reconstruction.
 
@@ -544,7 +544,7 @@ Every featured drive needs a distinct dramatic function. Reuse roads and locatio
 
 **PLAYER EXPERIENCE**  The player syncs surviving speed, braking, and steering traces with the partial camera file. The last video seconds are missing, but the data continues far enough to show approach speed, delayed braking, and a sharp correction as stability is lost.
 
-**DRAMATIC BEATS**  The data fits the wet road and the car’s departure from the road. It does not show a collision or an evasive input consistent with a nearby vehicle. Jolo’s warning is audible shortly before the final gap.
+**DRAMATIC BEATS**  The data fits the wet road and the car’s departure from the road. It does not show a collision or an evasive input consistent with a nearby vehicle. Jolo’s warning is audible shortly before the final gap: “Pang, it’s wet. It’s wet.” Not advice, not a slogan: a scared man saying what he sees. Ruel says why he kept the box; it is his one speech.
 
 **CLUES / CONTINUITY**  The logger cannot prove every detail. It does, however, support a coherent sequence that fits better than the theory of a rival forcing them off the road.
 

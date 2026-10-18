@@ -374,19 +374,17 @@ Jolo found out at a coffee shop while he was checking messages for a cheap set o
 
 He watched it twice. On the second pass, he noticed the missing title card.
 
-“Dante took the notes off,” he said.
+“Dante took something off it,” he said.
 
-Pang leaned across the table. The clip played between them. “It still looks good.”
+Pang leaned across the table. The clip played between them. “Off what? It looks good.”
 
-“That's not the point.”
-
-“Then what is?”
+“Yeah. It looks really good.”
 
 Jolo opened the original project folder, then closed it again. He could message Dante. He could post the source file and explain the edit. He could tell the group that Ghost was not a driver and the total was not a completed performance. The truth was simple. It would take less than a minute to type.
 
 But the group was already talking about them. People wanted to know what car Ghost drove. One person claimed the line belonged to a former racer who had moved abroad. Another said the driver had disappeared after a crash. Someone asked whether the next event would feature an attempt to beat the time.
 
-“People are interested,” Pang said quietly. He didn't sound greedy. He sounded surprised, as if the scene had finally seen something he had been trying to show it for years.
+“People are into it. Somebody out there can drive,” Pang said quietly. He didn't sound greedy. He sounded surprised, as if the scene had finally seen something he had been trying to show it for years.
 
 Jolo thought of the unpaid shop bill and the tires. He thought of the garage they kept talking about, the one with their name above the door. He told himself that Dante's exaggeration would burn out. Anyone who understood driving would see the difference between a reference study and a record. If the attention got them into better events, they could correct the story later, once the opportunity had done its work.
 
@@ -424,11 +422,11 @@ Pang's real car did not feel like that. It loaded its front tires, changed balan
 
 He sat in the car after the run, hands still on the wheel.
 
-“That's better than last time,” Jolo said from the passenger seat.
+“Better than last time,” Jolo said from the passenger seat.
 
-“Still not enough.”
+“Not enough.”
 
-“It's not a person, Pang. You don't have to make it nervous.”
+“It's a clip, boss. You don't have to make it nervous.”
 
 Pang gave him a look. “It has a time.”
 
@@ -440,19 +438,19 @@ Jolo looked away. “I know.”
 
 At the next event, Dante displayed the Ghost target across a tall screen beside the staging area. Drivers queued to attempt individual sectors. They could win one and still fail the total, because the total assumed that the best entry, middle, and exit could all be combined in a single pass. Nico ran two controlled attempts and matched one of the sector times, then stopped to review his notes.
 
-“What's wrong?” Pang asked when Nico returned.
+“What?” Pang asked when Nico returned.
 
-“The target isn't behaving like one run.”
+“It doesn't behave like one run.”
 
-“What does that mean?”
+“Meaning.”
 
 “It means the first sector rewards one kind of entry. The middle was recorded with a different surface condition, and the exit comes from a pass with a different rhythm. I can reproduce each piece. I can't make the whole thing add up.”
 
 Pang looked at the leaderboard. A small line of text beneath the official overlay still read \*\*COMBINED BEST SECTORS\*\*. It disappeared when the next promotional slide came up.
 
-“Then make it add up,” Pang said.
+“Then make them add up,” Pang said.
 
-Nico studied him for a moment. “That's what I've been doing.”
+Nico studied him for a moment. “What do you think I've been doing.”
 
 Dante turned every failed attempt into an advertisement for Ghost. If a driver came close, he called it progress. If a driver missed the target, he called it proof of the benchmark's difficulty. The more the totals failed to match, the more valuable the legend became.
 
@@ -460,13 +458,25 @@ After midnight, Pang found Jolo sitting in the car with his phone open. The proj
 
 “There is something about the clip I should've—” Jolo began.
 
-Pang turned from the windshield, excited and exhausted. “I know. I know it's hard. But I can do it. If I get the middle clean, the rest will follow.”
+Pang turned from the windshield, excited and exhausted. “I know. I know it's hard. If I get the middle clean, the rest follow.”
 
 Jolo looked at his face. He saw not arrogance but hope, the same hope he had spent months trying to feed. He could still tell him. He could say that the clip was a construction and that there was no complete performance waiting at the end of all this effort.
 
 Instead, he locked his phone.
 
-“We need to look at the car,” he said. “And the weather. The next run's going to be different.”
+“You remember the batchoy place in La Paz?” he said after a while. “By the school?”
+
+“It closed.”
+
+“It didn't close. I just never went back. I knew it wouldn't taste like that again, so I kept it how it was.”
+
+“You're tired,” Pang said.
+
+Jolo looked at something on his phone for a long time. Then he locked it. “Fronts are done, by the way. And it's raining Friday. Ruel's right. I hate when Ruel's right.”
+
+“I almost had the middle tonight.”
+
+“I know.”
 
 Pang heard caution. He did not hear a confession.
 
@@ -482,27 +492,27 @@ For Pang, the money represented an end to several immediate problems. The car co
 
 Ruel looked at the weather report and said no.
 
-“You can say no to the event,” he told Pang. “You can't negotiate with standing water.”
+“You can say no to Dante,” he told Pang. “You can't say no to standing water.”
 
 The sky over Iloilo had been heavy all afternoon. By dusk, the mountains had disappeared behind a low sheet of rain. Ruel examined the tires, checked the brakes, and explained what he already knew: the car was not prepared for a high-speed run in those conditions. The tires they could afford were acceptable for ordinary driving and dry practice. He would not choose them for a wet mountain route at night.
 
 “We've driven there before,” Pang said.
 
-“On a different surface. At a different speed. In different weather.”
+“Dry. Slower. Different week.”
 
-“That's why we're testing ourselves.”
+“That's the test.”
 
-“No,” Ruel said. “That's why you're trying to make the road keep a promise it never made.”
+“Tuesday was dry,” Ruel said.
 
 Jolo said little while they checked the car. When Ruel left to answer a call, Jolo walked with Pang around the front bumper and spoke so quietly that the rain filled the gaps between his words.
 
 “We should pull out.”
 
-Pang stared at him. “You got us into this.”
+Pang stared at him. “You got us in.”
 
-“I got us the invitation. I didn't make the weather.”
+“I got us an invitation. I didn't order the rain.”
 
-“The money changes things.”
+“Money changes things.”
 
 “Money doesn't change grip.”
 
@@ -512,15 +522,21 @@ Pang looked at the Ghost Line clip on his phone. The reference car entered the f
 
 Jolo's face changed. He could see that Pang was no longer arguing about the event. He was arguing with the months of effort that had led to it, with every failed attempt, every person who had told him to be patient, every advantage Nico had been able to buy and Pang had not. If he backed out now, the target would remain above him, perfect and untouched.
 
-“Pang,” Jolo said, “the clip isn't—”
+“Boss,” Jolo said, “the clip isn't—”
 
 His phone buzzed. Dante's name appeared. Jolo stared at it until the vibration stopped.
 
 He had another chance. He did not take it.
 
-Pang interpreted the silence as agreement. “We'll take it easy on the first section,” he said. “See how the road feels.”
+Pang interpreted the silence as agreement. “We take the first section easy,” he said. “Feel the road.”
 
-Ruel heard him through the open garage door. “You don't get to know how a wet road feels after you've committed to the corner.”
+Ruel heard him through the open garage door. “You don't get to feel a wet road after you've committed to the corner.”
+
+Jolo pushed a pan de sal into Pang's hand. “Eat. You brake angry when you're hungry.”
+
+“Bring it home,” Ruel said.
+
+Jolo did not make the joke. “Okay.”
 
 No one answered.
 
@@ -548,11 +564,11 @@ The starter gave them the signal.
 
 For the first section, Pang drove within himself. The engine climbed through the gears. Water hissed under the tires. The road gave him just enough information to stay moving, and he followed it rather than the overlay that lived in his memory. But as the second sector approached, he began to anticipate the Ghost Line. He tried to set the car for the same entry he had watched hundreds of times. The road did not match the recording. The surface was slicker, the light flatter, the corner's edge hidden by rain.
 
-“Different here,” Jolo said.
+“Feels different here,” Jolo said.
 
-“I know.”
+Pang said nothing.
 
-“Then don't force it.”
+“It's wet past the sign.”
 
 Pang saw the reference line in his head, pale and precise. He was not far from the target. He could feel it in the way the car moved, in the sector time he had calculated before they left, in the thought that this one pass could finally connect all the pieces.
 
@@ -560,7 +576,7 @@ The corner arrived.
 
 He braked later than he had on the dry practice run. The car's weight moved forward, and the tires struggled to hold the line he demanded. The rear began to drift. His hands answered with the familiar correction, a sharp movement that had saved him on other surfaces, at other speeds. Here it unsettled the car further. The tires lost grip entirely.
 
-Jolo shouted. “Drive the road\!”
+“Pang.” Jolo's voice, small. “Pang, it's wet. It's wet.” Then, very quietly: “Okay. Okay.”
 
 Headlights slid through the trees to their left. Pang looked, just for an instant, and saw what seemed to be another car coming level with them. The image arrived with the force of a fact. Another driver. Another presence. Someone entering the corner at the exact wrong time.
 
@@ -716,7 +732,7 @@ Ruel kept backups because he distrusted any technology that assumed a single cop
 
 The old drive sat in a drawer beneath receipts and spare fuses. He had used it to preserve Jolo's camera files after a laptop began failing, then forgotten about it as the months accumulated. When Nico mentioned that the circulating Ghost Line clips had lost their original metadata, Ruel remembered the drive and brought it to the workbench.
 
-“Don't expect a miracle,” he said. “Half the files may be damaged.”
+“Half these files are damaged,” he said. “Don't get excited.”
 
 They spent an evening connecting folders to dates. The archive was a jumble of ordinary life: clips of the car on a lift, Jolo testing audio levels, Pang complaining about a rattle, an unfinished video of Nico's race. Some files had been named by date; others by whatever joke Jolo had made at the time. They found a folder labeled GHOST\_LINE and several versions of the edit, each with a different title card.
 
@@ -730,7 +746,7 @@ Pang felt the hair rise along his arms. He knew the road. He knew the shape of t
 
 Ruel opened a raw recording from the same date. The steering correction appeared before the bend: a small lift, a brief adjustment, then the car settled. Another file contained the same movement from a later practice session. The timing was different. The conditions were different. But the gesture belonged to the same pair of hands.
 
-“That's me,” Pang said.
+“...Those are my hands,” Pang said.
 
 Ruel did not answer. He placed the raw file beside the circulating clip and synchronized the sound. The engine note, the camera's small movement, the reflection on the windshield—all matched.
 
@@ -742,9 +758,9 @@ He sat back. The room seemed to move away from him.
 
 For months, he had searched for the person whose presence he imagined at the fatal corner. He had asked strangers to identify a driver who could match the Ghost Line, as if the person who made the perfect run might also explain why Jolo had died. Now the mystery had turned inward. He was the unseen driver. The legend belonged to his own past.
 
-“Jolo uploaded it anonymously,” Pang said at last. “He wanted people to see it.”
+“He posted it. No name,” Pang said at last. “He wanted people to see it.”
 
-Ruel nodded toward the folder. “It appears that way.”
+Ruel nodded toward the folder. “It looks that way.”
 
 Pang watched the clip again, searching for a clue that would make the discovery easier to bear. The line flowed across the screen with impossible ease. It looked like him, but not like any run he remembered completing.
 
@@ -792,9 +808,11 @@ The perfect run never happened. The target Pang had chased was not a record made
 
 He looked at the paused image. The ghost car was mid-corner, smooth and certain, with no sign that it had ever needed to slow down and try again.
 
-“Why couldn't I beat myself?” he asked.
+“Then why couldn't I beat myself?” he asked.
 
-Nico closed the laptop halfway. “Because you weren't trying to beat yourself. You were trying to beat an edit.”
+Nico closed the laptop halfway. “Yourself? You were racing an edit. With a number even the edit never did.”
+
+“The one we'll pretend you meant to do,” Pang said, to nobody.
 
 # **Chapter Fifteen**
 
@@ -812,7 +830,7 @@ They walked to a viewpoint farther along the road. From there, the geography mad
 
 A witness who had been leaving a small roadside stop on the night of the crash met them later that afternoon. He remembered a car on the lower road, though he could not recall its make or color. He had seen the lights move through the trees. He had not seen the car approach the upper bend, and he had no reason to think it had anything to do with the crash until people began asking.
 
-“I'm sorry,” he said. “I thought the police would know more than I did.”
+“Sorry,” he said. “I thought the police knew more than me.”
 
 Pang did not ask him to turn uncertainty into a statement. The man had seen what he had seen. That was all.
 
@@ -820,9 +838,14 @@ They returned to the garage with the route map and the recovered logger. Ruel ha
 
 There was no sudden input consistent with avoiding a car entering his lane. No trace that required a collision to explain it. The car left the road after the correction, not before it.
 
-Pang listened to the surviving audio. Jolo's voice rose above the engine: “Drive the road\!” Then the file ended in a burst of noise. The logger continued a little farther. The camera did not.
+Pang listened to the surviving audio. Jolo's voice, under the engine: “Pang, it's wet. It's wet.” Not the line Pang had carried for months. That one was from a dry Tuesday. Then the file ended in a burst of noise. The logger continued a little farther. The camera did not.
 
-The headlights had been real. His certainty about what they meant had not been supported by the evidence.
+Ruel unplugged the logger and held it a moment. “Thirty years, every man who brings a car in here tells me what's wrong with it before I open the hood,” he said. “Almost always wrong. Not lying. They just tell me the version where it's the car's fault. I kept that box because the box doesn't do that. Not for you. Not for the family. I wanted one thing in all this that couldn't tell itself a story.”
+
+“And now?”
+
+“Now you know what it says.” He picked up a rag.
+
 
 He could have stopped there and called it an answer. Instead, he asked Ruel to run the data again, checked the timestamps, and compared the traces with the road's slope and the tires on the car. Every test returned to the same broad conclusion: the surface had changed, the car had approached too quickly for those conditions, and Pang's correction had made the loss of grip worse.
 
@@ -844,11 +867,11 @@ Pang stood over the papers and tried to arrange them into an accusation that wou
 
 Nico ran a final series of controlled comparisons on a safe section of road. He used the same car where possible, the same start points, and repeated passes under labeled conditions. The point was not to recreate the fatal drive. It was to test the composite's logic. The best entry came from one pass, the middle from another, the exit from a third. When Nico tried to string them together, the time changed. The line needed different conditions and different compromises from one sector to the next.
 
-“You can get close in each section,” Nico said. “You can improve each one. But the combined number isn't a completed drive. It assumes there are no costs between the best moments.”
+“Every sector, you're close,” Nico said. “The number skips the road between them. You can't.”
 
 Pang looked at the notes. “So it was impossible.”
 
-“It was impossible as advertised. That's not the same as saying the driving was fake.” Nico tapped the first sector. “You did this. You did the middle. You did the exit. The skill was real. The claim that they happened in one pass was false.”
+“As advertised.” Nico tapped the first sector. “The middle was yours. The exit was yours. Write that down.”
 
 That mattered more than Pang expected. He had been tempted to dismiss his own ability as another part of the lie. But the footage did not show a fraud. It showed a good driver with a good moment, then another good moment, then another—each separated by a mistake, a changed surface, or the patience to start over.
 
@@ -862,13 +885,13 @@ He did not write that he knew every second. He did not write that no other facto
 
 Ruel stood across from him. “What now?”
 
-Pang looked at the original notes, the line that Jolo had typed before anyone called it a legend. “Now I tell the truth.”
+Pang looked at the original notes, the line that Jolo had typed before anyone called it a legend. “I post the files. All of them.”
 
-Nico nodded once. “That won't make everyone believe it.”
+Nico nodded once. “Half of them won't believe it. I'm being generous.”
 
 “I know.”
 
-“It may cost you more than the races did.”
+“It'll cost you more than the races did.”
 
 Pang capped the marker. “I know that too.”
 
@@ -882,55 +905,39 @@ Dante read the project notes twice.
 
 The first time, he was looking for a way to argue with them. The second time, he seemed to understand that the text was not going to change. Pang had brought the original files to the same coffee shop where the Ghost Line had first been celebrated. Outside, cars moved through the parking lot, their polished panels catching the late sun. The scene was still alive, still making plans for the next event. Nothing about it looked like a community preparing to admit it had been wrong.
 
-“You knew it was a composite,” Pang said.
+“Coffee?” Dante said. “I'm getting coffee.”
 
-Dante kept his eyes on the screen. “I knew it was a reference assembled from good sectors. I never claimed it was an official record.”
+The folder lay open between them: v1, title card and all. He did not pretend not to know it.
 
-“You gave it a total time and called it Ghost Time.”
+“The notes say 1:29.4. Your poster says 1:26.7.”
 
-“Because the event needed a target.”
+“Posters round.”
 
-“A target no one could complete.”
+“Down?”
 
-Dante exhaled. “The audience knew it was a legend.”
+Dante smiled as if Pang had made a good point at a party. “Nobody drives down a mountain at night to chase 1:29.4, my friend. A record, somebody takes it, everybody goes home. A ghost sells this Saturday. And the one after.”
 
-“Some did. The drivers tried to beat it. I tried to beat it.”
+“You found time where there wasn't supposed to be any,” Pang said.
 
-Dante looked up. For a moment he seemed tired rather than defensive. “People wanted something impossible. They wanted a driver who could not be found, a number nobody could touch. I gave the scene what it was asking for.”
-
-“You gave it what you could sell.”
-
-“I organized races. I found sponsors. I paid for barriers, timing equipment, transport. You think none of that costs money? You think a story is separate from an event?” He leaned back. “I didn't put you in the car. I didn't tell you to ignore the weather. I didn't cause the crash.”
+“I said that. To you. Behind the warehouses.” Dante seemed pleased to be remembered. “I didn't put you in the car. I didn't tell you to ignore the rain. I didn't cause the crash.”
 
 “No,” Pang said. “You didn't.”
 
 The admission seemed to surprise Dante more than an accusation would have. Pang had come expecting him to deny everything, perhaps to reveal some hidden arrangement that would put a person behind the headlights. Instead, the truth was uglier because it was smaller. Dante had not planned a death. He had chosen not to correct a lie that helped him make money, and after the crash he had allowed the legend to protect his reputation.
 
-“What are you going to do?” Dante asked.
+“I'm posting the files.”
 
-“Release the files.”
+“Post them. I won't stop it.” Dante stirred his coffee. “Then they'll ask who was driving that night, and you'll tell them that too. I'm only asking if you've thought about which part they'll remember.”
 
-“That will damage people who had nothing to do with the crash.”
+“I've thought about it.”
 
-“It will also show what happened.”
-
-“Or people will argue about it for a week and move on. Some will say the notes are fake. Some will say a legend can be exaggerated. You won't control the story any more than I do.”
-
-“I know.”
-
-Dante looked at the screen again. He could bury the files, release them quietly, or tell the group what he had done. Any choice would cost him something. His hesitation showed Pang that the man still believed the person who controlled the framing controlled the damage.
-
-“I'll let the original context circulate,” Dante said at last. “I won't stop it.”
-
-“That isn't the same as telling the truth.”
-
-“No,” Dante said. “It isn't.”
+“Then you're braver than me. Sugar?”
 
 Nico made the next decision. He published his sector notes, his repeated tests, and a measured explanation of why the combined pace could not be treated as a single-run record. He did not call Dante a criminal or claim to know why the crash happened. He said only what his evidence supported. That restraint gave the report credibility, but it did not make it popular.
 
 Some drivers accepted it. Others insisted that all racing legends were built from exaggeration and that the Ghost Line remained a useful challenge regardless of its origin. Dante lost standing with some organizers and kept it with others. The events continued, though the name Ghost no longer filled every conversation.
 
-Pang watched the discussion unfold without entering it. There were people who believed him and people who found the truth less satisfying than the myth. He had wanted the scene to acknowledge what had happened. Now he understood that truth could be offered, but not made compulsory.
+Pang watched the discussion unfold without entering it. Forty-one people read Nico's post. Buko asked again on Thursday who Ghost was.
 
 One final thing remained, and no file could do it for him.
 
@@ -942,37 +949,43 @@ Jolo's mother opened the door and looked at Pang for a long time before stepping
 
 He had rehearsed what to say in the car. He had prepared a sequence of facts and brought the original footage on a drive, along with the project notes and the copies of the surviving camera file. In his head, he had arranged the conversation as neatly as Jolo had once arranged the video: one point leading cleanly to the next, each detail supporting the conclusion, no gaps where a person might misunderstand him.
 
-Inside, the house smelled of rice and laundry soap. A fan clicked in the corner. There was a framed photograph of Jolo on a shelf, smiling toward a camera he had probably set up himself. Pang could not look at it for long.
+Inside, the house smelled of rice and laundry soap. A fan clicked in the corner. On a shelf stood the picture Jolo had taken at the talyer, the three of them, Ruel frowning. Pang could not look at it for long.
 
 “I brought the original files,” he said.
 
-Jolo's mother sat at the table. His father remained by the window, arms folded. They did not offer him a drink. Pang set the drive down and explained what it contained. The Ghost Line had been assembled from different runs. Jolo had labeled the project as a composite line study. Dante had circulated it as an anonymous benchmark. The scene had treated the combined sector time as a performance that someone had completed.
+Jolo's mother sat at the table. His father remained by the window, arms folded. Jolo's sister sat on the stairs. They did not offer him a drink. Pang set the drive down.
 
-He told them he had tried to beat it. He told them about the night run and the rain, the tires, Ruel's warning, Jolo's warning, his own decision to continue. He explained the headlights on the lower switchback and what the evidence did—and did not—show. He described the logger data: the speed, the late braking, the correction, the loss of grip. The camera's last seconds were missing. No one could reconstruct every detail, but the best-supported explanation was that he had lost control on the wet corner.
+“The Ghost Line was cut from three of my runs. He labelled it a study. Dante took a number off it and posted it.” He made himself go on. “The lights were a car on the lower road. Not beside us. It was raining. Ruel said the tires were done. I went into the corner too fast. Jolo told me it was wet. I heard him.”
 
-Jolo's father stared at the table. “Are you telling us our son made the lie that killed him?”
+Nobody answered. Jolo's sister got up and left the room.
 
-“No,” Pang said, and heard how insufficient the word sounded. “Jolo made the edit. He didn't make me drive that night. He tried to warn me. He should have told me the truth about the clip sooner, but I chose to go. I ignored him when it mattered.”
+His father stared at the table. “So he made it up. The video.”
+
+“He made the video. I drove.”
 
 His mother held the drive in her hand, turning it slowly as if it might have a side that explained more than the other. “Why did you think there was another car?”
 
-“I saw lights. I thought they were beside us. I needed them to mean something.”
+“I saw lights. I needed them to be someone.”
 
 “Needed?”
 
-Pang looked down. “If another driver caused it, then I could find him. I could be angry at someone who wasn't me.”
+Pang looked down. “If it was someone, I could go and find him.”
 
-The room did not soften around the confession. No one told him that Jolo had loved him, though Pang knew he had. No one said the accident was not his fault. His mother put the drive on the table and asked him to leave a copy of everything.
+The room did not soften around the confession. No one told him that Jolo had loved him, though Pang knew he had. No one said the accident was not his fault. His mother put the drive on the table.
 
-“We'll look at it when we're ready,” she said.
+“Leave a copy of everything,” she said. Then: “A man came about a lens.”
 
-Pang nodded. He wanted to ask whether they could forgive him. He wanted to explain that he would carry the crash for the rest of his life, that he had not slept properly in months, that he would trade every race he had ever won for one more argument with Jolo in the garage. He understood that none of those things were theirs to manage.
+“Kuya Ben. I'll pay him.”
+
+“Did he eat? That night.”
+
+“Pan de sal. In the car.”
+
+“That's not dinner.” She went into the kitchen. The rice cooker clicked. Pang did not get up.
 
 “I won't ask you to forgive me,” he said.
 
 His father finally looked at him. “Good.”
-
-The word hurt because it was fair.
 
 Pang left the house without an answer. Outside, the afternoon carried on around him: a motorcycle passing, a neighbor calling to someone across the street, the ordinary sounds of a place that had not stopped because one family had been broken. He sat in the car for several minutes before turning the key.
 
@@ -984,9 +997,9 @@ The engine started on the second try. He let it idle until the temperature settl
 
 Nico asked him to drive the mountain road in daylight.
 
-Not as a test. Not to recreate the crash. Not for an event or a video. He made the invitation plain because they had both spent too long turning every drive into a measurement.
+Not as a test. Not to recreate the crash. Not for an event or a video. “I want to see what it looks like at forty,” he said.
 
-They went on a weekday morning when the road was quiet but not empty. A delivery truck moved slowly uphill. A family on a motorcycle passed them before a bend. The trees shone with the clean green brightness that rain left behind, and the asphalt changed texture where repairs had been made. Nothing was the same as it had been during the practice runs, and nothing needed to be.
+They went on a weekday morning when the road was quiet but not empty. A delivery truck moved slowly uphill. A family of four on one motorcycle passed them before a bend. The trees shone with the clean green brightness that rain left behind, and the asphalt changed texture where repairs had been made.
 
 Pang drove without a timer. At first, he could not stop thinking in sectors. He saw the start of the Ghost Line in the approach to the first bend, then its idealized middle section, then the fast exit. The ghost car appeared in his mind with its pale, smooth trajectory. He knew exactly where it wanted him to place the car. The knowledge arrived as a reflex, not a choice.
 
@@ -1006,13 +1019,9 @@ On the other side of the corner, he pulled into a safe lay-by and switched off t
 
 Pang rested his hands on the wheel. “That's it.”
 
-He had not defeated the corner. He had not proved that he could have avoided the crash under every possible circumstance. He had not undone the night or returned Jolo to the passenger seat. He had simply made a different decision when the road asked him to.
-
 They drove the rest of the route at an ordinary pace. The car rattled over a rough patch, and Pang heard the familiar trim tapping against the dash. Instead of imagining the sound as a defect that might ruin a run, he felt a strange affection for it. The car was imperfect. It had always been imperfect. Its flaws were part of the information it gave him, not a challenge to his pride.
 
 At the bottom of the mountain, Nico stopped for coffee. They talked about tires, a friend who needed help finding a part, and a new shop that had opened near the highway. They did not talk about forgiveness or closure. There was no need to turn the drive into a ceremony.
-
-Pang was beginning to understand that change was not a moment when the past finally made sense. It was a practice: seeing what was in front of him, admitting what he could not know, making a decision without demanding that it prove something about who he was.
 
 # **Epilogue**
 
@@ -1020,34 +1029,28 @@ Pang was beginning to understand that change was not a moment when the past fina
 
 The garage was full again by the time the rains returned.
 
-A small group had gathered around a car with its front bumper removed. Someone was looking for a used sensor. Someone else was arguing about whether an expensive coilover setup was worth the money on Philippine roads. Ruel moved between them with a rag in one hand and a list of jobs in the other. The old calendar had finally been replaced, but the workbench was still crowded with bolts, receipts, and tools that no one put back in the same place twice.
+A small group had gathered around a car with its front bumper removed. Someone was looking for a used sensor. Someone else was wrong about coilovers. Ruel moved between them with a rag in one hand and a list of jobs in the other. The old calendar had finally been replaced, but the workbench was still crowded with bolts, receipts, and tools that no one put back in the same place twice.
 
-Pang spent more time there now. He helped where he could, took small jobs, and kept the car running without pretending it would ever become the build he once imagined. He still drove. He still liked the sensation of a corner arriving and the car settling beneath him. He had not become a different person, only one who no longer treated every drive as a referendum on his worth.
+Pang spent more time there now. He helped where he could, took small jobs, and kept the car running without pretending it would ever become the build he once imagined. He still drove. He still liked the sensation of a corner arriving and the car settling beneath him.
 
 A young driver arrived near closing. His car was clean and loud, its tires new enough to shine. He waited until the conversation paused, then asked the question that had outlasted the evidence.
 
 “Has anyone beaten the Ghost Line yet?”
 
-A few people laughed. Someone said they had heard of a driver who came within a tenth. Another said the whole thing was fake, which started a familiar argument about what fake meant when every part of the footage had been real.
+A few people laughed. Someone said they had heard of a driver who came within a tenth. Another said the whole thing was fake. Ate Liza said it wasn't, exactly. That took a while.
 
-Pang looked at the young driver's car. “You check the tires and brakes?”
+“So nobody ever beat it?”
 
-The kid blinked, then smiled awkwardly. “I mean, yeah. Mostly. I'm more worried about the time.”
+Pang looked at the young driver's car. “Who does your tires?”
 
-Pang nearly laughed. He recognized the hunger, and he recognized how little a warning could do when someone had mistaken the next race for the door to a better life.
+“They're fine.”
 
-“A recording can teach you something,” he said. “But it can't drive your car for you. The road won't be the same twice.”
+“They're not finished becoming dangerous.”
 
-The young driver nodded politely, the way people did when they heard advice they had not yet needed. He went back to the others and asked about the next meet.
+“What?”
 
-Pang did not follow him to make sure he had understood. He had learned that a person could hear the truth and still choose the story they preferred. He had done it himself.
+At the bench, Ruel didn't look up. “Different thing.”
 
 The rain began tapping against the roller door. Ruel reached up to pull it down partway, and the metal rattled in its track. Somewhere outside, a car revved, then moved away into the ordinary night.
 
-Pang took his keys from the workbench. The engine started on the second turn. Its idle was uneven; the trim tapped lightly against the dash. The sound belonged to the car, not to a promise. He let it settle and drove out into the wet street, watching the road for what it was rather than what he wanted it to be.
-
-The Ghost Line had never been the story of a driver nobody could find. It was the story of a community that mistook an edit for a record, a friend who let a useful lie grow beyond his control, and a man who believed that a perfect line mattered more than the changing world in front of him.
-
-The road continued ahead, imperfect and unrepeatable.
-
-For once, that was enough.
+Pang took his keys from the workbench. The engine started on the second turn. The trim tapped the dash. He let it settle and drove out into the wet street.
