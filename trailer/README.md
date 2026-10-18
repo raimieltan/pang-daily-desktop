@@ -97,3 +97,30 @@ cd trailer/edit && npm run render:v2   # -> trailer/renders/pang_daily_v2_vertic
 - Music: "Live on JP (Eurobeat)" by ZTMusic (Pixabay licence), 147 BPM, drop at 127.74 s placed
   on trailer 0:12. Nothing plays under the open.
 - `--skill=` and `--rival-pace=` override the v2 shots' autopilot skill and rival pace for probing.
+
+## v3: the story trailer, "The Ghost Line" (16:9 ~93 s + 9:16 ~62 s)
+
+Design: `docs/superpowers/specs/2026-10-18-story-trailer-design.md`. Footage is story mode itself, captured beat by
+beat on the trailer's probe save; both cuts are in `edit/src/v3/edit.ts` (`wide`, `tall`).
+
+```sh
+trailer/story_capture.sh --probe-story        # once: play the story headless so the passes/cut/crash log exist
+                                              # (or copy a finished user://story_probe.json into
+                                              #  ~/Library/Application Support/pang_daily_trailer/)
+trailer/story_capture_all.sh                  # every take -> trailer/out/story/<name>.mp4 + .events.json (~3 h on an M1)
+ONLY=s13_clean,s27 trailer/story_capture_all.sh   # re-take some
+cd trailer/edit && npm run render:story       # -> renders/pang_daily_ghost_line_{16x9,9x16}.mp4
+```
+
+- `story_capture.gd` starts story mode at `--beat=<id>`, auto-advances lines (`--advance`), drives every drive beat
+  with the AI, and logs each line's on-screen time to `<name>.events.json` — that's where the edit's `from` values
+  come from. `--clean` hides the story's 2D layer and the HUD (clean plates for the edit's own text and the 9:16
+  reframes); `--cams=t:shot,…` switches game cameras.
+- Pass scenes render at ~14 % of real time; the watchdog (`LIMIT`, default 3600 s) must outlast them.
+- Speech-panel takes show the game's "CLICK / SPACE" prompt; the edit patches it with `masks` in the panel's colour
+  (`NOW_PANEL`, `MEMORY_PANEL`, `PAGE_HINT`).
+- 9:16 reframes each 1920×1080 take with `focus` [cx, cy, w] (607 px wide = full height), or shows comic pages as a
+  full-width `band` on paper.
+- Music: "Dark Pulse – Suspense Thriller Cinematic" by MeeGiStudio (Pixabay licence), spliced on its own hits
+  (`WIDE_MUSIC` / `TALL_MUSIC`). Story SFX (wrench, shutter, phone buzz) are the game's own, in `public/sfx`.
+- Final deliverables are loudness-normalised to −14 LUFS (two-pass `loudnorm`) from the `_raw` renders.

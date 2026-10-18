@@ -6,6 +6,8 @@ import { Banner, Cover, Icon, IconMark } from "./Branding";
 import { Trailer } from "./Trailer";
 import { TrailerV2 } from "./v2/TrailerV2";
 import { TOTAL_SECONDS as V2_SECONDS } from "./v2/edit";
+import { StoryTrailer } from "./v3/StoryTrailer";
+import { CUTS } from "./v3/edit";
 
 const fonts = delayRender("fonts");
 fontsReady.then(() => continueRender(fonts));
@@ -25,6 +27,13 @@ export const Root: React.FC = () => (
       durationInFrames={Math.round(V2_SECONDS * FPS)} defaultProps={{ showSafeZones: false }} />
     <Composition id="V2SafeZones" component={TrailerV2} width={1080} height={1920} fps={FPS}
       durationInFrames={Math.round(V2_SECONDS * FPS)} defaultProps={{ showSafeZones: true }} />
+    {/* v3, the story trailer "The Ghost Line": a 16:9 master and its 9:16 cutdown from the same takes. */}
+    <Composition id="StoryWide" component={StoryTrailer} width={1920} height={1080} fps={FPS}
+      durationInFrames={Math.round(CUTS.wide.seconds * FPS)} defaultProps={{ cut: "wide" as const, showSafeZones: false }} />
+    <Composition id="StoryTall" component={StoryTrailer} width={1080} height={1920} fps={FPS}
+      durationInFrames={Math.round(CUTS.tall.seconds * FPS)} defaultProps={{ cut: "tall" as const, showSafeZones: false }} />
+    <Composition id="StoryTallSafeZones" component={StoryTrailer} width={1080} height={1920} fps={FPS}
+      durationInFrames={Math.round(CUTS.tall.seconds * FPS)} defaultProps={{ cut: "tall" as const, showSafeZones: true }} />
     {/* Social account kit (render with `npm run brand`). */}
     <Composition id="YouTubeBanner" component={Banner} width={2560} height={1440} fps={FPS} durationInFrames={1} />
     <Composition id="Icon" component={Icon} width={1080} height={1080} fps={FPS} durationInFrames={1} defaultProps={{ dark: false }} />
