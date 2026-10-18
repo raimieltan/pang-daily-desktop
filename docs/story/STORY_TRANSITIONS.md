@@ -37,7 +37,7 @@ arrival, never over the driving.
 | 7 | s02 → s03 | race page | S02: Jolo announces the entry is paid | page carries Jolo's line, as written | |
 | 8 | s03 → s04t | race ends, cut to the talk | S03: Dante's invitation | **coast** after the finish; J-cut crickets (PAST MIDNIGHT) | |
 | 9 | s04t → s04a | (was s04t → s05) VRRMM page, fade | S04: Nico looks the build over: “Not on those.” | **tail** 1.5 s on the Kyo lot after Nico's line; fade; MORNING page into the talyer | no roller-door sound in the kit: the page carries the morning |
-| 9a | s04a → s04b | — (new Oct 18) | S04A: “Five hundred in.” | the garage closes; fade; NIGHT; roam starts at the talyer (the drive to the bypass is the roam's own) | S04B is a roam: the regulars parked on the forecourt, once each |
+| 9a | s04a → s04b | — (new Oct 18) | S04A: “Five hundred in.” | the garage closes; fade; NIGHT; the roam opens on the Bahandi forecourt | S04B is a roam: the regulars parked on the forecourt, once each |
 | 9b | s04b → s05 | — (new Oct 18) | S04B: Dante's invitation in the group chat | buzz when the player reaches NEXT; the VRRMM page (moved from #9); J-cut engine out of the page's black, gone when the meet comes up | |
 | 10 | s05 → s15a | (was s05 → s16) race, fade, black, wrench, 0.5 s, fade up | S05: Jolo promises a clip (cut) | **coast**; “Don't tell Ruel about the tires.” then a hard cut; the wrench and the present land together (NOW), on the talyer | same technique as before, new landing |
 | 10a | s15a → s15b | — (new Oct 18) | S15A: Kapitan's flyer | **coast** after lap two; flyer page; fade; roam starts at the talyer (the present shop opens) | |
@@ -54,7 +54,7 @@ arrival, never over the driving.
 | 19 | s07 → s08 | fade | S07 (old S06): the edit cuts to a continuous engine note | J-cut engine under the chat's last line, gone when the pass comes up | matches S06's exit, moved to where the drive is |
 | 20 | s08 → s09 | run ends, page | S08: Dante announces the public event | **coast**; the crowd page | |
 | 21 | s09 → s09a1 | (was s09 → s10) run ends, fade | S09: Dante announces Saturdays | **coast**; SATURDAY page (the posted time on a poster) | |
-| 21a | s09a1 → s09b1 | — (new Oct 18) | Night 1 ends | **coast**; fade; roam starts at the talyer (board at the pumps) | |
+| 21a | s09a1 → s09b1 | — (new Oct 18) | Night 1 ends | **coast**; fade; the roam opens on the Bahandi forecourt (the board by the shop door) | |
 | 21b | s09b1 → s09a2 | — (new Oct 18) | S09B1: NEXT is the pass | the player reaches NEXT; SATURDAY page, the poster's number changed if the player beat it; **ease** into the start line | the poster is the clue: show it, don't point at it |
 | 21c | s09a2 → s09b2 | — (new Oct 18) | Night 2 ends | as #21a | |
 | 21d | s09b2 → s09a3 | — (new Oct 18) | S09B2: NEXT is the pass | as #21b | the poster is the clue: show it, don't point at it |

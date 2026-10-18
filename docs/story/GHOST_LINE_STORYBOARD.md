@@ -36,6 +36,9 @@ The scene order below is the intended order of player experience. The chronology
 * Racing stays central in the middle. At least two playable drives after the crash must advance the investigation or dramatize the protagonist’s altered relationship with driving.  
 * Confession is not absolution. The protagonist tells Jolo’s family what happened without asking them to forgive him. The ending changes his conduct, not the past.  
 * Avoid repeating the theme after the image has landed. The final daylight drive should carry the meaning; explanatory dialogue should be minimal.  
+
+*Races and progression (Oct 18, 2026): the storyboard's story stays. What changes is the player's relationship to it: races now cost and pay, the car is built and rebuilt, and the story's last drive is a real race.*
+
 * Races matter. Every new drive has stakes: money, reputation, information, a grid slot, or the car. A loss costs something; it never fails the story.  
 * The past has a fixed number of nights. Memory events can each be run once. The player cannot grind the months before the crash.  
 * The build is the arc. The memory car is built with Dante's money while chasing Ghost. The present car is rebuilt Ruel's way, from the wreck.  
