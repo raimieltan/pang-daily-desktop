@@ -106,6 +106,7 @@ static func scene_for(b: Dictionary) -> String:
 
 ## Replay from the first beat of an act already reached (the recorded passes stay).
 static func play_from(tree: SceneTree, index: int) -> void:
+	StoryBridge.node().release_all(0.3)
 	load_save()
 	goto(tree, clampi(index, 0, reached))
 
@@ -121,6 +122,7 @@ static func finish(tree: SceneTree) -> void:
 ## Leave the story for the title screen (progress stays saved).
 static func quit_to_title(tree: SceneTree) -> void:
 	active = false
+	StoryBridge.node().release_all(0.3)
 	tree.paused = false
 	tree.change_scene_to_file(PASS_SCENE)
 

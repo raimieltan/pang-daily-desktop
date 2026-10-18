@@ -189,6 +189,35 @@ func test_scene_changes_are_bridged_by_pages() -> void:
 		prev = b
 
 
+## Transitions: every bridge names a sound there is, tails and heads stay short (the crash
+## runs its own), and a looped sound really loops.
+func test_transitions_are_well_formed() -> void:
+	var sounds := StoryBridge.sounds()
+	var keys := ["sound", "db", "loop", "lead", "carry", "until", "cut", "tail", "head", "fade"]
+	var count := 0
+	for b in StoryScript.BEATS:
+		for side in ["enter", "exit"]:
+			if not b.has(side):
+				continue
+			count += 1
+			var t: Dictionary = b[side]
+			var where := "%s.%s" % [b["id"], side]
+			for k in t.keys():
+				_check(k in keys, "%s: known key %s" % [where, k])
+			if t.has("sound"):
+				_check(t["sound"] in sounds, "%s: sound %s exists" % [where, t["sound"]])
+			for k in ["tail", "head"]:
+				if t.has(k):
+					_check(float(t[k]) >= 1.0 and float(t[k]) <= 3.0, "%s: %s is 1-3 s" % [where, k])
+			if t.has("lead"):
+				_check(float(t["lead"]) <= 2.0, "%s: lead is at most 2 s" % where)
+			if t.has("until"):
+				_check(t["until"] == "reveal" and side == "enter", "%s: until reveal, on an enter" % where)
+	_check(count >= 15, "the transitions are authored (got %d)" % count)
+	var rain := StoryBridge.stream_for("rain", true) as AudioStreamWAV
+	_check(rain != null and rain.loop_mode == AudioStreamWAV.LOOP_FORWARD, "a looped bridge loops")
+
+
 func test_the_entry_pages_keep_the_twist() -> void:
 	# Before the backup folder (s21) no caption or line may tie the clip to Pang's own car.
 	var stop := StoryScript.index_of("s21")

@@ -62,6 +62,7 @@ const BEATS := [
 	{ "id": "a1_card", "scene": "S14", "stage": "panel", "type": "chapter",
 		"act": "ACT I", "title": "THE RETURN", "subtitle": "A name nobody can place." },
 	{ "id": "s14", "scene": "S14", "stage": "room", "type": "talk", "set": "clinic", "place": "THE CLINIC", "when": "AFTER THE CRASH",
+		"enter": { "sound": "rain", "loop": true, "db": -16.0, "lead": 1.0 },
 		"comic": [[
 			{ "art": "white", "cap": "The clinic. I learned the ceiling. The window did weather and nothing else." },
 			{ "art": "tone", "cap": "Twenty-three days. Nobody said Jolo's name in there, so it was in there all the time." },
@@ -80,6 +81,7 @@ const BEATS := [
 		["RUEL", "Car's here. So's the camera card. So's the logger. Come when you come."],
 	] },
 	{ "id": "s15", "scene": "S15", "stage": "hub", "type": "evidence", "spot": "talyer", "place": "RUEL'S TALYER", "when": "AFTER THE CRASH",
+		"exit": { "cut": true },
 		"comic": [[
 			{ "art": "tone", "cap": "Ruel's talyer, the first time back. The car under a tarp. On the bench, in a sandwich bag: Jolo's cracked phone card and the logger." },
 		]],
@@ -150,6 +152,7 @@ const BEATS := [
 			["DANTE", "Come by Kyo, my friend. Meet some people. Coffee's on me."],
 		] },
 	{ "id": "s04t", "scene": "S04", "stage": "hub", "type": "talk", "spot": "kyo", "night": true,
+		"enter": { "sound": "crickets", "loop": true, "db": -12.0, "lead": 1.0 },
 		"place": "KYO COFFEE", "when": "PAST MIDNIGHT", "lines": [
 		["", "Dante's thing wasn't speed. He made you feel the next room had saved you a seat."],
 		["DANTE", "Look— people want to watch you. Small car. No budget. You."],
@@ -168,6 +171,7 @@ const BEATS := [
 			{ "art": "speed", "fx": "VRRMM" },
 		]] },
 	{ "id": "s05", "scene": "S05", "stage": "pass", "type": "race", "course": "pass", "title": "NICO'S LESSON",
+		"enter": { "sound": "engine", "loop": true, "db": -14.0, "lead": 1.0, "until": "reveal" },
 		"field": [NICO], "night_value": 0.2,
 		"comic": [[
 			{ "art": "road", "cap": "PASS 1 · SATURDAY · BEFORE THE LIGHT GOES" },
@@ -230,6 +234,7 @@ const BEATS := [
 			["NICO", "Drive it with me. Sector by sector. Then tell me it's one run."],
 		] },
 	{ "id": "s06", "scene": "S06", "stage": "pass", "type": "practice", "title": "A LINE STUDY", "memory": "THE LINE STUDY",
+		"enter": { "sound": "rain", "loop": true, "db": -12.0, "lead": 0.6, "until": "reveal", "carry": 0.3 },
 		"comic": [[
 			{ "art": "black", "cap": "Buko's phone, face up at Kyo. The clip again. Rain on the lens." },
 			{ "art": "tone", "cap": "I looked at the rain until something older came up. A dry Tuesday, months before. THE LINE STUDY." },
@@ -276,6 +281,7 @@ const BEATS := [
 	{ "id": "a2_card", "scene": "S18", "stage": "panel", "type": "chapter",
 		"act": "ACT II", "title": "THE GHOST", "subtitle": "A line nobody can finish, and the one who posted it." },
 	{ "id": "s18", "scene": "S18", "stage": "pass", "type": "sectors", "title": "NICO REPEATS THE TEST",
+		"exit": { "cut": true },
 		"comic": [[
 			{ "art": "road", "cap": "Pass 1, a weekday morning. Nico's GSR at the top, a notebook on the roof. No crowd. No board." },
 		]],
@@ -331,6 +337,7 @@ const BEATS := [
 		["", "Jolo read it, turned the phone face down, and asked if I wanted more rice."],
 	] },
 	{ "id": "s08", "scene": "S08", "stage": "pass", "type": "attack", "title": "CHASE THE COMPOSITE", "grip": 0.95,
+		"enter": { "sound": "engine", "loop": true, "db": -14.0, "lead": 1.0, "until": "reveal" },
 		"comic": [[
 			{ "art": "road", "cap": "I'd watched it so often the line was on the road before the road was." },
 			{ "art": "face", "who": "RUEL", "side": "right", "say": "Fronts are near the end. Don't come back and tell me the car changed." },
@@ -393,6 +400,7 @@ const BEATS := [
 			["NICO", "What do you think I've been doing."],
 		] },
 	{ "id": "s10", "scene": "S10", "stage": "hub", "type": "talk", "spot": "home", "cabin": true, "glass": 0.35,
+		"enter": { "sound": "rain", "loop": true, "db": -12.0, "lead": 1.2, "carry": 0.2 },
 		"place": "THE CAR, PARKED", "when": "AFTER MIDNIGHT", "night": true,
 		"comic": [[
 			{ "art": "rain", "cap": "AFTER MIDNIGHT · THE CAR, PARKED OUTSIDE MY PLACE" },
@@ -430,6 +438,7 @@ const BEATS := [
 		"wrong": ["RUEL", "Anyone can name a folder. Look at the picture."],
 		"after": [["RUEL", "Watch the driver's hands."]] },
 	{ "id": "s22", "scene": "S22", "stage": "hub", "type": "evidence", "spot": "talyer", "place": "RUEL'S TALYER", "when": "TWO CLIPS, SYNCED",
+		"exit": { "tail": 2.0 },
 		"cards": [{ "kind": "match", "title": "GHOST LINE vs RAW CLIP · STEERING" }],
 		"question": "Ghost's steering trace sits exactly on top of the raw clip. Whose hands are on the wheel?",
 		"options": [
@@ -454,6 +463,7 @@ const BEATS := [
 	{ "id": "a3_card", "scene": "S23", "stage": "panel", "type": "chapter",
 		"act": "ACT III", "title": "THE GHOST IS YOU", "subtitle": "The clip is yours. Then: it never happened." },
 	{ "id": "s23", "scene": "S23", "stage": "hub", "type": "talk", "spot": "talyer", "night": true, "place": "RUEL'S TALYER", "when": "AFTER CLOSING",
+		"enter": { "sound": "crickets", "loop": true, "db": -14.0, "lead": 1.0 },
 		"comic": [[
 			{ "art": "black", "cap": "After closing. Ruel's laptop on the bench, the backup drive beside it. GHOST_LINE/v1, title card still on." },
 			{ "art": "tone", "cap": "Jolo's voice came out of the little speaker like he was in the next bay." },
@@ -473,6 +483,7 @@ const BEATS := [
 		["RUEL", "Under the picture. It skips."],
 	] },
 	{ "id": "s24", "scene": "S24", "stage": "hub", "type": "talk", "spot": "home", "cabin": true, "glass": 0.35,
+		"exit": { "tail": 2.0, "fade": 0.8 },
 		"place": "THE CAR, PARKED", "when": "AFTER THE CHALLENGE · ANOTHER ANGLE", "night": true,
 		"comic": [[
 			{ "art": "rain", "cap": "I drove home and didn't go in. Phone on the passenger seat. The other folder open: the same night, from the dash." },
@@ -530,6 +541,7 @@ const BEATS := [
 			["", "Nico peeled the tape off the shutter."],
 		] },
 	{ "id": "s26", "scene": "S26", "stage": "pass", "type": "sectors", "title": "THE SECTOR TRIALS", "connect": true,
+		"enter": { "sound": "engine", "loop": true, "db": -14.0, "lead": 1.0, "until": "reveal" },
 		"comic": [[
 			{ "art": "road", "cap": "Pass 1, dry, new fronts. Nico's sheet clipped to the dash." },
 		]],
@@ -574,6 +586,8 @@ const BEATS := [
 			["RUEL", "Bring the car in before you say yes to anything. I want those tires."],
 		] },
 	{ "id": "s12", "scene": "S12", "stage": "hub", "type": "talk", "spot": "talyer", "night_value": 0.6, "rain": 0.6, "wet": 0.9,
+		"enter": { "sound": "rain", "loop": true, "db": -10.0, "lead": 1.0, "until": "reveal" },
+		"exit": { "sound": "rain", "loop": true, "db": -8.0, "carry": 3.0 },
 		"place": "RUEL'S TALYER", "when": "THE NIGHT RUN · DUSK",
 		"comic": [[
 			{ "art": "rain", "cap": "FRIDAY · DUSK · RAIN SINCE NOON" },
@@ -604,6 +618,7 @@ const BEATS := [
 		]] },
 	{ "id": "s13", "scene": "S13", "stage": "pass", "type": "crash", "title": "THE LAST NIGHT RUN", "posted": true, "grip": 0.95 },
 	{ "id": "s27", "scene": "S27", "stage": "pass", "type": "evidence", "at": "overlook", "place": "PASS 1 · ABOVE 8A", "when": "DAYLIGHT", "now": "wiper", "night_value": 0.0, "wet": 0.0,
+		"enter": { "head": 2.0 },
 		"before": [
 			["NICO", "Lower road's behind that ridge. A car down there is hidden most of the bend. Then its lights come through the gap."],
 			["WITNESS", "I was leaving the sari-sari store. Two cigarettes and a Coke. A car went up the lower road."],
@@ -629,6 +644,7 @@ const BEATS := [
 			["RUEL", "Then we read the logger."],
 		] },
 	{ "id": "s28", "scene": "S28", "stage": "hub", "type": "evidence", "spot": "talyer", "place": "RUEL'S TALYER", "when": "THE LOGGER",
+		"exit": { "tail": 2.0, "fade": 0.6 },
 		"comic": [[
 			{ "art": "tone", "cap": "Back down the mountain in daylight. Ruel wired the logger to the bench and the last 160 metres came up as four lines." },
 			{ "art": "face", "who": "RUEL", "side": "right", "say": "Read it like a road. Left to right." },
@@ -679,6 +695,7 @@ const BEATS := [
 			["PANG", "I know."],
 		] },
 	{ "id": "s30", "scene": "S30", "stage": "hub", "type": "talk", "spot": "kyo", "place": "KYO COFFEE", "when": "LATE SUN", "night_value": 0.3, "wet": 0.0,
+		"exit": { "cut": true },
 		"comic": [[
 			{ "art": "tone", "cap": "Kyo Coffee, late sun. Dante's table. The folder went down on it before anyone said hello." },
 		]],
@@ -701,7 +718,8 @@ const BEATS := [
 		["PANG", "I've thought about it."],
 		["DANTE", "Then you're braver than me. Sugar?"],
 	] },
-	{ "id": "s31", "scene": "S31", "stage": "panel", "type": "talk", "style": "phone", "place": "PASS 1 RUNNERS (PRIVATE GROUP)", "when": "A WEEK LATER", "lines": [
+	{ "id": "s31", "scene": "S31", "stage": "panel", "type": "talk", "style": "phone", "place": "PASS 1 RUNNERS (PRIVATE GROUP)", "when": "A WEEK LATER",
+		"enter": { "sound": "phone_buzz", "lead": 0.4 }, "lines": [
 		["NICO", "Sector notes, repeat tests, source files. The Ghost Line is a composite of separate passes. Every sector is real. It was never one run, and the posted time is shorter than even the cut. That is all the evidence supports."],
 		["ATE LIZA", "I told you that sign was bent."],
 		["KAPITAN", "fake notes. legend is legend"],
@@ -716,6 +734,8 @@ const BEATS := [
 	{ "id": "a5_card", "scene": "S32", "stage": "panel", "type": "chapter",
 		"act": "ACT V", "title": "THE ROAD IS NOT A RECORDING", "subtitle": "Two barangays over." },
 	{ "id": "s32", "scene": "S32", "stage": "room", "type": "talk", "set": "jolo_home", "place": "JOLO'S FAMILY HOME", "when": "AFTERNOON",
+		"enter": { "sound": "dog", "db": -10.0, "lead": 0.8 },
+		"exit": { "tail": 2.5, "fade": 1.2 },
 		"comic": [[
 			{ "art": "tone", "cap": "Jolo's family home, two barangays over. Concrete and dogs. The files on a drive, the notes on paper." },
 			{ "art": "black", "cap": "I knocked once and waited." },
@@ -767,6 +787,8 @@ const BEATS := [
 			["", "Here's what I know. I was driving."],
 		] },
 	{ "id": "s35", "scene": "S35", "stage": "hub", "type": "talk", "spot": "talyer", "night": true, "rain": 0.4, "wet": 0.6,
+		"enter": { "sound": "rain", "loop": true, "db": -10.0, "lead": 1.5, "until": "reveal" },
+		"exit": { "sound": "engine", "loop": true, "db": -12.0, "carry": 4.0 },
 		"place": "RUEL'S TALYER", "when": "EPILOGUE · THE RAINS RETURN",
 		"comic": [[
 			{ "art": "rain", "cap": "The rains came back the way they always do. Afternoon, all at once." },

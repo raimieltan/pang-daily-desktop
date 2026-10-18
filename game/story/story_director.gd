@@ -144,6 +144,43 @@ func _play(b: Dictionary) -> void:
 			await dialogue.chapter("PANG DAILY", "THE GHOST LINE", "The road continued ahead, imperfect and unrepeatable.")
 	if b.has("comic_after"):
 		await dialogue.comic(b["comic_after"], "black" if _cut_next() else "fade")
+	await _exit(b)
+
+
+## The way out of a beat (its "exit", and the next beat's "enter" when that is heard first):
+##   tail   seconds held on the last shot (skippable after 1 s; the crash runs its own)
+##   sound  heard from here into the next beat, faded over `carry` s (the L-cut); loop: true
+##   cut    a hard cut instead of a fade (so is any beat back to the present: "now")
+##   fade   seconds of the fade out (it fades anyway when the next beat is on another stage)
+## The next beat's "enter": sound (+ db, loop) starts `lead` s before the cut (the J-cut); a loop
+## runs until this beat ends, or only until its image is up with until: "reveal"; head holds
+## its first shot before anything is said.
+func _exit(b: Dictionary) -> void:
+	var ex: Dictionary = b.get("exit", {})
+	var bridge := StoryBridge.node()
+	if ex.has("tail"):
+		await dialogue.hold(float(ex["tail"]))
+	var own: Dictionary = b.get("enter", {})
+	if own.has("sound") and own.get("loop", false):
+		bridge.release(own["sound"], float(own.get("carry", 1.5)))
+	if ex.has("sound"):
+		bridge.play(ex["sound"], float(ex.get("db", -8.0)), ex.get("loop", false))
+		if ex.get("loop", false):
+			get_tree().create_timer(0.05).timeout.connect(bridge.release.bind(ex["sound"], float(ex.get("carry", 2.0))))
+	var i := StoryMode.beat + 1
+	if i >= StoryScript.BEATS.size():
+		return
+	var next: Dictionary = StoryScript.BEATS[i]
+	var en: Dictionary = next.get("enter", {})
+	if en.has("sound"):
+		bridge.play(en["sound"], float(en.get("db", -8.0)), en.get("loop", false))
+		await get_tree().create_timer(float(en.get("lead", 0.8))).timeout
+	if dialogue.is_black():
+		return
+	if ex.get("cut", false) or en.get("cut", false) or next.has("now"):
+		dialogue.black(true)
+	elif next.get("stage", "panel") != stage or ex.has("fade"):
+		await dialogue.fade(true, float(ex.get("fade", 0.45)))
 
 
 ## The way into a beat: the stage set up behind the black (or the last page), then the beat's
@@ -151,24 +188,42 @@ func _play(b: Dictionary) -> void:
 ## A memory opens on its pages and comes up warm under its period stamp; the first beat back
 ## cuts to black on a present-day sound and comes up on NOW.
 func _reveal(b: Dictionary) -> void:
+	await _reveal_shot(b)
+	var en: Dictionary = b.get("enter", {})
+	if en.get("until", "") == "reveal" and en.has("sound"):
+		StoryBridge.node().release(en["sound"], float(en.get("carry", 1.5)))
+	if en.has("head"):
+		await dialogue.hold(float(en["head"]))
+
+
+## The tint and the stamp change with the picture: under the black, or on the cut.
+func _look(memory: String, now: bool) -> void:
+	tint.set_warm(memory != "")
+	dialogue.set_stamp(memory if memory != "" else ("NOW" if now else ""))
+
+
+func _reveal_shot(b: Dictionary) -> void:
 	var cold: bool = b.get("cold_open", false)
 	var memory := StoryScript.memory_of(StoryMode.beat)
-	tint.set_warm(memory != "")
-	dialogue.set_stamp(memory if memory != "" else ("NOW" if b.has("now") else ""))
 	if b["type"] in ["chapter", "end"]:
+		_look(memory, false)
 		return
 	if b.has("memory"):
+		# The pages are still the present; the past comes up warm out of their black.
 		await dialogue.comic(b["comic"], "black")
+		_look(memory, false)
 		await _settle(b)
 		await dialogue.fade(false, 0.5)
 		return
 	if b.has("now"):
+		# A hard cut back: the present-day sound and the picture land on the same frame.
 		dialogue.black(true)
-		dialogue.sfx(str(b["now"]))
-		await get_tree().create_timer(0.5).timeout
+		_look("", true)
 		await _settle(b)
-		await dialogue.fade(false, 0.5)
+		dialogue.sfx(str(b["now"]))
+		dialogue.black(false)
 		return
+	_look(memory, false)
 	if not cold:
 		await _settle(b)
 	else:
@@ -332,6 +387,37 @@ func _mute_car(on: bool) -> void:
 			AudioServer.set_bus_mute(i, on)
 
 
+## The end of a drive: off the throttle and onto the brakes by degrees, the driver still steering,
+## so the car rolls to a stop instead of being caught by the next scene.
+func _coast(seconds: float) -> void:
+	var prev := session.input_filter
+	var st := { "t": 0.0 }
+	session.input_filter = func(i: VehicleTypes.DriverInput) -> VehicleTypes.DriverInput:
+		if prev.is_valid():
+			i = prev.call(i)
+		st["t"] += get_physics_process_delta_time()
+		i.throttle = 0.0
+		i.brake = maxf(i.brake, clampf(st["t"] / maxf(seconds, 0.1), 0.0, 1.0) * 0.7)
+		i.handbrake = 0.0
+		return i
+	await get_tree().create_timer(seconds).timeout
+	session.input_filter = prev
+
+
+## Arriving at a place: the car rolls to a stop while the camera drifts to the scene's shot; the
+## car is moved to its mark under a short dip to black (the next beat comes up out of it).
+func _ease_into(spot: String) -> void:
+	var v: Array = SPOT_VIEWS[spot]
+	var from := get_viewport().get_camera_3d().global_transform
+	_frame(HubLayout.pos(v[0].x, v[0].y, v[0].z), HubLayout.pos(v[1].x, v[1].y, v[1].z))
+	var to := _view.global_transform
+	_view.global_transform = from
+	create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT) \
+		.tween_property(_view, "global_transform", to, 1.4)
+	await _coast(1.4)
+	await dialogue.fade(true, 0.3)
+
+
 ## Drive to a place in the barangay.
 func _goto(b: Dictionary) -> void:
 	await _lines(b, "lines")
@@ -347,6 +433,10 @@ func _goto(b: Dictionary) -> void:
 			break
 		await get_tree().process_frame
 	_objective.text = ""
+	var i := StoryMode.beat + 1
+	var next: Dictionary = StoryScript.BEATS[i] if i < StoryScript.BEATS.size() else {}
+	if next.get("spot", "") == b["place"] and SPOT_VIEWS.has(b["place"]):
+		await _ease_into(b["place"])
 	_hold(true)
 
 
@@ -389,7 +479,7 @@ func _race(b: Dictionary) -> void:
 			session.input_filter = func(i: VehicleTypes.DriverInput) -> VehicleTypes.DriverInput:
 				return _shake(vs._filter_input(i), vs)
 		place = await vs.finished
-		await get_tree().create_timer(RESULT_HOLD).timeout
+		await _coast(RESULT_HOLD)
 		StoryMode.results[b["id"]] = { "place": place, "time": vs.run.time if vs.run else 0.0 }
 		vs.stop()
 		_hold(true)
@@ -478,7 +568,7 @@ func _timed_run(reference: Dictionary, ghost: PackedFloat32Array, label: String)
 	time_attack.started.disconnect(begin)
 	recorder.stop()
 	var out := { "time": time_attack.run.time, "splits": time_attack.run.splits }
-	await get_tree().create_timer(RESULT_HOLD).timeout
+	await _coast(RESULT_HOLD)
 	time_attack.free_drive()
 	time_attack.records = true
 	return out
@@ -619,7 +709,7 @@ func _flying_sector(k: int) -> float:
 			break
 	hud.split(k, run.time, _ghost.sector_time(k))
 	_ghost_car.show_pose({})
-	await get_tree().create_timer(2.0).timeout
+	await _coast(2.0)
 	hud.visible = false
 	return run.time
 
@@ -826,6 +916,7 @@ func _daylight(b: Dictionary) -> void:
 			_ghost_car.show_pose({})
 		if d >= t.finish_distance - 12.0:
 			break
+	await _coast(2.5)
 	_hold(true)
 	truck.queue_free()
 	await _lines(b, "after")

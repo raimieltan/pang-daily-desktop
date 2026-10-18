@@ -10,6 +10,8 @@ extends CanvasLayer
 signal advanced
 
 const CHARS_PER_SECOND := 70.0
+## A held shot (hold()) can be skipped after this long.
+const HOLD_SKIPPABLE := 1.0
 const SFX := {
 	"wrench": preload("res://assets/audio/story/wrench.wav"),
 	"shutter": preload("res://assets/audio/story/shutter.wav"),
@@ -24,6 +26,8 @@ static var auto_advance := 0.0
 
 ## Called with a set name on a ["~set", name] line (the room stage cuts to that room).
 var on_set := Callable()
+## Seconds into a hold(); below zero when none is running.
+var _holding := -1.0
 
 var _top: ColorRect
 var _bottom: ColorRect
@@ -392,11 +396,17 @@ func _process(delta: float) -> void:
 
 
 func _input(event: InputEvent) -> void:
-	if not _waiting:
+	if not _waiting and _holding < 0.0:
 		return
 	var pressed: bool = event.is_action_pressed("ui_accept") or (InputMap.has_action("interact") and event.is_action_pressed("interact")) \
 		or (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT)
 	if not pressed:
+		return
+	if not _waiting:
+		# A press during a held shot: skips it once the first second is up.
+		if _holding >= HOLD_SKIPPABLE:
+			_holding = INF
+		get_viewport().set_input_as_handled()
 		return
 	get_viewport().set_input_as_handled()
 	if _typing:
@@ -405,6 +415,15 @@ func _input(event: InputEvent) -> void:
 		return
 	_waiting = false
 	advanced.emit()
+
+
+## Hold on the shot for `seconds` (a scene's tail or head), skippable after the first second.
+func hold(seconds: float) -> void:
+	_holding = 0.0
+	while _holding < seconds and is_inside_tree():
+		await get_tree().process_frame
+		_holding += get_process_delta_time()
+	_holding = -1.0
 
 
 ## A line over the road while driving, gone after `seconds`; does not wait.
